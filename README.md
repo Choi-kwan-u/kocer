@@ -2,13 +2,59 @@
 
 한국어 STT를 공정하게 채점하는 CER — 띄어쓰기·숫자·문장부호·영문 약어 표기 차이를 오류로 세지 않습니다.
 
-*Fair CER/WER for Korean speech recognition. Spacing, punctuation, number notation (3개 ↔ 세 개) and Latin acronyms (AI ↔ 에이아이) are not counted as errors. Pure Python, zero dependencies, `jiwer`-compatible API.*
+*Fair CER/WER for Korean speech recognition. Spacing, punctuation, number notation (3개 ↔ 세 개) and Latin acronyms (AI ↔ 에이아이) are not counted as errors. Unlike jiwer and nlptutti, kocer scores numbers against every valid Korean reading and keeps the original CER alongside. Pure Python, zero dependencies, `jiwer`-compatible API.*
 
 ```
 ref: 사과 세 개 주세요
 hyp: 사과 3개 주세요
 jiwer CER 0.200   nlptutti CER 0.143   kocer CER 0.000
 ```
+
+## 기존 도구와 무엇이 다른가
+
+한국어 STT 채점에는 보통 [jiwer](https://github.com/jitsi/jiwer)나 [nlptutti](https://github.com/hyeonsangjeon/computing-Korean-STT-error-rates)를 씁니다. 셋 다 같은 편집거리로 CER을 계산합니다. 다른 점은 **무엇을 오류로 세느냐**입니다.
+
+- **jiwer**는 언어를 가리지 않는 범용 도구입니다. 띄어쓰기와 문장부호도 기본으로 오류로 셉니다.
+- **nlptutti**는 한국어용입니다. 띄어쓰기와 문장부호는 무시하지만, 숫자와 영문 표기 차이는 오류로 셉니다.
+- **kocer**는 여기에 더해 숫자 읽기(3개 = 세 개)와 영문 약어 읽기(AI = 에이아이)까지 같은 말로 봅니다.
+
+### 같은 문장, 세 도구의 CER
+
+2026-10-24 실측. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.1.2, 모두 기본 설정.
+
+| 정답 | STT 결과 | jiwer | nlptutti | kocer |
+|---|---|---|---|---|
+| 네, 알겠습니다. | 네 알겠습니다 | 0.222 | 0.000 | 0.000 |
+| 오늘날씨가좋다 | 오늘 날씨가 좋다 | 0.286 | 0.000 | 0.000 |
+| 사과 세 개 주세요 | 사과 3개 주세요 | 0.200 | 0.143 | **0.000** |
+| 삼 층으로 가세요 | 3층으로 가세요 | 0.222 | 0.143 | **0.000** |
+| 세 시 삼십 분 | 3시 30분 | 0.625 | 0.600 | **0.000** |
+| 이천이십사 년 십이 월 | 2024년 12월 | 0.750 | 0.778 | **0.000** |
+| 오천 원 | 5,000원 | 1.250 | 0.800 | **0.000** |
+| 오십 퍼센트 | 50% | 1.000 | 1.000 | **0.000** |
+| 에이아이 모델 | AI 모델 | 0.571 | 0.667 | **0.000** |
+| 나사 우주선 | NASA 우주선 | 0.667 | 0.571 | **0.000** |
+| 사과 세 개 주세요 | 사과 **네** 개 주세요 | 0.100 | 0.143 | 0.143 |
+| 세 시 삼십 분 | 3시 **13**분 | 0.625 | 0.600 | 0.400 |
+
+마지막 두 줄은 진짜 인식 오류입니다. kocer도 오류로 셉니다. "세 시 삼십 분"과 "3시 13분"에서 kocer가 낮은 이유는 "3시"는 맞게 인식한 부분이라 감점하지 않고, 틀린 "13분"만 세기 때문입니다.
+
+### 기능 비교
+
+| | jiwer | nlptutti | kocer |
+|---|---|---|---|
+| 띄어쓰기·문장부호 무시 | 직접 설정 | 기본 | 기본 |
+| 숫자 읽기 차이 무시 (3개 = 세 개) | 없음 | 없음 | 기본 |
+| 영문 약어 읽기 차이 무시 (AI = 에이아이) | 없음 | 없음 | 기본, 사용자 사전 지원 |
+| 정규화 전·후 CER을 한 번에 반환 | 없음 | 없음 | `raw_cer`, `cer` |
+| 여러 모델 비교 리포트, 품질 게이트 | 없음 | 있음 | 없음 |
+| 개체명·키워드 오류율 | 없음 | 있음 | 없음 |
+| 지원 지표 | WER, CER, MER, WIL, WIP | CER, WER, CRR | CER, WER |
+| 필수 의존성 | rapidfuzz, click | jiwer | 없음 |
+
+**이럴 때 kocer를 쓰세요.** 정답 전사와 STT 결과의 숫자·영문 표기 방식이 다를 때입니다. 예를 들어 정답은 한글로 읽은 대로 적었는데 모델은 아라비아 숫자로 출력하는 경우입니다. 이 차이를 오류로 세면 모델 간 비교가 표기 습관 비교가 됩니다.
+
+**이럴 때는 nlptutti가 낫습니다.** 여러 모델의 리포트를 만들거나, 개체명·키워드 단위로 평가하거나, 기준 점수로 CI를 막고 싶을 때입니다. 두 도구를 같이 써도 됩니다.
 
 ## 설치
 
@@ -73,21 +119,6 @@ kocer ref.txt hyp.txt --diff   # 틀린 글자만 색으로 표시
 ### "너무 관대하다"는 비판에 대해
 
 정규화는 실제 오류를 숨길 수 있습니다. 그래서 `raw_cer`를 항상 같이 돌려주고, 모든 단계를 끌 수 있게 했습니다. 두 값을 같이 보고하세요.
-
-## 기존 도구 비교 (2026-10-23 실측)
-
-nlptutti 0.0.0.24, jiwer 4.0.0. [tests/cases.tsv](tests/cases.tsv)의 케이스 일부.
-
-| ref | hyp | jiwer | nlptutti | kocer |
-|---|---|---|---|---|
-| 사과 세 개 주세요 | 사과 3개 주세요 | 0.200 | 0.143 | 0.000 |
-| 삼 층으로 가세요 | 3층으로 가세요 | 0.222 | 0.143 | 0.000 |
-| 세 시 삼십 분 | 3시 30분 | 0.625 | 0.600 | 0.000 |
-| 에이아이 모델 | AI 모델 | 0.571 | 0.667 | 0.000 |
-| 네, 알겠습니다. | 네 알겠습니다 | 0.222 | 0.000 | 0.000 |
-| 오늘날씨가좋다 | 오늘 날씨가 좋다 | 0.286 | 0.000 | 0.000 |
-
-nlptutti는 띄어쓰기·문장부호를 이미 처리하고, CLI·코퍼스 비교 리포트·개체명 평가 등 kocer에 없는 기능이 많습니다. kocer의 차이는 숫자·영문 약어 정규화와 `raw_cer` 대비 표시입니다.
 
 ## 한계
 
