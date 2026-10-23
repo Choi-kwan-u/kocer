@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kocer"
+version = "0.1.0"
+description = "한국어 STT를 공정하게 채점하는 CER/WER — 띄어쓰기·숫자·문장부호 차이를 오류로 세지 않음"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [{ name = "Choi Kwan-u" }]
+keywords = ["korean", "stt", "asr", "cer", "wer", "evaluation"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Natural Language :: Korean",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Choi-kwan-u/kocer"
+
+[project.scripts]
+kocer = "kocer.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kocer"]
