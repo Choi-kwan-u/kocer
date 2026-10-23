@@ -1,12 +1,14 @@
-"""숫자 읽기와 후보 전개."""
+"""숫자·영문 토큰의 읽기 후보 전개. 후보 중 CER이 최소인 조합을 고른다."""
 from __future__ import annotations
 
 import re
 from itertools import product
-from typing import Callable, List, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 from .counters import lookup
+from .normalize import spell
 
+LATIN = re.compile(r"[A-Za-z]+")
 NUMBER = re.compile(r"\d+(?:\.\d+)?")  # 천 단위 콤마는 normalize 단계에서 이미 제거됨
 
 _DIGIT = "영일이삼사오육칠팔구"
@@ -75,8 +77,26 @@ def options(num: str, following: str) -> List[str]:
     return list(dict.fromkeys(opts))
 
 
-def _spans(text: str) -> List[Tuple[int, int, List[str]]]:
-    return [(m.start(), m.end(), options(m.group(), text[m.end():m.end() + 6])) for m in NUMBER.finditer(text)]
+def latin_options(token: str, aliases: Dict[str, str]) -> List[str]:
+    """영문 토큰의 후보: 대문자면 철자 읽기, 사전에 있으면 사전 읽기, 원문.
+    거리가 같으면 앞의 것이 뽑히므로 한글 읽기를 앞에 둔다 (원문이 뽑히면 분모가 짧아져 CER이 부풀려짐)."""
+    opts = []
+    if token.isupper():
+        opts.append(spell(token))
+    alias = aliases.get(token) or aliases.get(token.upper())
+    if alias:
+        opts.append(alias)
+    opts.append(token)
+    return list(dict.fromkeys(opts))
+
+
+def _spans(text: str, digits: bool, aliases: Optional[Dict[str, str]]) -> List[Tuple[int, int, List[str]]]:
+    spans = []
+    if digits:
+        spans += [(m.start(), m.end(), options(m.group(), text[m.end():m.end() + 6])) for m in NUMBER.finditer(text)]
+    if aliases is not None:
+        spans += [(m.start(), m.end(), latin_options(m.group(), aliases)) for m in LATIN.finditer(text)]
+    return sorted(s for s in spans if len(s[2]) > 1)
 
 
 def _build(text: str, spans, choice: Sequence[str]) -> str:
@@ -85,9 +105,10 @@ def _build(text: str, spans, choice: Sequence[str]) -> str:
     return text
 
 
-def best(text: str, score: Callable[[str], float], limit: int = 64) -> str:
-    """text의 숫자들을 읽기 후보로 바꿔 본 문자열 중 score가 최소인 것."""
-    spans = _spans(text)
+def best(text: str, score: Callable[[str], float], limit: int = 64, digits: bool = True,
+         aliases: Optional[Dict[str, str]] = None) -> str:
+    """text의 숫자(digits)와 영문 토큰(aliases가 None이 아니면)을 후보로 바꿔 본 문자열 중 score가 최소인 것."""
+    spans = _spans(text, digits, aliases)
     if not spans:
         return text
     total = 1

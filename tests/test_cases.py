@@ -64,3 +64,18 @@ def test_pure_python_distance_matches_rapidfuzz_when_installed():
     pairs = [("세시삼십분", "3시13분"), ("", "가나"), ("가나다", ""), (list("오늘 날씨".split()), list("오늘 춥다".split()))]
     for a, b in pairs:
         assert sum(op != "H" for op, _, _ in align(a, b)) == rf.distance(a, b)
+
+
+def test_user_aliases():
+    assert kocer.cer("유니스트 입학", "UNIST 입학") > 0
+    assert kocer.cer("유니스트 입학", "UNIST 입학", aliases={"UNIST": "유니스트"}) == 0
+    assert kocer.cer("애플 주가", "Apple 주가", aliases={"Apple": "애플"}) == 0
+
+
+def test_letters_off_keeps_latin_as_is():
+    assert kocer.cer("에이아이", "AI", letters=False) > 0
+    assert kocer.cer("나사", "NASA", letters=False) > 0
+
+
+def test_builtin_alias_list_stays_small():
+    assert len(kocer.ALIASES) <= 20  # 사전 유지보수가 프로젝트를 잡아먹지 않게

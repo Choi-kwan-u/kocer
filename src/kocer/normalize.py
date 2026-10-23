@@ -12,7 +12,13 @@ _LETTERS = dict(zip(
 ))
 _UNITS = {"%": "퍼센트", "km": "킬로미터", "kg": "킬로그램", "cm": "센티미터", "mm": "밀리미터", "ml": "밀리리터"}
 _UNIT_RE = re.compile(r"(?<=\d)\s*(" + "|".join(map(re.escape, sorted(_UNITS, key=len, reverse=True))) + r")(?![A-Za-z])")
-_CAPS = re.compile(r"[A-Z]+")
+# 단어처럼 읽는 약어. 철자 읽기(에이아이)가 기본이고 이건 추가 후보다.
+# 일부러 20개 안쪽으로 둔다. 도메인 약어는 사용자가 aliases로 넘긴다.
+ALIASES = {
+    "NASA": "나사", "UNESCO": "유네스코", "NATO": "나토", "FIFA": "피파", "OPEC": "오펙",
+    "AIDS": "에이즈", "COVID": "코비드", "UNICEF": "유니세프", "ASEAN": "아세안", "SARS": "사스",
+    "MERS": "메르스", "KOSPI": "코스피", "KOSDAQ": "코스닥", "NASDAQ": "나스닥", "RAM": "램", "LAN": "랜",
+}
 
 
 def nfc(text: str) -> str:
@@ -27,10 +33,14 @@ def strip_fillers(text: str) -> str:
     return _FILLER.sub(" ", text)
 
 
-def spell_letters(text: str) -> str:
-    """AI → 에이아이, 50% → 50퍼센트. 대문자 연속과 단위 기호만 바꾼다."""
-    text = _UNIT_RE.sub(lambda m: _UNITS[m.group(1)], text)
-    return _CAPS.sub(lambda m: "".join(_LETTERS[c] for c in m.group()), text)
+def units(text: str) -> str:
+    """50% → 50퍼센트, 3km → 3킬로미터. 숫자 바로 뒤의 단위 기호만 바꾼다."""
+    return _UNIT_RE.sub(lambda m: _UNITS[m.group(1)], text)
+
+
+def spell(token: str) -> str:
+    """대문자 약어의 철자 읽기. AI → 에이아이."""
+    return "".join(_LETTERS[c] for c in token)
 
 
 def squeeze(text: str) -> str:
@@ -44,5 +54,5 @@ def normalize(text: str, punct: bool = True, fillers: bool = False, letters: boo
     if fillers:
         text = strip_fillers(text)
     if letters:
-        text = spell_letters(text)
+        text = units(text)  # 영문 토큰 자체는 numbers.best에서 후보로 전개
     return squeeze(text)

@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Sequence, Union
+from typing import Dict, List, Optional, Sequence, Union
 
 from . import numbers as _numbers
 from .align import Op, align, distance
+from .normalize import ALIASES
 from .normalize import normalize as _normalize
 
-__version__ = "0.1.1"
-__all__ = ["cer", "wer", "measure", "Result"]
+__version__ = "0.1.2"
+__all__ = ["cer", "wer", "measure", "Result", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
 
@@ -41,7 +42,9 @@ def _units(text: str, unit: str) -> List[str]:
 
 
 def measure(reference: str, hypothesis: str, *, unit: str = "char", normalize: bool = True,
-            numbers: bool = True, punct: bool = True, fillers: bool = False, letters: bool = True) -> Result:
+            numbers: bool = True, punct: bool = True, fillers: bool = False, letters: bool = True,
+            aliases: Optional[Dict[str, str]] = None) -> Result:
+    """aliases: 단어처럼 읽는 약어 사전 (예: {"NASA": "나사"}). 내장 ALIASES 위에 덮어쓴다."""
     raw_ref, raw_hyp = (reference.split(), hypothesis.split()) if unit == "word" else (list(reference), list(hypothesis))
     raw = distance(raw_ref, raw_hyp) / max(len(raw_ref), 1)
 
@@ -49,10 +52,11 @@ def measure(reference: str, hypothesis: str, *, unit: str = "char", normalize: b
     if normalize:
         ref = _normalize(reference, punct, fillers, letters)
         hyp = _normalize(hypothesis, punct, fillers, letters)
-        if numbers:
+        table = {**ALIASES, **(aliases or {})} if letters else None
+        if numbers or letters:
             # shortcut: hyp 후보를 먼저 ref 원문에 맞춰 고르고, 그다음 ref 후보를 고른 hyp에 맞춤(양쪽 곱집합 아님), 혼합 표기에서 틀리면 곱집합으로 올릴 것
-            hyp = _numbers.best(hyp, lambda c: distance(_units(ref, unit), _units(c, unit)))
-            ref = _numbers.best(ref, lambda c: distance(_units(c, unit), _units(hyp, unit)))
+            hyp = _numbers.best(hyp, lambda c: distance(_units(ref, unit), _units(c, unit)), digits=numbers, aliases=table)
+            ref = _numbers.best(ref, lambda c: distance(_units(c, unit), _units(hyp, unit)), digits=numbers, aliases=table)
     r, h = (_units(ref, unit), _units(hyp, unit)) if normalize else (raw_ref, raw_hyp)
     ops = align(r, h)
     counts = {k: sum(op == k for op, _, _ in ops) for k in "HSDI"}
