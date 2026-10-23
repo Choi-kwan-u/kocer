@@ -19,7 +19,7 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/Choi-kwan-u/kocer"
+Repository = "https://github.com/Choi-kwan-u/Korea_CER"
 
 [project.scripts]
 kocer = "kocer.cli:main"
