@@ -85,7 +85,7 @@ def _build(text: str, spans, choice: Sequence[str]) -> str:
     return text
 
 
-def best(text: str, score: Callable[[str], float], limit: int = 1024) -> str:
+def best(text: str, score: Callable[[str], float], limit: int = 64) -> str:
     """text의 숫자들을 읽기 후보로 바꿔 본 문자열 중 score가 최소인 것."""
     spans = _spans(text)
     if not spans:

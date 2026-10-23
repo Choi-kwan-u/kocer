@@ -9,7 +9,7 @@ from . import numbers as _numbers
 from .align import Op, align, distance
 from .normalize import normalize as _normalize
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = ["cer", "wer", "measure", "Result"]
 
 Text = Union[str, Sequence[str]]

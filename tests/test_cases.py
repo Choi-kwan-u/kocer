@@ -56,3 +56,11 @@ def test_many_numbers_fall_back_to_greedy_without_blowing_up():
     ref = " ".join(f"{i}개" for i in range(1, 13))
     hyp = " ".join(["한 개", "두 개", "세 개", "네 개", "다섯 개", "여섯 개", "일곱 개", "여덟 개", "아홉 개", "열 개", "열한 개", "열두 개"])
     assert kocer.cer(ref, hyp) == 0
+
+
+def test_pure_python_distance_matches_rapidfuzz_when_installed():
+    rf = pytest.importorskip("rapidfuzz.distance.Levenshtein")
+    from kocer.align import align
+    pairs = [("세시삼십분", "3시13분"), ("", "가나"), ("가나다", ""), (list("오늘 날씨".split()), list("오늘 춥다".split()))]
+    for a, b in pairs:
+        assert sum(op != "H" for op, _, _ in align(a, b)) == rf.distance(a, b)
