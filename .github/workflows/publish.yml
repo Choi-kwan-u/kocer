@@ -1,0 +1,19 @@
+# v로 시작하는 태그(v0.1.0 등)를 푸시하면 테스트 후 PyPI에 올린다. 토큰 없이 Trusted Publishing 사용.
+name: publish
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]" build && python -m pytest -q && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
