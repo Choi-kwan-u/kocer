@@ -13,7 +13,7 @@ jiwer CER 0.200   nlptutti CER 0.143   kocer CER 0.000
 ## 설치
 
 ```bash
-pip install git+https://github.com/Choi-kwan-u/kocer.git
+pip install kocer
 ```
 
 ## 사용
