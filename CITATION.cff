@@ -8,7 +8,7 @@ authors:
 repository-code: "https://github.com/Choi-kwan-u/kocer"
 url: "https://pypi.org/project/kocer/"
 license: MIT
-version: 0.1.6
+version: 0.1.7
 date-released: 2026-10-24
 keywords:
   - korean

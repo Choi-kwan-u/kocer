@@ -13,11 +13,11 @@ Seven public Korean ASR settings, three public test sets (1,418 utterances) plus
 Re-score with the installed kocer:
 
 ```bash
-pip install "kocer[fast]==0.1.6" numpy nlptutti
+pip install "kocer[fast]==0.1.7" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 
-With kocer 0.1.5 or 0.1.6 (same scorer as 0.1.3; 0.1.6 changes only the README) the `kocer` column of all 21 result files reproduces `scores2.json` to two decimals (checked 2026-10-24).
+With kocer 0.1.5 to 0.1.7 (same scorer as 0.1.3; later versions change only the README) the `kocer` column of all 21 result files reproduces `scores2.json` to two decimals (checked 2026-10-24).
 
 ## Datasets
 
@@ -100,6 +100,15 @@ KsponSpeech eval_clean + eval_other: 6,000 utterances, 6.4 h of conversational s
 | BuzzASR/korean | 10.14 / 9.41 | +0.53 | −0.10 |
 | openai/whisper-large-v3 | 11.07 / 11.87 | +0.66 | +0.07 |
 | SenseVoiceSmall (itn on / off) | 13.28 / 13.82, 13.09 / 13.72 | +0.20 / +0.19 | −0.19 / −0.19 |
+
+**On the 628 utterances whose spelling reference contains a digit**, the same comparison (TeamUNIVA release minus Qwen3-ASR base, negative = release better) flips direction under the usual normalization and stays put under kocer:
+
+| reference side | nospace+punct | kocer |
+|---|---|---|
+| spelling (`3시`) | −8.50 pt [−9.32, −7.70] | −2.34 pt [−2.80, −1.89] |
+| pronunciation (`세 시`) | **+4.13 pt** [+3.40, +4.91] | −2.36 pt [−2.80, −1.91] |
+
+With the pronunciation reference and nospace+punct scoring the base model ranks 1st and the release 3rd; with kocer the release is 1st and the base 3rd. Zeroth shows the same pattern on its 152 utterances where any system wrote a digit (beta minus base: +5.49 pt vs −0.46 pt, both CIs exclude 0). Full tables: `results/number_subset.md` (`scripts/number_subset.py`). Over all 6,000 KsponSpeech utterances the effect is diluted by the many sentences without numbers:
 
 1. With spacing and punctuation removed, the choice of reference side alone moves a model's CER by −0.77 to +0.85 pt, in opposite directions for digit-writing models and for the base Qwen model, which writes numbers in Hangul. With kocer the range is −0.35 to +0.07 pt; the remainder comes from the 452 non-numeric dual spellings, which kocer does not handle.
 2. Model gaps here are large (at least 0.76 pt between neighbours, except the two SenseVoice settings at 0.14 pt), so the reference choice did not change any rank. Every pair is separated by the paired bootstrap (2,000 resamples).

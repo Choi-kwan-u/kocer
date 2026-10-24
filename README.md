@@ -7,8 +7,8 @@
 *Fair CER/WER for Korean speech recognition. Spacing, punctuation, number notation (3개 ↔ 세 개) and Latin acronyms (AI ↔ 에이아이) are not counted as errors. Unlike jiwer and nlptutti, kocer scores numbers against every valid Korean reading, keeps the original CER alongside, and tells you where your errors come from. Pure Python, zero dependencies, `jiwer`-compatible API.*
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.6/docs/breakdown-dark.svg">
-  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.6/docs/breakdown-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.7/docs/breakdown-dark.svg">
+  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.7/docs/breakdown-light.svg">
 </picture>
 
 위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER 숫자는 그대로 두고, 그 오류가 어디서 왔는지만 나눠 보여줍니다.
@@ -145,7 +145,7 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 | 지원 지표 | WER, CER, MER, WIL, WIP | CER, WER, CRR | CER, WER |
 | 필수 의존성 | rapidfuzz, click | jiwer | 없음 |
 
-**이럴 때 kocer를 쓰세요.** 정답 전사와 STT 결과의 숫자·영문 표기 방식이 다를 때입니다. 예를 들어 정답은 한글로 읽은 대로 적었는데 모델은 아라비아 숫자로 출력하는 경우입니다. 이 차이를 오류로 세면 모델 간 비교가 표기 습관 비교가 됩니다.
+**이럴 때 kocer를 쓰세요.** 정답 전사와 STT 결과의 숫자·영문 표기 방식이 다를 때입니다. 예를 들어 정답은 한글로 읽은 대로 적었는데 모델은 아라비아 숫자로 출력하는 경우입니다. 이 차이를 오류로 세면 모델 간 비교가 표기 습관 비교가 됩니다. 실제로 KsponSpeech의 숫자가 든 문장에서는, 같은 두 모델의 비교가 정답 표기를 철자로 쓰느냐 발음으로 쓰느냐에 따라 "8.5%p 좋아짐"과 "4.1%p 나빠짐"으로 정반대가 됐습니다. kocer로는 두 경우 모두 "2.3%p 좋아짐"입니다([아래](#ksponspeech-정답을-철자로-쓰느냐-발음으로-쓰느냐)).
 
 **이럴 때는 nlptutti가 낫습니다.** 여러 모델의 리포트를 만들거나, 개체명·키워드 단위로 평가하거나, 기준 점수로 CI를 막고 싶을 때입니다. 두 도구를 같이 써도 됩니다.
 
@@ -180,6 +180,22 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 ### KsponSpeech: 정답을 철자로 쓰느냐 발음으로 쓰느냐
 
 AI-Hub KsponSpeech 평가셋(eval_clean·eval_other 6,000발화, 6.4시간, 대화체)은 숫자 같은 부분을 `(3시)/(세 시)`처럼 철자와 발음 두 가지로 적습니다. 논문마다 어느 쪽을 정답으로 쓰는지 다릅니다. 같은 출력을 두 정답으로 각각 채점했습니다.
+
+**숫자가 든 문장에서는 기존 채점이 비교의 방향을 틀립니다.** 철자 정답에 숫자가 있는 628발화에서 같은 두 모델(TeamUNIVA 정식판과 Qwen 기본 모델)을 비교했습니다.
+
+| 정답으로 쓴 쪽 | 공백·부호 제거로 비교 | kocer로 비교 |
+|---|---|---|
+| 철자 (`3시`) | 정식판이 8.50%p 좋음 [7.70, 9.32] | 정식판이 2.34%p 좋음 [1.89, 2.80] |
+| 발음 (`세 시`) | 정식판이 **4.13%p 나쁨** [3.40, 4.91] | 정식판이 2.36%p 좋음 [1.91, 2.80] |
+
+(대괄호는 문장 단위 paired bootstrap 2,000회 95% 구간)
+
+- 기존 방식은 정답 표기 선택 하나로 정반대 결론을 냅니다. kocer는 어느 쪽으로 재도 같은 결론입니다.
+- 순위도 뒤집힙니다. 발음 정답에 공백·부호 제거로 재면 Qwen 기본 모델 1위, TeamUNIVA 정식판 3위이고, kocer로 재면 정식판 1위, 기본 모델 3위입니다.
+- Zeroth에서 숫자가 나온 152발화(정답이 숫자를 한글로만 적어서, 어느 모델이든 숫자를 쓴 문장으로 골랐습니다)에서도 공백·부호 제거로는 TeamUNIVA beta가 기본 모델보다 5.49%p 나쁘고, kocer로는 0.46%p 낫습니다. 둘 다 구간이 0을 벗어납니다.
+- 숫자 문장별 표 전체: [benchmarks/results/number_subset.md](benchmarks/results/number_subset.md)
+
+KsponSpeech 전체 6,000발화로 보면 숫자가 없는 문장이 대부분이라 차이가 작아집니다.
 
 | 모델 | kocer CER, 철자 정답 (clean / other) | 정답을 철자 → 발음으로 바꿀 때 변화: 공백·부호 제거 | 같은 변화: kocer |
 |---|---|---|---|
