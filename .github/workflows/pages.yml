@@ -1,0 +1,31 @@
+# space/ 폴더(브라우저 데모)를 GitHub Pages로 내보낸다. Hugging Face Space와 같은 파일을 쓴다.
+# 처음 한 번: 레포 Settings → Pages → Source를 "GitHub Actions"로.
+name: pages
+on:
+  push:
+    branches: [main]
+    paths: ["space/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: space
+      - id: deployment
+        uses: actions/deploy-pages@v4
