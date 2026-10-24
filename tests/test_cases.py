@@ -120,3 +120,40 @@ def test_aihub_tags_stripped_only_when_asked():
 def test_breakdown_puts_dual_notation_in_numbers_letters():
     b = kocer.breakdown(["(7시)/(일곱 시)에 만나"], ["일곱 시에 만나"])
     assert b.remaining == 0 and b.numbers_letters > 0 and b.spacing == 0
+
+
+def test_compare_ranks_and_intervals():
+    refs = ["사과 세 개 주세요", "세 시 삼십 분", "오늘 날씨 좋다", "네 알겠습니다"] * 25
+    good = ["사과 3개 주세요", "3시 30분", "오늘 날씨 좋다", "네 알겠습니다"] * 25      # 표기만 다름
+    bad = ["사과 네 개 주세요", "3시 13분", "오늘 날씨 춥다", "네 알겠어요"] * 25          # 진짜 오류
+    c = kocer.compare(refs, {"good": good, "bad": bad}, n_boot=300)
+    assert c.cer["good"] == 0 and c.cer["bad"] > 0
+    assert c.significant("good", "bad") and c.ranks["good"][:2] == (1, 1)
+    assert c.pairs[("good", "bad")][0] == pytest.approx(-c.cer["bad"])
+    assert "good" in str(c) and "*" in str(c)
+
+
+def test_compare_identical_systems_not_significant():
+    refs = ["가나다라", "마바사"] * 20
+    hyps = ["가나다마", "마바사"] * 20
+    c = kocer.compare(refs, {"a": hyps, "b": list(hyps)}, n_boot=200)
+    assert not c.significant("a", "b")
+
+
+def test_compare_input_checks():
+    with pytest.raises(ValueError):
+        kocer.compare(["가"], {"only": ["가"]})
+    with pytest.raises(ValueError):
+        kocer.compare(["가", "나"], {"a": ["가"], "b": ["가", "나"]})
+
+
+def test_cli_compare_mode(tmp_path, capsys):
+    from kocer.cli import main
+    files = {"ref.txt": ["사과 세 개 주세요", "세 시 삼십 분"],
+             "a.txt": ["사과 3개 주세요", "3시 30분"],
+             "b.txt": ["사과 네 개 주세요", "3시 13분"]}
+    for name, lines in files.items():
+        (tmp_path / name).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    assert main([str(tmp_path / "ref.txt"), str(tmp_path / "a.txt"), str(tmp_path / "b.txt"), "--boot", "100"]) == 0
+    out = capsys.readouterr().out
+    assert "1. a" in out and "a − b" in out

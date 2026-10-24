@@ -15,11 +15,11 @@ Model names used here: **Qwen3-ASR base** = [Qwen/Qwen3-ASR-1.7B](https://huggin
 Re-score with the installed kocer:
 
 ```bash
-pip install "kocer[fast]==0.2.0" numpy nlptutti
+pip install "kocer[fast]==0.3.0" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 
-With kocer 0.1.5 to 0.2.0 the `kocer` column of all 21 result files reproduces `scores2.json` exactly: same error counts for every file (0.2.0 adds AI-Hub dual-notation handling, which these references never contain; checked 2026-10-24).
+With kocer 0.1.5 to 0.3.0 the `kocer` column of all 21 result files reproduces `scores2.json` exactly: same error counts for every file (0.2.0 adds AI-Hub dual-notation handling, which these references never contain; checked 2026-10-24). Since 0.3.0 the pairwise bootstrap tables can be reproduced with `kocer.compare(refs, {name: hyps, ...})`; on the pooled public sets it gives the same differences and intervals as `scripts/score2.py` (same seed, numpy installed).
 
 ## Datasets
 

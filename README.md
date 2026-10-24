@@ -7,8 +7,8 @@
 *Fair CER for Korean speech recognition. Number notation (3개 ↔ 세 개) is scored against every valid Korean reading, the original CER is kept alongside, and `breakdown()` tells you where your errors come from. Pure Python, zero dependencies, `jiwer`-compatible API.*
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.2.0/docs/breakdown-dark.svg">
-  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.2.0/docs/breakdown-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.3.0/docs/breakdown-dark.svg">
+  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.3.0/docs/breakdown-light.svg">
 </picture>
 
 위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER은 그대로 두고, 그 오류가 어디서 왔는지 나눠 보여줍니다.
@@ -16,7 +16,7 @@
 ```python
 >>> import kocer
 >>> print(kocer.breakdown(refs, hyps))      # whisper-large-v3, Zeroth test 457발화
-raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.2.0)
+raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.3.0)
 띄어쓰기     1,142   52%  █████████████████████
 문장부호       226   10%  ████
 숫자·영문      258   12%  █████
@@ -38,7 +38,7 @@ raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.2.0)
 
 보통 CER은 정답을 어떻게 적었느냐에 따라 정반대 결론을 냅니다. kocer는 같은 말을 다르게 적은 것을 맞은 것으로 보기 때문에, 어느 쪽 정답으로 재도 같은 결론이 나옵니다.
 
-그래서 비슷한 모델끼리, 특히 새 버전이 숫자 쓰는 습관을 바꿨을 때 필요합니다. 모델끼리 실력 차이가 크면 어떤 도구로 재도 순위는 거의 같습니다.
+그래서 비슷한 모델끼리, 특히 새 버전이 숫자 쓰는 습관을 바꿨을 때 필요합니다. 모델끼리 실력 차이가 크면 어떤 도구로 재도 순위는 거의 같습니다. 차이가 진짜인지는 `kocer.compare()`로 확인할 수 있습니다.
 
 <details>
 <summary>자세한 숫자</summary>
@@ -70,6 +70,7 @@ r = kocer.measure("세 시 삼십 분", "3시 30분")
 r.cer, r.raw_cer                                      # 0.0, 0.625  (정규화 후, 정규화 전)
 
 print(kocer.breakdown(refs, hyps))                    # 오류를 종류별로 분해 (위 출력)
+print(kocer.compare(refs, {"새 모델": new, "이전 모델": old}))   # 모델 비교: 순위와 차이의 95% 신뢰구간
 kocer.cer("유니스트 입학", "UNIST 입학", aliases={"UNIST": "유니스트"})   # 단어처럼 읽는 약어
 kocer.cer("(7시)/(일곱 시)에 만나", "7시에 만나")    # 0.0  AI-Hub 이중 표기는 양쪽 다 정답
 kocer.cer("b/ 그거+ 그거 *좋아", "그거 그거 좋아", aihub=True)   # 0.0  AI-Hub 원본 전사를 정제 없이
@@ -78,6 +79,7 @@ kocer.cer("b/ 그거+ 그거 *좋아", "그거 그거 좋아", aihub=True)   # 0
 ```bash
 kocer ref.txt hyp.txt          # 줄 단위 쌍. raw CER, kocer CER, 오류 분해
 kocer ref.txt hyp.txt --diff   # 틀린 글자만 색으로 표시
+kocer ref.txt new.txt old.txt  # 결과 파일이 둘 이상이면 모델 비교
 ```
 
 <details>
@@ -96,6 +98,13 @@ b = kocer.breakdown(refs, hyps)
 b.spacing, b.punctuation, b.numbers_letters, b.remaining   # 합이 b.raw_errors
 b.shares                          # 비율
 b.cer                             # {'raw':…, 'nospace':…, 'nopunct':…, 'kocer':…}
+
+c = kocer.compare(refs, {"A": hyps_a, "B": hyps_b, "C": hyps_c}, n_boot=2000, seed=0)
+c.cer                             # 시스템별 CER
+c.pairs[("A", "B")]               # (CER A − CER B, 95% 하한, 상한). 문장 단위 paired bootstrap
+c.significant("A", "B")           # 차이가 0이 아닌가
+c.ranks["A"]                      # (순위 하한, 상한, 1위 확률)
+print(c)                          # 표로 출력. numpy가 있으면 빠르게, 없으면 순수 파이썬으로 계산
 
 kocer.cer("엘지 트윈스", "LG 트윈스")      # 0.0  대문자 연속은 철자 읽기
 kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
@@ -117,9 +126,9 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 | 사과 세 개 주세요 | 사과 **네** 개 주세요 | 0.100 | 0.143 | 0.143 |
 | 세 시 삼십 분 | 3시 **13**분 | 0.625 | 0.600 | 0.400 |
 
-마지막 두 줄은 진짜 인식 오류이고, kocer도 오류로 셉니다. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.2.0, 모두 기본 설정.
+마지막 두 줄은 진짜 인식 오류이고, kocer도 오류로 셉니다. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.3.0, 모두 기본 설정.
 
-여러 모델 리포트, 개체명·키워드 평가, 품질 게이트가 필요하면 nlptutti가 낫습니다. 두 도구를 같이 써도 됩니다.
+개체명·키워드 평가나 품질 게이트(기준 점수로 CI 막기)가 필요하면 nlptutti가 낫습니다. 두 도구를 같이 써도 됩니다.
 
 <details>
 <summary>기능 비교표</summary>
@@ -131,7 +140,8 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 | 영문 약어 읽기 차이 무시 (AI = 에이아이) | 없음 | 없음 | 기본, 사용자 사전 지원 |
 | 정규화 전·후 CER을 한 번에 반환 | 없음 | 없음 | `raw_cer`, `cer` |
 | 오류를 띄어쓰기·문장부호·숫자·진짜 오류로 분해 | 없음 | 없음 | `breakdown()` |
-| 여러 모델 비교 리포트, 품질 게이트 | 없음 | 있음 | 없음 |
+| 여러 모델 비교, 쌍별 신뢰구간 | 없음 | 있음 | `compare()` |
+| 품질 게이트 (기준 점수로 CI 막기) | 없음 | 있음 | 없음 |
 | 개체명·키워드 오류율 | 없음 | 있음 | 없음 |
 | 지원 지표 | WER, CER, MER, WIL, WIP | CER, WER, CRR | CER, WER |
 | 필수 의존성 | rapidfuzz, click | jiwer | 없음 |
@@ -211,7 +221,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 점수를 적을 때는 버전을 함께 적어 주세요. 정규화 규칙이 버전마다 바뀌어 같은 출력도 점수가 다를 수 있습니다. `raw_cer`도 같이 적으면 다른 도구로 잰 숫자와 비교할 수 있습니다.
 
 ```
-CER 4.13% (raw) / 2.93% (kocer 0.2.0)
+CER 4.13% (raw) / 2.93% (kocer 0.3.0)
 ```
 
 레포 오른쪽의 "Cite this repository"에서 인용 형식을 복사할 수 있습니다([CITATION.cff](CITATION.cff)). kocer로 채점한 모델·논문이 있으면 [이슈](https://github.com/Choi-kwan-u/kocer/issues)로 알려주세요.
@@ -224,7 +234,7 @@ CER 4.13% (raw) / 2.93% (kocer 0.2.0)
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.2.0},
+  version = {0.3.0},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

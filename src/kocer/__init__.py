@@ -14,8 +14,8 @@ from .normalize import normalize as _normalize
 from .normalize import resolve_dual as _resolve_dual
 from .normalize import strip_aihub_tags as _strip_aihub
 
-__version__ = "0.2.0"
-__all__ = ["cer", "wer", "measure", "breakdown", "Result", "Breakdown", "ALIASES"]
+__version__ = "0.3.0"
+__all__ = ["cer", "wer", "measure", "breakdown", "compare", "Result", "Breakdown", "Comparison", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
 
@@ -180,3 +180,6 @@ def breakdown(reference: Text, hypothesis: Text, **opts) -> Breakdown:
             N[i] += m.hits + m.substitutions + m.deletions
     cer = dict(zip(("raw", "nospace", "nopunct", "kocer"), (e / max(n, 1) for e, n in zip(E, N))))
     return Breakdown(len(reference), E[0], E[0] - E[1], E[1] - E[2], E[2] - E[3], E[3], cer)
+
+
+from .compare import Comparison, compare  # noqa: E402  (measure를 쓰므로 맨 아래에서 가져옴)
