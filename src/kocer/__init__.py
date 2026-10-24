@@ -10,8 +10,8 @@ from .align import Op, align, distance
 from .normalize import ALIASES
 from .normalize import normalize as _normalize
 
-__version__ = "0.1.3"
-__all__ = ["cer", "wer", "measure", "Result", "ALIASES"]
+__version__ = "0.1.4"
+__all__ = ["cer", "wer", "measure", "breakdown", "Result", "Breakdown", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
 
@@ -82,3 +82,46 @@ def cer(reference: Text, hypothesis: Text, **opts) -> float:
 def wer(reference: Text, hypothesis: Text, **opts) -> float:
     """jiwer.wer 호환. 띄어쓰기 차이는 오류로 센다 (한국어 WER의 한계)."""
     return _rate(reference, hypothesis, "word", **opts)
+
+
+@dataclass
+class Breakdown:
+    """raw CER가 센 오류를 띄어쓰기 / 문장부호 / 숫자·영문 표기 / 진짜 오류로 나눈 개수."""
+    pairs: int
+    raw_errors: int
+    spacing: int
+    punctuation: int
+    numbers_letters: int
+    remaining: int
+    cer: Dict[str, float]  # 단계별 CER: raw, nospace, nopunct, kocer
+
+    @property
+    def shares(self) -> Dict[str, float]:
+        d = max(self.raw_errors, 1)
+        return {"spacing": self.spacing / d, "punctuation": self.punctuation / d,
+                "numbers_letters": self.numbers_letters / d, "remaining": self.remaining / d}
+
+    def __str__(self) -> str:
+        rows = [("띄어쓰기", self.spacing), ("문장부호", self.punctuation), ("숫자·영문", self.numbers_letters), ("진짜 오류", self.remaining)]
+        d = max(self.raw_errors, 1)
+        out = [f"raw CER {self.cer['raw']:.2%}  →  kocer CER {self.cer['kocer']:.2%}   ({self.raw_errors:,} raw errors, {self.pairs:,} pairs)"]
+        out += [f"{name:<6}{n:>8,}  {n / d:4.0%}  {'█' * round(40 * n / d)}" for name, n in rows]
+        return "\n".join(out)
+
+
+def breakdown(reference: Text, hypothesis: Text, **opts) -> Breakdown:
+    """raw → 공백 제거 → 공백·부호 제거 → kocer 네 단계로 채점해 오류가 어디서 사라지는지 개수로 센다.
+    각 단계는 정답과 결과에 똑같이 적용된다. opts는 cer()와 같다(aliases 등)."""
+    if isinstance(reference, str):
+        reference, hypothesis = [reference], [hypothesis]
+    if len(reference) != len(hypothesis):
+        raise ValueError("reference and hypothesis must have the same length")
+    levels = [dict(normalize=False), dict(numbers=False, punct=False, letters=False), dict(numbers=False, letters=False), {}]
+    E, N = [0] * 4, [0] * 4
+    for r, h in zip(reference, hypothesis):
+        for i, lv in enumerate(levels):
+            m = measure(r, h, **{**opts, **lv}) if lv else measure(r, h, **opts)
+            E[i] += m.errors
+            N[i] += m.hits + m.substitutions + m.deletions
+    cer = dict(zip(("raw", "nospace", "nopunct", "kocer"), (e / max(n, 1) for e, n in zip(E, N))))
+    return Breakdown(len(reference), E[0], E[0] - E[1], E[1] - E[2], E[2] - E[3], E[3], cer)

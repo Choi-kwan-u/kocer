@@ -79,3 +79,16 @@ def test_letters_off_keeps_latin_as_is():
 
 def test_builtin_alias_list_stays_small():
     assert len(kocer.ALIASES) <= 20  # 사전 유지보수가 프로젝트를 잡아먹지 않게
+
+
+def test_breakdown_counts_add_up_and_match_cer():
+    refs = ["네, 알겠습니다.", "사과 세 개 주세요", "오늘날씨가좋다", "안녕하세요"]
+    hyps = ["네 알겠습니다", "사과 3개 주세요", "오늘 날씨가 좋다", "안녕하세유"]
+    b = kocer.breakdown(refs, hyps)
+    assert b.pairs == 4
+    assert b.spacing + b.punctuation + b.numbers_letters + b.remaining == b.raw_errors
+    assert b.punctuation == 2 and b.numbers_letters > 0 and b.remaining == 1
+    assert b.cer["kocer"] == pytest.approx(kocer.cer(refs, hyps))
+    assert b.cer["raw"] == pytest.approx(kocer.cer(refs, hyps, normalize=False))
+    assert abs(sum(b.shares.values()) - 1) < 1e-9
+    assert "진짜 오류" in str(b)

@@ -2,7 +2,30 @@
 
 한국어 STT를 공정하게 채점하는 CER — 띄어쓰기·숫자·문장부호·영문 약어 표기 차이를 오류로 세지 않습니다.
 
-*Fair CER/WER for Korean speech recognition. Spacing, punctuation, number notation (3개 ↔ 세 개) and Latin acronyms (AI ↔ 에이아이) are not counted as errors. Unlike jiwer and nlptutti, kocer scores numbers against every valid Korean reading and keeps the original CER alongside. Pure Python, zero dependencies, `jiwer`-compatible API.*
+*Fair CER/WER for Korean speech recognition. Spacing, punctuation, number notation (3개 ↔ 세 개) and Latin acronyms (AI ↔ 에이아이) are not counted as errors. Unlike jiwer and nlptutti, kocer scores numbers against every valid Korean reading, keeps the original CER alongside, and tells you where your errors come from. Pure Python, zero dependencies, `jiwer`-compatible API.*
+
+```bash
+pip install kocer
+```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-dark.svg">
+  <img alt="공개 한국어 ASR 모델 6개의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-light.svg">
+</picture>
+
+위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER 숫자는 그대로 두고, 그 오류가 어디서 왔는지만 나눠 보여줍니다.
+
+```python
+>>> import kocer
+>>> print(kocer.breakdown(refs, hyps))      # whisper-large-v3, Zeroth test 457발화
+raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs)
+띄어쓰기     1,142   52%  █████████████████████
+문장부호       226   10%  ████
+숫자·영문      258   12%  █████
+진짜 오류      565   26%  ██████████
+```
+
+문장 하나로 보면 이렇습니다.
 
 ```
 ref: 사과 세 개 주세요
@@ -12,7 +35,7 @@ jiwer CER 0.200   nlptutti CER 0.143   kocer CER 0.000
 
 ## 공개 모델 재채점: 같은 출력, 네 가지 채점
 
-공개 한국어 ASR 6개 설정을 공개 테스트셋 세 개(Zeroth 457발화, FLEURS ko 382발화, Common Voice 27 ko 579발화, 합계 1,418발화·약 2.9시간)에서 같은 조건(greedy, 언어 고정, 프롬프트 없음)으로 돌리고, **모델 출력은 그대로 둔 채 채점만** 네 단계로 바꿨습니다. 각 단계는 정답과 출력에 똑같이 적용됩니다. 단위 %, 코퍼스 단위(총 오류 / 총 정답 글자).
+공개 한국어 ASR 6개 설정을 공개 테스트셋 세 개(Zeroth 457발화, FLEURS ko 382발화, Common Voice 27 ko 579발화, 합계 1,418발화·약 2.9시간)에서 같은 조건(greedy, 언어 고정, 프롬프트 없음)으로 돌리고, **모델 출력은 그대로 둔 채 채점만** 네 단계로 바꿨습니다. 각 단계는 정답과 출력에 똑같이 적용됩니다. 단위 %, 코퍼스 단위(총 오류 / 총 정답 글자). 맨 위 그림이 이 실험의 오류 분해이고, 아래가 숫자입니다.
 
 ### 데이터셋별 kocer CER
 
@@ -96,6 +119,7 @@ jiwer CER 0.200   nlptutti CER 0.143   kocer CER 0.000
 | 숫자 읽기 차이 무시 (3개 = 세 개) | 없음 | 없음 | 기본 |
 | 영문 약어 읽기 차이 무시 (AI = 에이아이) | 없음 | 없음 | 기본, 사용자 사전 지원 |
 | 정규화 전·후 CER을 한 번에 반환 | 없음 | 없음 | `raw_cer`, `cer` |
+| 오류를 띄어쓰기·문장부호·숫자·진짜 오류로 분해 | 없음 | 없음 | `breakdown()` |
 | 여러 모델 비교 리포트, 품질 게이트 | 없음 | 있음 | 없음 |
 | 개체명·키워드 오류율 | 없음 | 있음 | 없음 |
 | 지원 지표 | WER, CER, MER, WIL, WIP | CER, WER, CRR | CER, WER |
@@ -129,6 +153,12 @@ r.alignment   # [('H', '세', '세'), ...]
 r.chosen_ref  # 숫자 후보 중 실제로 채택된 정답
 r.chosen_hyp  # '세시삼십분'
 
+b = kocer.breakdown(refs, hyps)   # 오류가 어디서 왔는지 개수로 분해
+b.spacing, b.punctuation, b.numbers_letters, b.remaining   # 합이 b.raw_errors
+b.shares                          # 비율
+b.cer                             # {'raw':…, 'nospace':…, 'nopunct':…, 'kocer':…}
+print(b)                          # 위의 막대 출력
+
 # 단어처럼 읽는 약어는 직접 넘김 (내장 사전 위에 덮어씀)
 kocer.cer("엘지 트윈스", "LG 트윈스")                      # 0.0  철자 읽기
 kocer.cer("케이비오 리그", "KBO 리그")                      # 0.0
@@ -136,7 +166,7 @@ kocer.cer("유니스트 입학", "UNIST 입학", aliases={"UNIST": "유니스트
 ```
 
 ```bash
-kocer ref.txt hyp.txt          # 줄 단위 쌍, raw CER과 kocer CER을 같이 출력
+kocer ref.txt hyp.txt          # 줄 단위 쌍. raw CER, kocer CER, 오류 분해를 출력
 kocer ref.txt hyp.txt --diff   # 틀린 글자만 색으로 표시
 ```
 

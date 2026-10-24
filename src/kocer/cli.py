@@ -2,7 +2,7 @@
 import argparse
 import sys
 
-from . import __version__, measure
+from . import __version__, breakdown, measure
 
 RED, GREEN, STRIKE, END = "\x1b[31m", "\x1b[32m", "\x1b[9;31m", "\x1b[0m"
 
@@ -33,17 +33,12 @@ def main(argv=None) -> int:
     hyps = open(a.hyp, encoding="utf-8").read().splitlines()
     if len(refs) != len(hyps):
         sys.exit(f"줄 수가 다릅니다: ref {len(refs)}, hyp {len(hyps)}")
-    err = raw_err = total = 0
-    for i, (r, h) in enumerate(zip(refs, hyps), 1):
-        m = measure(r, h, numbers=not a.no_numbers)
-        n = m.hits + m.substitutions + m.deletions
-        err += m.errors
-        raw_err += round(m.raw_cer * max(len(r), 1))
-        total += n
-        if a.diff and m.errors:
-            print(f"{i}: {render(m.alignment)}  (cer {m.cer:.3f})")
-    print(f"raw CER   {raw_err / max(sum(map(len, refs)), 1):.4f}")
-    print(f"kocer CER {err / max(total, 1):.4f}   ({len(refs)} lines)")
+    if a.diff:
+        for i, (r, h) in enumerate(zip(refs, hyps), 1):
+            m = measure(r, h, numbers=not a.no_numbers)
+            if m.errors:
+                print(f"{i}: {render(m.alignment)}  (cer {m.cer:.3f})")
+    print(breakdown(refs, hyps, numbers=not a.no_numbers))
     return 0
 
 
