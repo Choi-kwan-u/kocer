@@ -258,6 +258,92 @@
     "n": 1418
    }
   },
+  "qwen3-asr-1.7b-ko-univa-release": {
+   "zeroth": {
+    "cer": {
+     "raw": 0.0888819095477387,
+     "nospace": 0.08010161758606388,
+     "nopunct": 0.053608461219411034,
+     "kocer": 0.02374533388635421
+    },
+    "E": [
+     2264,
+     1545,
+     1034,
+     458
+    ],
+    "N": [
+     25472,
+     19288,
+     19288,
+     19288
+    ],
+    "n": 457
+   },
+   "fleurs": {
+    "cer": {
+     "raw": 0.06245813797722706,
+     "nospace": 0.0660833154391239,
+     "nopunct": 0.04386659129451668,
+     "kocer": 0.04251355013550136
+    },
+    "E": [
+     1492,
+     1231,
+     776,
+     753
+    ],
+    "N": [
+     23888,
+     18628,
+     17690,
+     17712
+    ],
+    "n": 382
+   },
+   "commonvoice": {
+    "cer": {
+     "raw": 0.06850643055645318,
+     "nospace": 0.06995336442371752,
+     "nopunct": 0.06178649237472767,
+     "kocer": 0.06004357298474945
+    },
+    "E": [
+     1060,
+     840,
+     709,
+     689
+    ],
+    "N": [
+     15473,
+     12008,
+     11475,
+     11475
+    ],
+    "n": 579
+   },
+   "overall": {
+    "cer": {
+     "raw": 0.07428315826816591,
+     "nospace": 0.07243009374248859,
+     "nopunct": 0.05198852496233464,
+     "kocer": 0.039195461578133056
+    },
+    "E": [
+     4816,
+     3616,
+     2519,
+     1900
+    ],
+    "N": [
+     64833,
+     49924,
+     48453,
+     48475
+    ],
+    "n": 1418
+   }
+  },
   "sensevoice-small-itn": {
    "zeroth": {
     "cer": {
@@ -531,6 +617,12 @@
     "hi": 0.0045745323668654955,
     "sig": false
    },
+   "buzzasr-korean vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.004025727638702514,
+    "lo": 0.0017163627255643223,
+    "hi": 0.006317486847583484,
+    "sig": true
+   },
    "buzzasr-korean vs sensevoice-small-itn": {
     "diff": -0.001449878919685954,
     "lo": -0.005831930550127171,
@@ -559,6 +651,12 @@
     "diff": -0.006385636944148815,
     "lo": -0.008720082363710545,
     "hi": -0.0040649479627705674,
+    "sig": true
+   },
+   "qwen3-asr-1.7b vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": -0.004550151928801691,
+    "lo": -0.007036167792140549,
+    "hi": -0.001977843115022043,
     "sig": true
    },
    "qwen3-asr-1.7b vs sensevoice-small-itn": {
@@ -591,6 +689,12 @@
     "hi": 0.008720082363710545,
     "sig": true
    },
+   "qwen3-asr-1.7b-ko-univa vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.0018354850153471242,
+    "lo": 0.0004105057085779289,
+    "hi": 0.0033620163537238625,
+    "sig": true
+   },
    "qwen3-asr-1.7b-ko-univa vs sensevoice-small-itn": {
     "diff": -0.003640121543041344,
     "lo": -0.008530850041867941,
@@ -607,6 +711,42 @@
     "diff": -0.01966591087871916,
     "lo": -0.02279902685991517,
     "hi": -0.016493279852067007,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs buzzasr-korean": {
+    "diff": -0.004025727638702514,
+    "lo": -0.006317486847583486,
+    "hi": -0.0017163627255643245,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs qwen3-asr-1.7b": {
+    "diff": 0.004550151928801691,
+    "lo": 0.0019778431150220413,
+    "hi": 0.007036167792140546,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs qwen3-asr-1.7b-ko-univa": {
+    "diff": -0.0018354850153471242,
+    "lo": -0.0033620163537238642,
+    "hi": -0.00041050570857792976,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs sensevoice-small-itn": {
+    "diff": -0.005475606558388468,
+    "lo": -0.010230772366785663,
+    "hi": -0.0007990755409107142,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs sensevoice-small-noitn": {
+    "diff": -0.01022627365693396,
+    "lo": -0.015441895881221447,
+    "hi": -0.005110937574796279,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs whisper-large-v3": {
+    "diff": -0.021501395894066286,
+    "lo": -0.024422704190648573,
+    "hi": -0.018422477252793137,
     "sig": true
    },
    "sensevoice-small-itn vs buzzasr-korean": {
@@ -626,6 +766,12 @@
     "lo": -0.001261223162354458,
     "hi": 0.00853085004186794,
     "sig": false
+   },
+   "sensevoice-small-itn vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.005475606558388468,
+    "lo": 0.0007990755409107091,
+    "hi": 0.01023077236678566,
+    "sig": true
    },
    "sensevoice-small-itn vs sensevoice-small-noitn": {
     "diff": -0.004750667098545491,
@@ -655,6 +801,12 @@
     "diff": 0.008390788641586835,
     "lo": 0.00315056041070004,
     "hi": 0.013856713317712913,
+    "sig": true
+   },
+   "sensevoice-small-noitn vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.01022627365693396,
+    "lo": 0.005110937574796278,
+    "hi": 0.015441895881221445,
     "sig": true
    },
    "sensevoice-small-noitn vs sensevoice-small-itn": {
@@ -687,6 +839,12 @@
     "hi": 0.022799026859915167,
     "sig": true
    },
+   "whisper-large-v3 vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.021501395894066286,
+    "lo": 0.018422477252793133,
+    "hi": 0.024422704190648566,
+    "sig": true
+   },
    "whisper-large-v3 vs sensevoice-small-itn": {
     "diff": 0.016025789335677817,
     "lo": 0.012093234931492102,
@@ -703,9 +861,9 @@
   "rank_raw": {
    "buzzasr-korean": {
     "p1": 0.0,
-    "med": 3,
-    "lo": 2,
-    "hi": 4
+    "med": 4,
+    "lo": 3,
+    "hi": 5
    },
    "qwen3-asr-1.7b": {
     "p1": 1.0,
@@ -715,27 +873,33 @@
    },
    "qwen3-asr-1.7b-ko-univa": {
     "p1": 0.0,
+    "med": 3,
+    "lo": 3,
+    "hi": 4
+   },
+   "qwen3-asr-1.7b-ko-univa-release": {
+    "p1": 0.0,
     "med": 2,
     "lo": 2,
-    "hi": 3
+    "hi": 2
    },
    "sensevoice-small-itn": {
     "p1": 0.0,
-    "med": 4,
-    "lo": 2,
-    "hi": 4
-   },
-   "sensevoice-small-noitn": {
-    "p1": 0.0,
     "med": 5,
-    "lo": 5,
+    "lo": 3,
     "hi": 5
    },
-   "whisper-large-v3": {
+   "sensevoice-small-noitn": {
     "p1": 0.0,
     "med": 6,
     "lo": 6,
     "hi": 6
+   },
+   "whisper-large-v3": {
+    "p1": 0.0,
+    "med": 7,
+    "lo": 7,
+    "hi": 7
    }
   },
   "nopunct": {
@@ -749,6 +913,12 @@
     "diff": -0.0024353497203475558,
     "lo": -0.00478351263068212,
     "hi": 4.933009727867286e-07,
+    "sig": false
+   },
+   "buzzasr-korean vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": -0.0017749158978804247,
+    "lo": -0.004149995533223547,
+    "hi": 0.0005785378644801826,
     "sig": false
    },
    "buzzasr-korean vs sensevoice-small-itn": {
@@ -781,6 +951,12 @@
     "hi": -0.0028102975289317055,
     "sig": true
    },
+   "qwen3-asr-1.7b vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": -0.004684952428126228,
+    "lo": -0.007391934785663844,
+    "hi": -0.0018955908345246561,
+    "sig": true
+   },
    "qwen3-asr-1.7b vs sensevoice-small-itn": {
     "diff": -0.01632509854910944,
     "lo": -0.020048191635772403,
@@ -811,6 +987,12 @@
     "hi": 0.007962139318288406,
     "sig": true
    },
+   "qwen3-asr-1.7b-ko-univa vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.0006604338224671311,
+    "lo": -0.0006603537916647235,
+    "hi": 0.0019768140093374413,
+    "sig": false
+   },
    "qwen3-asr-1.7b-ko-univa vs sensevoice-small-itn": {
     "diff": -0.010979712298516082,
     "lo": -0.015156386641734802,
@@ -829,6 +1011,42 @@
     "hi": 0.0064101643267254664,
     "sig": true
    },
+   "qwen3-asr-1.7b-ko-univa-release vs buzzasr-korean": {
+    "diff": 0.0017749158978804247,
+    "lo": -0.0005785378644801856,
+    "hi": 0.004149995533223543,
+    "sig": false
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs qwen3-asr-1.7b": {
+    "diff": 0.004684952428126228,
+    "lo": 0.0018955908345246529,
+    "hi": 0.0073919347856638415,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs qwen3-asr-1.7b-ko-univa": {
+    "diff": -0.0006604338224671311,
+    "lo": -0.0019768140093374444,
+    "hi": 0.0006603537916647231,
+    "sig": false
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs sensevoice-small-itn": {
+    "diff": -0.011640146120983214,
+    "lo": -0.015659418943671857,
+    "hi": -0.007523841763555564,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs sensevoice-small-noitn": {
+    "diff": -0.011598869007079016,
+    "lo": -0.015624969213663157,
+    "hi": -0.007541491894148069,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs whisper-large-v3": {
+    "diff": 0.0028893979732937114,
+    "lo": 0.00023778171995491508,
+    "hi": 0.005705926890340261,
+    "sig": true
+   },
    "sensevoice-small-itn vs buzzasr-korean": {
     "diff": 0.013415062018863638,
     "lo": 0.009162236235656178,
@@ -845,6 +1063,12 @@
     "diff": 0.010979712298516082,
     "lo": 0.006713506454058609,
     "hi": 0.015156386641734796,
+    "sig": true
+   },
+   "sensevoice-small-itn vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.011640146120983214,
+    "lo": 0.007523841763555561,
+    "hi": 0.015659418943671854,
     "sig": true
    },
    "sensevoice-small-itn vs sensevoice-small-noitn": {
@@ -877,6 +1101,12 @@
     "hi": 0.015146245862033792,
     "sig": true
    },
+   "sensevoice-small-noitn vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.011598869007079016,
+    "lo": 0.0075414918941480655,
+    "hi": 0.015624969213663156,
+    "sig": true
+   },
    "sensevoice-small-noitn vs sensevoice-small-itn": {
     "diff": -4.127711390419786e-05,
     "lo": -0.0004634725337763419,
@@ -907,6 +1137,12 @@
     "hi": -0.0009290637484416437,
     "sig": true
    },
+   "whisper-large-v3 vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": -0.0028893979732937114,
+    "lo": -0.0057059268903402625,
+    "hi": -0.00023778171995491603,
+    "sig": true
+   },
    "whisper-large-v3 vs sensevoice-small-itn": {
     "diff": -0.014529544094276925,
     "lo": -0.018086322934383305,
@@ -935,21 +1171,27 @@
    },
    "qwen3-asr-1.7b-ko-univa": {
     "p1": 0.0,
+    "med": 5,
+    "lo": 4,
+    "hi": 5
+   },
+   "qwen3-asr-1.7b-ko-univa-release": {
+    "p1": 0.0,
     "med": 4,
     "lo": 3,
-    "hi": 4
+    "hi": 5
    },
    "sensevoice-small-itn": {
     "p1": 0.0,
-    "med": 6,
-    "lo": 5,
-    "hi": 6
+    "med": 7,
+    "lo": 6,
+    "hi": 7
    },
    "sensevoice-small-noitn": {
     "p1": 0.0,
-    "med": 5,
-    "lo": 5,
-    "hi": 6
+    "med": 6,
+    "lo": 6,
+    "hi": 7
    },
    "whisper-large-v3": {
     "p1": 0.091,
@@ -969,6 +1211,12 @@
     "diff": -0.0009259372956295225,
     "lo": -0.003174998159197563,
     "hi": 0.0013169130677453747,
+    "sig": false
+   },
+   "buzzasr-korean vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": -0.00018163859484442157,
+    "lo": -0.0024114101517852806,
+    "hi": 0.0020122224833211515,
     "sig": false
    },
    "buzzasr-korean vs sensevoice-small-itn": {
@@ -1001,6 +1249,12 @@
     "hi": 0.004611731937704086,
     "sig": true
    },
+   "qwen3-asr-1.7b vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.0037966579086020982,
+    "lo": 0.0021020632105881983,
+    "hi": 0.005534731350120218,
+    "sig": true
+   },
    "qwen3-asr-1.7b vs sensevoice-small-itn": {
     "diff": -0.014837814309952617,
     "lo": -0.01763506816861607,
@@ -1031,6 +1285,12 @@
     "hi": -0.0014893647829723696,
     "sig": true
    },
+   "qwen3-asr-1.7b-ko-univa vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.000744298700785101,
+    "lo": -0.0005279228232811173,
+    "hi": 0.001997522687759721,
+    "sig": false
+   },
    "qwen3-asr-1.7b-ko-univa vs sensevoice-small-itn": {
     "diff": -0.017890173517769614,
     "lo": -0.02058231178620068,
@@ -1049,6 +1309,42 @@
     "hi": 0.00038628159699839943,
     "sig": false
    },
+   "qwen3-asr-1.7b-ko-univa-release vs buzzasr-korean": {
+    "diff": 0.00018163859484442157,
+    "lo": -0.002012222483321152,
+    "hi": 0.0024114101517852776,
+    "sig": false
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs qwen3-asr-1.7b": {
+    "diff": -0.0037966579086020982,
+    "lo": -0.005534731350120219,
+    "hi": -0.0021020632105881987,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs qwen3-asr-1.7b-ko-univa": {
+    "diff": -0.000744298700785101,
+    "lo": -0.0019975226877597223,
+    "hi": 0.000527922823281114,
+    "sig": false
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs sensevoice-small-itn": {
+    "diff": -0.018634472218554715,
+    "lo": -0.021420034218173064,
+    "hi": -0.0159938525724807,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs sensevoice-small-noitn": {
+    "diff": -0.01865509630336095,
+    "lo": -0.021377652131897937,
+    "hi": -0.016074945898212862,
+    "sig": true
+   },
+   "qwen3-asr-1.7b-ko-univa-release vs whisper-large-v3": {
+    "diff": -0.0021479944377111454,
+    "lo": -0.003979217051798129,
+    "hi": -0.0003667334910147473,
+    "sig": true
+   },
    "sensevoice-small-itn vs buzzasr-korean": {
     "diff": 0.018816110813399137,
     "lo": 0.015961201164344026,
@@ -1065,6 +1361,12 @@
     "diff": 0.017890173517769614,
     "lo": 0.015358428883756896,
     "hi": 0.02058231178620068,
+    "sig": true
+   },
+   "sensevoice-small-itn vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.018634472218554715,
+    "lo": 0.0159938525724807,
+    "hi": 0.021420034218173064,
     "sig": true
    },
    "sensevoice-small-itn vs sensevoice-small-noitn": {
@@ -1097,6 +1399,12 @@
     "hi": 0.020651681580146356,
     "sig": true
    },
+   "sensevoice-small-noitn vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.01865509630336095,
+    "lo": 0.01607494589821286,
+    "hi": 0.021377652131897937,
+    "sig": true
+   },
    "sensevoice-small-noitn vs sensevoice-small-itn": {
     "diff": 2.0624084806235288e-05,
     "lo": -0.0003994310953222684,
@@ -1127,6 +1435,12 @@
     "hi": 0.003318488716871407,
     "sig": false
    },
+   "whisper-large-v3 vs qwen3-asr-1.7b-ko-univa-release": {
+    "diff": 0.0021479944377111454,
+    "lo": 0.0003667334910147459,
+    "hi": 0.003979217051798129,
+    "sig": true
+   },
    "whisper-large-v3 vs sensevoice-small-itn": {
     "diff": -0.01648647778084357,
     "lo": -0.01916577224406654,
@@ -1142,40 +1456,46 @@
   },
   "rank_kocer": {
    "buzzasr-korean": {
-    "p1": 0.795,
+    "p1": 0.555,
     "med": 1,
     "lo": 1,
-    "hi": 2
+    "hi": 3
    },
    "qwen3-asr-1.7b": {
     "p1": 0.0,
-    "med": 4,
-    "lo": 3,
-    "hi": 4
+    "med": 5,
+    "lo": 4,
+    "hi": 5
    },
    "qwen3-asr-1.7b-ko-univa": {
-    "p1": 0.204,
+    "p1": 0.046,
+    "med": 3,
+    "lo": 1,
+    "hi": 4
+   },
+   "qwen3-asr-1.7b-ko-univa-release": {
+    "p1": 0.399,
     "med": 2,
     "lo": 1,
     "hi": 3
    },
    "sensevoice-small-itn": {
     "p1": 0.0,
-    "med": 5,
-    "lo": 5,
-    "hi": 6
+    "med": 6,
+    "lo": 6,
+    "hi": 7
    },
    "sensevoice-small-noitn": {
     "p1": 0.0,
-    "med": 6,
-    "lo": 5,
-    "hi": 6
+    "med": 7,
+    "lo": 6,
+    "hi": 7
    },
    "whisper-large-v3": {
-    "p1": 0.001,
-    "med": 3,
-    "lo": 2,
-    "hi": 4
+    "p1": 0.0,
+    "med": 4,
+    "lo": 3,
+    "hi": 5
    }
   }
  },
