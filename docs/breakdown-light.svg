@@ -1,66 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="298" viewBox="0 0 760 298" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
-<rect width="760" height="298" fill="#fcfcfb"/>
-<text x="16" y="26" font-size="15" font-weight="600" fill="#0b0b0b">What raw CER counts as errors, 6 Korean ASR models, 1,418 test utterances</text>
-<text x="16" y="46" font-size="12" fill="#52514e">Share of raw character errors. Only the last segment survives kocer. Zeroth + FLEURS + Common Voice 27, pooled.</text>
-<rect x="16" y="56" width="10" height="10" rx="2" fill="#2a78d6"/><text x="31" y="65" font-size="11" fill="#52514e">spacing</text>
-<rect x="102" y="56" width="10" height="10" rx="2" fill="#eb6834"/><text x="117" y="65" font-size="11" fill="#52514e">punctuation</text>
-<rect x="216" y="56" width="10" height="10" rx="2" fill="#1baf7a"/><text x="231" y="65" font-size="11" fill="#52514e">numbers / Latin</text>
-<rect x="358" y="56" width="10" height="10" rx="2" fill="#eda100"/><text x="373" y="65" font-size="11" fill="#52514e">real errors</text>
-<text x="140" y="93" font-size="12" text-anchor="end" fill="#0b0b0b">BuzzASR/korean</text>
-<rect x="150.0" y="78" width="111.7" height="22" rx="2" fill="#2a78d6"/>
-<text x="205.8" y="93" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
-<rect x="263.7" y="78" width="139.5" height="22" rx="2" fill="#eb6834"/>
-<text x="333.4" y="93" font-size="11" text-anchor="middle" fill="#0b0b0b">29%</text>
-<rect x="405.2" y="78" width="50.3" height="22" rx="2" fill="#1baf7a"/>
-<text x="430.3" y="93" font-size="11" text-anchor="middle" fill="#0b0b0b">11%</text>
-<rect x="457.5" y="78" width="180.5" height="22" rx="2" fill="#eda100"/>
-<text x="547.7" y="93" font-size="11" text-anchor="middle" fill="#0b0b0b">37%</text>
-<text x="650" y="93" font-size="11" fill="#52514e">7.83% → 3.90%</text>
-<text x="140" y="127" font-size="12" text-anchor="end" fill="#0b0b0b">TeamUNIVA ko</text>
-<rect x="150.0" y="112" width="118.5" height="22" rx="2" fill="#2a78d6"/>
-<text x="209.3" y="127" font-size="11" text-anchor="middle" fill="#0b0b0b">25%</text>
-<rect x="270.5" y="112" width="114.2" height="22" rx="2" fill="#eb6834"/>
-<text x="327.6" y="127" font-size="11" text-anchor="middle" fill="#0b0b0b">24%</text>
-<rect x="386.7" y="112" width="59.1" height="22" rx="2" fill="#1baf7a"/>
-<text x="416.2" y="127" font-size="11" text-anchor="middle" fill="#0b0b0b">12%</text>
-<rect x="447.8" y="112" width="190.2" height="22" rx="2" fill="#eda100"/>
-<text x="542.9" y="127" font-size="11" text-anchor="middle" fill="#0b0b0b">39%</text>
-<text x="650" y="127" font-size="11" fill="#52514e">7.61% → 3.99%</text>
-<text x="140" y="161" font-size="12" text-anchor="end" fill="#0b0b0b">whisper-large-v3</text>
-<rect x="150.0" y="146" width="205.1" height="22" rx="2" fill="#2a78d6"/>
-<text x="252.6" y="161" font-size="11" text-anchor="middle" fill="#0b0b0b">42%</text>
-<rect x="357.1" y="146" width="93.2" height="22" rx="2" fill="#eb6834"/>
-<text x="403.7" y="161" font-size="11" text-anchor="middle" fill="#0b0b0b">19%</text>
-<rect x="452.3" y="146" width="27.6" height="22" rx="2" fill="#1baf7a"/>
-<text x="466.1" y="161" font-size="11" text-anchor="middle" fill="#0b0b0b">6%</text>
-<rect x="481.9" y="146" width="156.1" height="22" rx="2" fill="#eda100"/>
-<text x="559.9" y="161" font-size="11" text-anchor="middle" fill="#0b0b0b">32%</text>
-<text x="650" y="161" font-size="11" fill="#52514e">9.58% → 4.13%</text>
-<text x="140" y="195" font-size="12" text-anchor="end" fill="#0b0b0b">Qwen3-ASR-1.7B</text>
-<rect x="150.0" y="180" width="124.6" height="22" rx="2" fill="#2a78d6"/>
-<text x="212.3" y="195" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
-<rect x="276.6" y="180" width="113.0" height="22" rx="2" fill="#eb6834"/>
-<text x="333.1" y="195" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
-<rect x="391.6" y="180" width="20.5" height="22" rx="2" fill="#1baf7a"/>
-<rect x="414.1" y="180" width="223.9" height="22" rx="2" fill="#eda100"/>
-<text x="526.1" y="195" font-size="11" text-anchor="middle" fill="#0b0b0b">46%</text>
-<text x="650" y="195" font-size="11" fill="#52514e">6.97% → 4.30%</text>
-<text x="140" y="229" font-size="12" text-anchor="end" fill="#0b0b0b">SenseVoice (itn on)</text>
-<rect x="150.0" y="214" width="89.3" height="22" rx="2" fill="#2a78d6"/>
-<text x="194.7" y="229" font-size="11" text-anchor="middle" fill="#0b0b0b">19%</text>
-<rect x="241.3" y="214" width="104.5" height="22" rx="2" fill="#eb6834"/>
-<text x="293.6" y="229" font-size="11" text-anchor="middle" fill="#0b0b0b">22%</text>
-<rect x="347.9" y="214" width="24.4" height="22" rx="2" fill="#1baf7a"/>
-<rect x="374.3" y="214" width="263.7" height="22" rx="2" fill="#eda100"/>
-<text x="506.1" y="229" font-size="11" text-anchor="middle" fill="#0b0b0b">54%</text>
-<text x="650" y="229" font-size="11" fill="#52514e">7.98% → 5.78%</text>
-<text x="140" y="263" font-size="12" text-anchor="end" fill="#0b0b0b">SenseVoice (itn off)</text>
-<rect x="150.0" y="248" width="84.0" height="22" rx="2" fill="#2a78d6"/>
-<text x="192.0" y="263" font-size="11" text-anchor="middle" fill="#0b0b0b">18%</text>
-<rect x="236.0" y="248" width="126.4" height="22" rx="2" fill="#eb6834"/>
-<text x="299.2" y="263" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
-<rect x="364.5" y="248" width="22.7" height="22" rx="2" fill="#1baf7a"/>
-<rect x="389.1" y="248" width="248.9" height="22" rx="2" fill="#eda100"/>
-<text x="513.6" y="263" font-size="11" text-anchor="middle" fill="#0b0b0b">51%</text>
-<text x="650" y="263" font-size="11" fill="#52514e">8.45% → 5.79%</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="328" viewBox="0 0 760 328" font-family="-apple-system,Apple SD Gothic Neo,Malgun Gothic,Noto Sans KR,Segoe UI,Helvetica,Arial,sans-serif">
+<rect width="760" height="328" fill="#fcfcfb"/>
+<text x="16" y="26" font-size="15" font-weight="600" fill="#0b0b0b">CER가 센 오류의 절반은 모델이 틀린 게 아니라 적는 방식 차이입니다</text>
+<text x="16" y="46" font-size="12" fill="#52514e">공개 한국어 STT 모델 6개, 테스트 1,418발화. 막대 전체가 보통 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>
+<rect x="16" y="56" width="10" height="10" rx="2" fill="#2a78d6"/><text x="31" y="65" font-size="11" fill="#52514e">띄어쓰기 차이</text>
+<rect x="130" y="56" width="10" height="10" rx="2" fill="#eb6834"/><text x="145" y="65" font-size="11" fill="#52514e">문장부호 차이</text>
+<rect x="244" y="56" width="10" height="10" rx="2" fill="#1baf7a"/><text x="259" y="65" font-size="11" fill="#52514e">숫자·영문 표기 차이</text>
+<rect x="402" y="56" width="10" height="10" rx="2" fill="#eda100"/><text x="417" y="65" font-size="11" fill="#52514e">진짜 오류 (kocer CER)</text>
+<text x="297" y="96" font-size="11" text-anchor="middle" fill="#52514e">← 표기만 다름: kocer는 오류로 안 셈 →</text>
+<text x="542" y="96" font-size="11" text-anchor="middle" fill="#0b0b0b">← 진짜 오류 →</text>
+<text x="650" y="96" font-size="11" fill="#52514e">보통 CER → kocer</text>
+<text x="140" y="123" font-size="12" text-anchor="end" fill="#0b0b0b">BuzzASR/korean</text>
+<rect x="150.0" y="108" width="111.7" height="22" rx="2" fill="#2a78d6"/>
+<text x="205.8" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
+<rect x="263.7" y="108" width="139.5" height="22" rx="2" fill="#eb6834"/>
+<text x="333.4" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">29%</text>
+<rect x="405.2" y="108" width="50.3" height="22" rx="2" fill="#1baf7a"/>
+<text x="430.3" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">11%</text>
+<rect x="457.5" y="108" width="180.5" height="22" rx="2" fill="#eda100"/>
+<text x="547.7" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">37%</text>
+<text x="650" y="123" font-size="11" fill="#52514e">7.83% → 3.90%</text>
+<text x="140" y="157" font-size="12" text-anchor="end" fill="#0b0b0b">TeamUNIVA ko</text>
+<rect x="150.0" y="142" width="118.5" height="22" rx="2" fill="#2a78d6"/>
+<text x="209.3" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">25%</text>
+<rect x="270.5" y="142" width="114.2" height="22" rx="2" fill="#eb6834"/>
+<text x="327.6" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">24%</text>
+<rect x="386.7" y="142" width="59.1" height="22" rx="2" fill="#1baf7a"/>
+<text x="416.2" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">12%</text>
+<rect x="447.8" y="142" width="190.2" height="22" rx="2" fill="#eda100"/>
+<text x="542.9" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">39%</text>
+<text x="650" y="157" font-size="11" fill="#52514e">7.61% → 3.99%</text>
+<text x="140" y="191" font-size="12" text-anchor="end" fill="#0b0b0b">whisper-large-v3</text>
+<rect x="150.0" y="176" width="205.1" height="22" rx="2" fill="#2a78d6"/>
+<text x="252.6" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">42%</text>
+<rect x="357.1" y="176" width="93.2" height="22" rx="2" fill="#eb6834"/>
+<text x="403.7" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">19%</text>
+<rect x="452.3" y="176" width="27.6" height="22" rx="2" fill="#1baf7a"/>
+<text x="466.1" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">6%</text>
+<rect x="481.9" y="176" width="156.1" height="22" rx="2" fill="#eda100"/>
+<text x="559.9" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">32%</text>
+<text x="650" y="191" font-size="11" fill="#52514e">9.58% → 4.13%</text>
+<text x="140" y="225" font-size="12" text-anchor="end" fill="#0b0b0b">Qwen3-ASR-1.7B</text>
+<rect x="150.0" y="210" width="124.6" height="22" rx="2" fill="#2a78d6"/>
+<text x="212.3" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
+<rect x="276.6" y="210" width="113.0" height="22" rx="2" fill="#eb6834"/>
+<text x="333.1" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
+<rect x="391.6" y="210" width="20.5" height="22" rx="2" fill="#1baf7a"/>
+<rect x="414.1" y="210" width="223.9" height="22" rx="2" fill="#eda100"/>
+<text x="526.1" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">46%</text>
+<text x="650" y="225" font-size="11" fill="#52514e">6.97% → 4.30%</text>
+<text x="140" y="259" font-size="12" text-anchor="end" fill="#0b0b0b">SenseVoice (itn on)</text>
+<rect x="150.0" y="244" width="89.3" height="22" rx="2" fill="#2a78d6"/>
+<text x="194.7" y="259" font-size="11" text-anchor="middle" fill="#0b0b0b">19%</text>
+<rect x="241.3" y="244" width="104.5" height="22" rx="2" fill="#eb6834"/>
+<text x="293.6" y="259" font-size="11" text-anchor="middle" fill="#0b0b0b">22%</text>
+<rect x="347.9" y="244" width="24.4" height="22" rx="2" fill="#1baf7a"/>
+<rect x="374.3" y="244" width="263.7" height="22" rx="2" fill="#eda100"/>
+<text x="506.1" y="259" font-size="11" text-anchor="middle" fill="#0b0b0b">54%</text>
+<text x="650" y="259" font-size="11" fill="#52514e">7.98% → 5.78%</text>
+<text x="140" y="293" font-size="12" text-anchor="end" fill="#0b0b0b">SenseVoice (itn off)</text>
+<rect x="150.0" y="278" width="84.0" height="22" rx="2" fill="#2a78d6"/>
+<text x="192.0" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">18%</text>
+<rect x="236.0" y="278" width="126.4" height="22" rx="2" fill="#eb6834"/>
+<text x="299.2" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
+<rect x="364.5" y="278" width="22.7" height="22" rx="2" fill="#1baf7a"/>
+<rect x="389.1" y="278" width="248.9" height="22" rx="2" fill="#eda100"/>
+<text x="513.6" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">51%</text>
+<text x="650" y="293" font-size="11" fill="#52514e">8.45% → 5.79%</text>
 </svg>
