@@ -16,7 +16,7 @@
 ```python
 >>> import kocer
 >>> print(kocer.breakdown(refs, hyps))      # whisper-large-v3, Zeroth test 457발화
-raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.1.4)
+raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.1.5)
 띄어쓰기     1,142   52%  █████████████████████
 문장부호       226   10%  ████
 숫자·영문      258   12%  █████
@@ -188,7 +188,7 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 점수를 논문·모델카드·보고서에 적을 때는 **버전을 함께** 적어 주세요. 정규화 규칙(조수사 사전, 약어 사전)이 버전마다 바뀌어서, 버전이 다르면 같은 출력도 점수가 다릅니다. `raw_cer`도 같이 적으면 다른 도구로 잰 숫자와 비교할 수 있습니다.
 
 ```
-CER 4.13% (raw) / 2.93% (kocer 0.1.4)
+CER 4.13% (raw) / 2.93% (kocer 0.1.5)
 ```
 
 ```bibtex
@@ -196,7 +196,7 @@ CER 4.13% (raw) / 2.93% (kocer 0.1.4)
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.1.4},
+  version = {0.1.5},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

@@ -12,11 +12,11 @@ Six public Korean ASR settings, three public test sets (1,418 utterances), one s
 Re-score with the installed kocer:
 
 ```bash
-pip install "kocer[fast]==0.1.4" numpy nlptutti
+pip install "kocer[fast]==0.1.5" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 
-With kocer 0.1.4 (same scorer as 0.1.3) the `kocer` column of all 16 available files reproduces `scores2.json` to two decimals (checked 2026-10-24).
+With kocer 0.1.5 (same scorer as 0.1.3) the `kocer` column of all 16 available files reproduces `scores2.json` to two decimals (checked 2026-10-24).
 
 ## Datasets
 
