@@ -8,7 +8,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-dark.svg">
-  <img alt="공개 한국어 ASR 모델 6개의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-light.svg">
+  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-light.svg">
 </picture>
 
 위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER 숫자는 그대로 두고, 그 오류가 어디서 왔는지만 나눠 보여줍니다.
@@ -151,18 +151,20 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 
 ## 공개 모델 재채점
 
-공개 한국어 ASR 6개 설정을 공개 테스트셋 세 개(Zeroth 457, FLEURS 382, Common Voice 27 579발화)에서 같은 조건(greedy, 언어 고정)으로 돌리고, 출력은 그대로 둔 채 채점만 바꿨습니다. 맨 위 그림이 그 오류 분해이고, 아래는 kocer CER입니다(단위 %, 총 오류 / 총 정답 글자).
+공개 한국어 ASR 7개 설정을 공개 테스트셋 세 개(Zeroth 457, FLEURS 382, Common Voice 27 579발화)에서 같은 조건(greedy, 언어 고정)으로 돌리고, 출력은 그대로 둔 채 채점만 바꿨습니다. 맨 위 그림이 그 오류 분해이고, 아래는 kocer CER입니다(단위 %, 총 오류 / 총 정답 글자).
 
 | 모델 | Zeroth | FLEURS | Common Voice 27 | 합산 | 합산 순위 raw → kocer |
 |---|---|---|---|---|---|
-| BuzzASR/korean | 3.16 | 4.72 | **3.88** | **3.90** | 3 → **1** |
-| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | **4.31** | 6.08 | 3.99 | 2 → **2** |
-| openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 4.13 | 6 → 3 |
-| Qwen/Qwen3-ASR-1.7B | 2.91 | **4.31** | 6.61 | 4.30 | 1 → 4 |
-| SenseVoiceSmall (itn 켬 / 끔) | **2.40** / 2.41 | 6.95 / 6.91 | 9.68 / 9.72 | 5.78 / 5.79 | 4, 5 → 5, 6 |
+| BuzzASR/korean | 3.16 | 4.72 | **3.88** | **3.90** | 4 → **1** |
+| TeamUNIVA/qwen3_asr_1.7b_ko | 2.37 | **4.25** | 6.00 | 3.92 | 2 → **2** |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | 4.31 | 6.08 | 3.99 | 3 → 3 |
+| openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 4.13 | 7 → 4 |
+| Qwen/Qwen3-ASR-1.7B | 2.91 | 4.31 | 6.61 | 4.30 | 1 → 5 |
+| SenseVoiceSmall (itn 켬 / 끔) | **2.40** / 2.41 | 6.95 / 6.91 | 9.68 / 9.72 | 5.78 / 5.79 | 5, 6 → 6, 7 |
 
 - raw CER이 오류로 센 것의 **46~68%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호이고, 그것만 지워도 whisper-large-v3가 꼴찌에서 2위로 올라옵니다.
-- kocer만 처리하는 숫자·영문 몫은 합산 raw 오류의 5~12%이고 거의 전부 Zeroth에서 나옵니다. Zeroth 정답은 숫자를 전부 한글로 적는데 모델은 아라비아 숫자를 뱉기 때문입니다. 이 몫만으로 합산 상위권이 바뀝니다(TeamUNIVA 4위 → 2위, BuzzASR 3위 → 1위).
+- kocer만 처리하는 숫자·영문 몫은 합산 raw 오류의 5~13%이고 거의 전부 Zeroth에서 나옵니다. Zeroth 정답은 숫자를 전부 한글로 적는데 모델은 아라비아 숫자를 뱉기 때문입니다. 이 몫만으로 합산 상위권이 바뀝니다(공백·부호만 지운 단계 대비 TeamUNIVA 정식판 4위 → 2위, BuzzASR 3위 → 1위). 상위 셋(BuzzASR, TeamUNIVA 정식판, beta)은 통계적으로 구분되지 않습니다.
+- TeamUNIVA는 beta → 정식판에서 모든 데이터셋이 조금씩 좋아졌지만(합산 −0.07%p) 신뢰구간 안입니다. 숫자를 아라비아로 쓰는 습관(Zeroth 출력의 31%)은 그대로입니다. 그래서 공백·부호만 지우는 채점에서는 두 버전 모두 기본 모델보다 나빠 보이고, 숫자까지 맞추면 기본 모델보다 낫습니다. [비교표](benchmarks/results/univa_compare.md)
 - raw > 0이고 kocer = 0인 문장 100건을 저자가 직접 읽은 결과, 99건은 표기 차이만, 0건이 실제 오류를 숨김, 1건이 띄어쓰기 동형이의어로 애매했습니다.
 
 **데이터셋 출처.** 모두 공개 데이터이고 레포의 jsonl에는 정답 전사와 모델 출력만 있습니다(음성 없음).

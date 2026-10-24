@@ -2,7 +2,7 @@
 import json, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S = json.load(open(os.path.join(ROOT, "results", "scores2.json"), encoding="utf-8"))["scores"]
-NAMES = {"buzzasr-korean": "BuzzASR/korean", "qwen3-asr-1.7b-ko-univa": "TeamUNIVA ko", "whisper-large-v3": "whisper-large-v3",
+NAMES = {"buzzasr-korean": "BuzzASR/korean", "qwen3-asr-1.7b-ko-univa-release": "TeamUNIVA ko", "qwen3-asr-1.7b-ko-univa": "TeamUNIVA ko beta", "whisper-large-v3": "whisper-large-v3",
          "qwen3-asr-1.7b": "Qwen3-ASR-1.7B", "sensevoice-small-itn": "SenseVoice (itn on)", "sensevoice-small-noitn": "SenseVoice (itn off)"}
 rows = []
 for tag, name in NAMES.items():
@@ -18,7 +18,7 @@ for mode, t in THEMES.items():
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="-apple-system,Apple SD Gothic Neo,Malgun Gothic,Noto Sans KR,Segoe UI,Helvetica,Arial,sans-serif">',
          f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>',
          f'<text x="16" y="26" font-size="15" font-weight="600" fill="{t["fg"]}">CER가 센 오류의 절반은 모델이 틀린 게 아니라 적는 방식 차이입니다</text>',
-         f'<text x="16" y="46" font-size="12" fill="{t["muted"]}">공개 한국어 STT 모델 6개, 테스트 1,418발화. 막대 전체가 보통 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>']
+         f'<text x="16" y="46" font-size="12" fill="{t["muted"]}">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 보통 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>']
     x = 16
     for c, lab in zip(t["series"], LEGEND):
         o.append(f'<rect x="{x}" y="56" width="10" height="10" rx="2" fill="{c}"/><text x="{x + 15}" y="65" font-size="11" fill="{t["muted"]}">{lab}</text>')
@@ -35,7 +35,7 @@ for mode, t in THEMES.items():
         for c, v in zip(t["series"], parts):
             w = span * v / total - 2
             o.append(f'<rect x="{x:.1f}" y="{y}" width="{max(w, 0):.1f}" height="{BAR}" rx="2" fill="{c}"/>')
-            if v / total >= 0.06:
+            if v / total >= 0.04:
                 o.append(f'<text x="{x + w / 2:.1f}" y="{y + 15}" font-size="11" text-anchor="middle" fill="#0b0b0b">{v / total:.0%}</text>')
             x += span * v / total
         o.append(f'<text x="{LABEL + span + 10}" y="{y + 15}" font-size="11" fill="{t["muted"]}">{cer["raw"]:.2%} → {cer["kocer"]:.2%}</text>')

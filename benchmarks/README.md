@@ -1,13 +1,14 @@
 # Leaderboard re-scoring (2026-10-24)
 
-Six public Korean ASR settings, three public test sets (1,418 utterances), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
+Seven public Korean ASR settings, three public test sets (1,418 utterances), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
 
 - `scripts/`: data download (`prepare_data.py` for Zeroth/FLEURS, `get_cv27.py` for Common Voice 27 from Mozilla Data Collective), inference (greedy, identical settings for all models), four-level scoring with paired bootstrap (`score2.py`). Written for Windows + CUDA; paths in `setup_envs.sh` are the author's machine.
 - `results/<model>/<dataset>.jsonl`: every hypothesis exactly as emitted, with the reference. `*.meta.json` has the decoding settings and the full `pip freeze`.
 - `results/tables2.md`: all tables (per dataset, pooled, error-count decomposition, ranks, bootstrap matrices). `results/scores2.json` is the raw data behind them.
 - `results/fake_review.tsv`: the 100 sampled sentences with raw CER > 0 and kocer CER = 0. `verdict` is the author's reading (99 notation-only, 0 hidden errors, 1 ambiguous); `claude_first_pass` is the AI assistant's first pass kept for comparison.
 - `results/NOTES.md`: environment, pitfalls, and the two kocer fixes found during the run (shipped in kocer 0.1.3).
-- Missing: `results/buzzasr-korean/fleurs.jsonl` and `commonvoice.jsonl` could not be published (the model emitted U+FFFD characters); their numbers are in `scores2.json`.
+- `results/univa_compare.md`: TeamUNIVA base → beta → release under the model card's normalization (punctuation removed, case-folded) and kocer, the number-writing habit, and paired bootstrap between versions (`scripts/compare_univa.py`).
+- Two BuzzASR files (`fleurs.jsonl`, `commonvoice.jsonl`) contain U+FFFD characters exactly as the model emitted them.
 
 Re-score with the installed kocer:
 
@@ -16,7 +17,7 @@ pip install "kocer[fast]==0.1.5" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 
-With kocer 0.1.5 (same scorer as 0.1.3) the `kocer` column of all 16 available files reproduces `scores2.json` to two decimals (checked 2026-10-24).
+With kocer 0.1.5 (same scorer as 0.1.3) the `kocer` column of all 21 result files reproduces `scores2.json` to two decimals (checked 2026-10-24).
 
 ## Datasets
 
@@ -46,9 +47,10 @@ Test sets (all public, 1,418 utterances, ~2.9 h): Zeroth-Korean test (457 utt.),
 | Model | Zeroth | FLEURS | Common Voice 27 | pooled |
 |---|---|---|---|---|
 | BuzzASR/korean | 3.16 | 4.72 | **3.88** | **3.90** |
-| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | **4.31** | 6.08 | 3.99 |
+| TeamUNIVA/qwen3_asr_1.7b_ko | 2.37 | **4.25** | 6.00 | 3.92 |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | 4.31 | 6.08 | 3.99 |
 | openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 4.13 |
-| Qwen/Qwen3-ASR-1.7B | 2.91 | **4.31** | 6.61 | 4.30 |
+| Qwen/Qwen3-ASR-1.7B | 2.91 | 4.31 | 6.61 | 4.30 |
 | FunAudioLLM/SenseVoiceSmall (use_itn=True) | **2.40** | 6.95 | 9.68 | 5.78 |
 | FunAudioLLM/SenseVoiceSmall (use_itn=False) | 2.41 | 6.91 | 9.72 | 5.79 |
 
@@ -58,19 +60,21 @@ No model wins everywhere. BuzzASR, fine-tuned on Common Voice and FLEURS trainin
 
 | Model | raw | nospace | nospace+punct | kocer | rank raw → nospace+punct → kocer |
 |---|---|---|---|---|---|
-| BuzzASR/korean | 7.83 | 7.81 | 5.02 | 3.90 | 3 → 3 → **1** |
-| TeamUNIVA ko | 7.61 | 7.45 | 5.26 | 3.99 | 2 → 4 → **2** |
-| whisper-large-v3 | 9.58 | 7.18 | 4.91 | 4.13 | 6 → 2 → 3 |
-| Qwen3-ASR-1.7B | 6.97 | 6.72 | 4.73 | 4.30 | 1 → 1 → 4 |
-| SenseVoice (itn on) | 7.98 | 8.43 | 6.36 | 5.78 | 4 → 6 → 5 |
-| SenseVoice (itn off) | 8.45 | 9.05 | 6.36 | 5.79 | 5 → 5 → 6 |
+| BuzzASR/korean | 7.83 | 7.81 | 5.02 | 3.90 | 4 → 3 → **1** |
+| TeamUNIVA ko (release) | 7.43 | 7.24 | 5.20 | 3.92 | 2 → 4 → **2** |
+| TeamUNIVA ko beta | 7.61 | 7.45 | 5.26 | 3.99 | 3 → 5 → 3 |
+| whisper-large-v3 | 9.58 | 7.18 | 4.91 | 4.13 | 7 → 2 → 4 |
+| Qwen3-ASR-1.7B | 6.97 | 6.72 | 4.73 | 4.30 | 1 → 1 → 5 |
+| SenseVoice (itn on) | 7.98 | 8.43 | 6.36 | 5.78 | 5 → 7 → 6 |
+| SenseVoice (itn off) | 8.45 | 9.05 | 6.36 | 5.79 | 6 → 6 → 7 |
 
 Do not compare the columns as ratios: removing spaces shrinks the denominator by ~25% (64,833 → 48,470 reference characters), which is why a model whose spacing already matches the reference can get a *higher* nospace CER than raw. The honest view is error **counts**:
 
 | Model | raw errors | spacing | punctuation | numbers / Latin (kocer only) | real errors left | notation share |
 |---|---|---|---|---|---|---|
 | BuzzASR/korean | 5,077 | 23% | 29% | 11% | 37% | 63% |
-| TeamUNIVA ko | 4,935 | 25% | 24% | 12% | 39% | 61% |
+| TeamUNIVA ko (release) | 4,816 | 25% | 23% | 13% | 39% | 61% |
+| TeamUNIVA ko beta | 4,935 | 25% | 24% | 12% | 39% | 61% |
 | whisper-large-v3 | 6,210 | 42% | 19% | 6% | 32% | 68% |
 | Qwen3-ASR-1.7B | 4,521 | 26% | 23% | 5% | 46% | 54% |
 | SenseVoice (itn on) | 5,171 | 19% | 22% | 5% | 54% | 46% |
@@ -78,8 +82,9 @@ Do not compare the columns as ratios: removing spaces shrinks the denominator by
 
 **What this says.**
 1. 46–68% of what raw CER counts as errors on these sets is notation, not recognition. Most of it is spacing and punctuation. Removing those alone, which nlptutti and many Korean papers already do, moves whisper-large-v3 from last to 2nd.
-2. Numbers and Latin acronyms, the part only kocer handles, are 5–12% of raw errors pooled, and nearly all of it comes from **Zeroth**: its references spell every number in Hangul (`이천 십 육 년`) while most models emit digits (`2016년`). There it is 8–27% of raw errors for the digit-emitting models. On FLEURS and Common Voice it is 0–3% for every model except SenseVoice on FLEURS (9–11%). That slice still reorders the top pooled: TeamUNIVA 4th → 2nd and BuzzASR 3rd → 1st.
-3. Which pooled differences are real? Pairwise paired bootstrap (2,000 sentence resamples, kocer level): BuzzASR ≈ TeamUNIVA (−0.09 pt [−0.32, +0.13]); both are ahead of Qwen3-ASR (0.40 [0.16, 0.64] and 0.31 [0.15, 0.46]); BuzzASR is ahead of whisper (0.23 [0.06, 0.40]); whisper vs TeamUNIVA and whisper vs Qwen3-ASR are not distinguishable; SenseVoice trails everyone by 1.5–1.9 pt and its two settings are identical. Rank intervals: BuzzASR [1, 2], TeamUNIVA [1, 3], whisper [2, 4], Qwen3-ASR [3, 4], SenseVoice [5, 6]. Full matrices for all levels: `results/tables2.md`.
+2. Numbers and Latin acronyms, the part only kocer handles, are 5–13% of raw errors pooled, and nearly all of it comes from **Zeroth**: its references spell every number in Hangul (`이천 십 육 년`) while most models emit digits (`2016년`). There it is 8–27% of raw errors for the digit-emitting models. On FLEURS and Common Voice it is 0–3% for every model except SenseVoice on FLEURS (9–11%). That slice still reorders the top pooled: from the nospace+punct level to kocer, TeamUNIVA release 4th → 2nd, beta 5th → 3rd, BuzzASR 3rd → 1st.
+3. Which pooled differences are real? Pairwise paired bootstrap (2,000 sentence resamples, kocer level): BuzzASR, TeamUNIVA release and TeamUNIVA beta are not distinguishable (release − BuzzASR +0.02 pt [−0.20, +0.24]; release − beta −0.07 [−0.20, +0.05]; BuzzASR − beta −0.09 [−0.32, +0.13]); all three are ahead of Qwen3-ASR (release −0.38 [−0.55, −0.21]); BuzzASR and the release are ahead of whisper (−0.23 [−0.40, −0.06], −0.21 [−0.40, −0.04]); whisper vs beta and whisper vs Qwen3-ASR are not distinguishable; SenseVoice trails everyone by 1.5–1.9 pt and its two settings are identical. Rank intervals: BuzzASR [1, 3], TeamUNIVA release [1, 3], beta [1, 4], whisper [3, 5], Qwen3-ASR [4, 5], SenseVoice [6, 7].
+4. TeamUNIVA beta → release: the number-writing habit did not change (share of outputs with a digit: Zeroth 31.7% → 31.3%, FLEURS 23.8% → 25.4%, Common Voice 2.1% → 1.9%; base was 8.5% on Zeroth). Under the model card's own normalization (punctuation removed, case-folded) with a single public reference, both fine-tunes score *worse* than the base on Zeroth; with number readings handled, both are better. The card avoids this with hand-made TN/ITN dual references. Details: `results/univa_compare.md`. Full matrices for all levels: `results/tables2.md`.
 
 **Does the normalization hide real errors?** 100 sentences with raw CER > 0 and kocer CER = 0 were drawn at random (seed 20261024) from the Zeroth and FLEURS pool and read side by side by the author: 99 were spacing / punctuation / number-notation differences only, 0 hid a recognition error, 1 was ambiguous (`일 세기 전`/`일세기 전`: "one century ago" vs "the 1st century"). That ambiguous class is a spacing difference that creates a Korean homograph; an earlier draw with the unpatched scorer had two more (`세 배`/`세배`, `정 전 의원`/`정전 의원`). Every space-removing CER scores these as 0; none came from kocer's number candidates. Common Voice was added after the review; its kocer-only share is 0–2%, so its zero-CER sentences are almost all spacing and punctuation. Full list: `results/fake_review.tsv`.
 
@@ -92,7 +97,8 @@ Do not compare the columns as ratios: removing spaces shrinks the denominator by
 - **Common Voice.** Hugging Face copies of Common Voice are empty since October 2025; the data came from Mozilla Data Collective ("Common Voice Scripted Speech 27.0 - Korean", CC0). BuzzASR's card reports Common Voice **25**, so the test set is not identical. Overlap check: none of the 579 CV27 test sentences, clips or speakers appear in the CV17 train split; 195 are the CV17 test set carried forward. CV keeps its test split stable across releases, so the BuzzASR lead on CV reads as in-domain training data, not test leakage. We cannot check CV25 train directly.
 - BuzzASR's card: CV 4.24, FLEURS 5.16 ("normalized CER"). Ours at the spacing+punctuation level: CV 3.98, FLEURS 4.79. Same picture: a large CV gain, near-parity with whisper on FLEURS.
 - Each test set is 0.8–1.1 h of audio. Gaps under ~0.3 pt should be read with the bootstrap intervals, not the point estimates.
-- TeamUNIVA/qwen3_asr_1.7b_ko_beta currently lacks `chat_template.json`; the base model's file was copied in to load it with qwen-asr 0.0.6.
+- TeamUNIVA/qwen3_asr_1.7b_ko_beta lacks `chat_template.json`; the base model's file was copied in to load it with qwen-asr 0.0.6. The release (TeamUNIVA/qwen3_asr_1.7b_ko) loads as-is and was run in the same environment as the base and beta.
+- The TeamUNIVA cards report much lower CER (e.g. FLEURS 1.26%) on hand-corrected references with 106 records removed and best-of-TN/ITN scoring. Our references are the public transcripts as-is, so absolute values are not comparable; only the order between models and how it moves with normalization are.
 
 </details>
 
