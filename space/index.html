@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>kocer: 한국어 STT 공정 채점</title>
+<style>
+:root{--bg:#fcfcfb;--fg:#0b0b0b;--muted:#52514e;--line:#d9d7d0;--field:#ffffff;--btn:#2a78d6;--btnfg:#fff;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1a1a19;--fg:#f0efec;--muted:#c3c2b7;--line:#3a3935;--field:#22221f;--btn:#3987e5;--btnfg:#fff;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.5rem;margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 16px}
+.lead a{color:var(--btn)}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+textarea{width:100%;min-height:170px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--field);color:var(--fg);font:inherit;resize:vertical}
+.bar-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 18px}
+button{font:inherit;border-radius:6px;border:1px solid var(--line);background:var(--field);color:var(--fg);padding:7px 12px;cursor:pointer}
+button.primary{background:var(--btn);border-color:var(--btn);color:var(--btnfg);font-weight:600;padding:8px 22px}
+button:disabled{opacity:.5;cursor:wait}
+#status{font-size:13px;color:var(--muted)}
+.k-accent{color:#c98500 !important}
+</style>
+<style id="kcss"></style>
+</head>
+<body>
+<main>
+  <h1>kocer: 한국어 STT를 공정하게 채점하는 CER</h1>
+  <p class="lead">띄어쓰기·문장부호·숫자 표기(3개 = 세 개)·영문 약어(AI = 에이아이) 차이는 오류로 세지 않습니다.
+  정답과 STT 출력을 <b>한 줄에 한 문장씩</b> 넣으면 기존 CER과 kocer CER, 오류가 어디서 왔는지 보여줍니다.
+  채점은 이 브라우저 안에서만 돌고 입력은 어디에도 보내지 않습니다.
+  · <a href="https://github.com/Choi-kwan-u/kocer" target="_blank" rel="noopener">GitHub</a> · <code>pip install kocer</code></p>
+  <div class="grid">
+    <div><label for="ref">정답 (한 줄에 한 문장)</label><textarea id="ref"></textarea></div>
+    <div><label for="hyp">STT 출력 (같은 순서)</label><textarea id="hyp"></textarea></div>
+  </div>
+  <div class="bar-row">
+    <button id="go" class="primary" disabled>채점</button>
+    <span>예시:</span>
+    <button data-ex="0">표기 차이 + 오타</button>
+    <button data-ex="1">숫자·영문</button>
+    <button data-ex="2">진짜 오류</button>
+    <span id="status" role="status">파이썬을 불러오는 중입니다. 처음 한 번은 몇 초 걸립니다…</span>
+  </div>
+  <div id="out" aria-live="polite"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+let py, score, examples;
+async function boot() {
+  try {
+    py = await loadPyodide();
+    await py.loadPackage("micropip");
+    await py.pyimport("micropip").install("kocer==0.3.0");
+    py.FS.writeFile("demo_core.py", await (await fetch("demo_core.py")).text());
+    const core = py.pyimport("demo_core");
+    score = core.score;
+    examples = core.EXAMPLES.toJs();
+    $("kcss").textContent = core.CSS;
+    fill(0); run();
+    $("go").disabled = false;
+    $("status").textContent = "kocer " + py.pyimport("kocer").__version__ + " 준비 완료";
+  } catch (e) {
+    $("status").textContent = "불러오기 실패: " + e.message + " (새로고침해 보세요)";
+  }
+}
+function fill(i) { $("ref").value = examples[i][0]; $("hyp").value = examples[i][1]; }
+function run() { if (score) $("out").innerHTML = score($("ref").value, $("hyp").value); }
+$("go").onclick = run;
+document.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => { if (examples) { fill(+b.dataset.ex); run(); } });
+boot();
+</script>
+</body>
+</html>
