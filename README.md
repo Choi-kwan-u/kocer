@@ -224,7 +224,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 CER 4.13% (raw) / 2.93% (kocer 0.3.0)
 ```
 
-레포 오른쪽의 "Cite this repository"에서 인용 형식을 복사할 수 있습니다([CITATION.cff](CITATION.cff)). kocer로 채점한 모델·논문이 있으면 [이슈](https://github.com/Choi-kwan-u/kocer/issues)로 알려주세요.
+레포 오른쪽의 "Cite this repository"에서 인용 형식을 복사할 수 있습니다([CITATION.cff](CITATION.cff)).
 
 <details>
 <summary>BibTeX, 관련 연구</summary>
