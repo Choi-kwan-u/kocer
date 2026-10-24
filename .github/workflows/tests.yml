@@ -8,8 +8,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.9", "3.13"]
+        python: ["3.10", "3.13"]  # 3.9는 로컬에서 검증, 런너에 설치 패키지 없음
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
