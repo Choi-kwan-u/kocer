@@ -43,3 +43,10 @@
 - **kocer 패치**(kocer_src, 미커밋): counters.py "주"를 양쪽 읽기로, numbers.py 고유어 단독형(하나/둘/셋/넷/스물…) 후보 추가. tests/cases.tsv 8건 추가, 158 통과. "쩜"은 **추가하지 않음** — 구어 표기라 허용 범위를 넓히면 4.4 검수에서 ②가 늘 수 있음. 한계로 명시.
 - 100건 검수는 패치된 kocer로 **다시 추출**(seed 20261024, pool 2067 → 중복 제거 후 100).
 - BuzzASR 비교는 CV 없이는 결론 내리지 않음. Discussion 글은 CV 추가 후 보냄.
+
+## Common Voice (2026-10-24)
+- HF의 mozilla-foundation/common_voice_* 는 2025-10부터 비어 있음(README만). Mozilla Data Collective 전용 배포.
+- 사용: "Common Voice Scripted Speech 27.0 - Korean" (MDC id cmu5rwtaf003dnq07e7n3q6tf, CC0, 218 MB, archive cv-corpus-27.0-2026-09-11/ko). test.tsv 579발화, 48.1분, 최대 12.6초. ref = `sentence` 그대로.
+- 다운로드: `scripts/get_cv27.py` (MDC_API_KEY 환경변수, 약관 동의 필요; POST는 mozilladatacollective.com 호스트로 — datacollective.mozillafoundation.org는 301로 POST가 GET이 되어 405).
+- 참조: 숫자 0%, 영문 0%, 문장부호 87.2%, 평균 26.7자.
+- BuzzASR 모델카드는 CV 25 기준이라 test 세트가 다름. 비교 시 각주 필요.

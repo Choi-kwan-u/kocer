@@ -12,35 +12,50 @@ jiwer CER 0.200   nlptutti CER 0.143   kocer CER 0.000
 
 ## 공개 모델 재채점: 같은 출력, 네 가지 채점
 
-공개 한국어 ASR 6개 설정을 Zeroth 테스트(457발화)와 FLEURS ko 테스트(382발화)에서 같은 조건(greedy, 언어 고정, 프롬프트 없음)으로 돌리고, **모델 출력은 그대로 둔 채 채점만** 네 단계로 바꿨습니다. 각 단계는 정답과 출력에 똑같이 적용됩니다. 단위 %, 두 데이터셋 합산(총 오류 / 총 정답 글자).
+공개 한국어 ASR 6개 설정을 공개 테스트셋 세 개(Zeroth 457발화, FLEURS ko 382발화, Common Voice 27 ko 579발화, 합계 1,418발화·약 2.9시간)에서 같은 조건(greedy, 언어 고정, 프롬프트 없음)으로 돌리고, **모델 출력은 그대로 둔 채 채점만** 네 단계로 바꿨습니다. 각 단계는 정답과 출력에 똑같이 적용됩니다. 단위 %, 코퍼스 단위(총 오류 / 총 정답 글자).
+
+### 데이터셋별 kocer CER
+
+| 모델 | Zeroth | FLEURS | Common Voice 27 | 합산 |
+|---|---|---|---|---|
+| BuzzASR/korean | 3.16 | 4.72 | **3.88** | **3.90** |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | **4.31** | 6.08 | 3.99 |
+| openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 4.13 |
+| Qwen/Qwen3-ASR-1.7B | 2.91 | **4.31** | 6.61 | 4.30 |
+| FunAudioLLM/SenseVoiceSmall (itn 켬) | **2.40** | 6.95 | 9.68 | 5.78 |
+| FunAudioLLM/SenseVoiceSmall (itn 끔) | 2.41 | 6.91 | 9.72 | 5.79 |
+
+모든 데이터셋에서 이기는 모델은 없습니다. Common Voice·FLEURS 학습 데이터로 파인튜닝한 BuzzASR는 Common Voice에서 크게 앞서고 Zeroth에서는 뒤집니다. SenseVoice는 Zeroth에서 가장 좋고 나머지에서는 꼴찌입니다. 합산 순위는 어떤 데이터셋을 섞느냐에 따라 달라지니 데이터셋별 열을 먼저 보세요.
+
+### 채점 단계별 합산 CER
 
 | 모델 | raw | 공백 제거 | 공백·부호 제거 | kocer | 순위 raw → 공백·부호 → kocer |
 |---|---|---|---|---|---|
-| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 7.79 | 7.51 | 4.94 | **3.35** | 4 → 3 → **1** |
-| Qwen/Qwen3-ASR-1.7B | 6.86 | 6.44 | 4.13 | 3.58 | 1 → 1 → 2 |
-| openai/whisper-large-v3 | 8.77 | 6.59 | 4.62 | 3.62 | 6 → 2 → 3 |
-| BuzzASR/korean | 7.98 | 7.68 | 5.34 | 3.91 | 5 → 6 → 4 |
-| FunAudioLLM/SenseVoiceSmall (itn 끔) | 7.07 | 7.59 | 5.28 | 4.57 | 2 → 4 → 5 |
-| FunAudioLLM/SenseVoiceSmall (itn 켬) | 7.23 | 7.76 | 5.30 | 4.57 | 3 → 5 → 6 |
+| BuzzASR/korean | 7.83 | 7.81 | 5.02 | 3.90 | 3 → 3 → **1** |
+| TeamUNIVA ko | 7.61 | 7.45 | 5.26 | 3.99 | 2 → 4 → **2** |
+| whisper-large-v3 | 9.58 | 7.18 | 4.91 | 4.13 | 6 → 2 → 3 |
+| Qwen3-ASR-1.7B | 6.97 | 6.72 | 4.73 | 4.30 | 1 → 1 → 4 |
+| SenseVoice (itn 켬) | 7.98 | 8.43 | 6.36 | 5.78 | 4 → 6 → 5 |
+| SenseVoice (itn 끔) | 8.45 | 9.05 | 6.36 | 5.79 | 5 → 5 → 6 |
 
-열끼리 비율로 비교하면 안 됩니다. 공백을 지우면 분모가 25% 줄어서, 띄어쓰기를 이미 잘 맞춘 모델은 CER이 오히려 오릅니다(SenseVoice). 그래서 오류 **개수**로 다시 봅니다.
+열끼리 비율로 비교하면 안 됩니다. 공백을 지우면 분모가 25% 줄어서(정답 글자 64,833 → 48,470), 띄어쓰기를 이미 잘 맞춘 모델은 CER이 오히려 오릅니다(SenseVoice). 그래서 오류 **개수**로 다시 봅니다.
 
 | 모델 | raw 오류 수 | 띄어쓰기 | 문장부호 | 숫자·약어 (kocer만 처리) | 진짜 오류 | 표기 차이 비율 |
 |---|---|---|---|---|---|---|
-| TeamUNIVA ko | 3,846 | 26% | 26% | 15% | 32% | 68% |
-| Qwen3-ASR-1.7B | 3,388 | 28% | 27% | 6% | 39% | 61% |
-| whisper-large-v3 | 4,327 | 42% | 18% | 9% | 31% | 69% |
-| BuzzASR/korean | 3,938 | 26% | 24% | 13% | 37% | 63% |
-| SenseVoice (itn 끔) | 3,488 | 18% | 26% | 8% | 48% | 52% |
-| SenseVoice (itn 켬) | 3,567 | 18% | 28% | 7% | 47% | 53% |
+| BuzzASR/korean | 5,077 | 23% | 29% | 11% | 37% | 63% |
+| TeamUNIVA ko | 4,935 | 25% | 24% | 12% | 39% | 61% |
+| whisper-large-v3 | 6,210 | 42% | 19% | 6% | 32% | 68% |
+| Qwen3-ASR-1.7B | 4,521 | 26% | 23% | 5% | 46% | 54% |
+| SenseVoice (itn 켬) | 5,171 | 19% | 22% | 5% | 54% | 46% |
+| SenseVoice (itn 끔) | 5,479 | 18% | 26% | 5% | 51% | 49% |
 
-- raw CER이 오류로 센 것의 **52~69%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호이고, 이 둘만 지워도(nlptutti 등이 이미 하는 일) whisper-large-v3가 꼴찌에서 2위로 올라옵니다.
-- 숫자·영문 약어는 kocer만 처리하는 몫입니다. 전체 raw 오류의 6~15%지만 상위권 순위를 다시 바꿉니다. 한국어 파인튜닝 모델 TeamUNIVA는 raw에서는 기본 모델보다 나빠 보이다가 kocer에서 1위가 되고, 그 차이(0.24%p)는 문장 단위 paired bootstrap 2,000회에서 95% 구간 [0.08, 0.39]로 0을 벗어납니다. Zeroth 정답이 숫자를 전부 한글로 적는데 이 모델은 아라비아 숫자를 자주 뱉어서, Zeroth raw 오류의 24%가 숫자 표기였습니다.
-- Qwen3-ASR과 whisper-large-v3의 kocer 차이(0.04%p)는 유의하지 않습니다. 순위 구간은 TeamUNIVA [1,1], Qwen [2,3], whisper [2,3], BuzzASR [4,4], SenseVoice [5,6]입니다.
+- raw CER이 오류로 센 것의 **46~68%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호이고, 이 둘만 지워도(nlptutti 등이 이미 하는 일) whisper-large-v3가 꼴찌에서 2위로 올라옵니다.
+- 숫자·영문 약어는 kocer만 처리하는 몫입니다. 합산 raw 오류의 5~12%이고 거의 전부 **Zeroth**에서 나옵니다. Zeroth 정답은 숫자를 전부 한글로 적는데(`이천 십 육 년`) 대부분의 모델은 아라비아 숫자를 뱉어서(`2016년`), 숫자를 뱉는 모델의 Zeroth raw 오류 중 8~27%가 이 경우였습니다. FLEURS와 Common Voice에서는 0~3%입니다(예외: 숫자를 한글로만 뱉는 SenseVoice의 FLEURS 9~11%, 반대 방향). 이 몫만으로도 합산 상위권이 바뀝니다. TeamUNIVA 4위 → 2위, BuzzASR 3위 → 1위.
+- 어디까지 믿을 수 있나. 문장 단위 paired bootstrap 2,000회(kocer 기준): BuzzASR ≈ TeamUNIVA(−0.09%p, 95% 구간 [−0.32, +0.13]), 둘 다 Qwen3-ASR보다 나음(0.40 [0.16, 0.64], 0.31 [0.15, 0.46]), BuzzASR > whisper(0.23 [0.06, 0.40]), whisper는 TeamUNIVA·Qwen3-ASR과 구분 안 됨, SenseVoice는 모두에게 1.5~1.9%p 뒤짐. 순위 구간: BuzzASR [1,2], TeamUNIVA [1,3], whisper [2,4], Qwen3-ASR [3,4], SenseVoice [5,6].
 
-**정규화가 진짜 오류를 숨기지 않나.** raw > 0이고 kocer = 0인 문장을 전체에서 모아(중복 제거 1,325건) 무작위 100건을 정답과 나란히 읽은 1차 검수에서, 100건 모두 표기 차이였고 실제 오류가 숨겨진 경우는 0건이었습니다. 1차 판정은 AI 어시스턴트가 했고 저자 재확인은 아직입니다. 목록은 [benchmarks/results/fake_review.tsv](benchmarks/results/fake_review.tsv)에 있습니다. 띄어쓰기 차이가 동형이의어를 만드는 경우(`세 배`/`세배`)는 공백을 지우는 모든 CER이 0으로 세며, kocer도 같습니다.
+**정규화가 진짜 오류를 숨기지 않나.** raw > 0이고 kocer = 0인 문장을 Zeroth·FLEURS 전 모델 출력에서 모아(중복 제거 1,325건) 무작위 100건(seed 20261024)을 저자가 정답과 나란히 읽었습니다. 99건은 띄어쓰기·문장부호·숫자 표기 차이만, 0건이 실제 오류를 숨김, 1건이 애매(`일 세기 전`/`일세기 전`: 띄어쓰기가 "한 세기 전"과 "1세기"를 가름). 애매한 유형은 띄어쓰기가 동형이의어를 만드는 경우로, 공백을 지우는 모든 CER이 0으로 세며 kocer의 숫자 후보 때문에 생긴 건 없었습니다. 목록은 [benchmarks/results/fake_review.tsv](benchmarks/results/fake_review.tsv)에 있습니다.
 
-**안 한 것.** Common Voice ko는 접근 제한 때문에 빠졌습니다. BuzzASR가 whisper를 가장 크게 이긴다고 보고한 데이터셋이라, BuzzASR 대 whisper 비교는 여기서 결론 내리지 않습니다. 디코딩은 전 모델 greedy로 각 모델의 최고점 설정이 아닙니다. 데이터셋은 각 1시간 안팎이라 0.3%p 이하 차이는 위 신뢰구간과 함께 읽어야 합니다.
+**주의할 것.** 디코딩은 전 모델 greedy로 각 모델의 최고점 설정이 아닙니다(BuzzASR 모델카드는 반복 억제 옵션을 권장). Common Voice는 Hugging Face 사본이 비어 있어 Mozilla Data Collective의 Scripted Speech 27.0을 썼고, BuzzASR 모델카드(버전 25)와 test가 완전히 같지 않습니다. 데이터셋은 각 0.8~1.1시간이라 0.3%p 이하 차이는 위 신뢰구간과 함께 읽어야 합니다.
 
 모델 출력 전체(jsonl), 추론·채점 스크립트, 부트스트랩 코드, 전체 표는 [benchmarks/](benchmarks/)에 있습니다. kocer 0.1.3으로 다시 채점하면 표의 kocer 열이 소수점 둘째 자리까지 재현됩니다.
 
