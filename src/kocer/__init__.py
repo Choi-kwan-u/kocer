@@ -104,7 +104,7 @@ class Breakdown:
     def __str__(self) -> str:
         rows = [("띄어쓰기", self.spacing), ("문장부호", self.punctuation), ("숫자·영문", self.numbers_letters), ("진짜 오류", self.remaining)]
         d = max(self.raw_errors, 1)
-        out = [f"raw CER {self.cer['raw']:.2%}  →  kocer CER {self.cer['kocer']:.2%}   ({self.raw_errors:,} raw errors, {self.pairs:,} pairs)"]
+        out = [f"raw CER {self.cer['raw']:.2%}  →  kocer CER {self.cer['kocer']:.2%}   ({self.raw_errors:,} raw errors, {self.pairs:,} pairs, kocer {__version__})"]
         out += [f"{name:<6}{n:>8,}  {n / d:4.0%}  {'█' * round(40 * n / d)}" for name, n in rows]
         return "\n".join(out)
 

@@ -18,7 +18,7 @@ pip install kocer
 ```python
 >>> import kocer
 >>> print(kocer.breakdown(refs, hyps))      # whisper-large-v3, Zeroth test 457발화
-raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs)
+raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.1.4)
 띄어쓰기     1,142   52%  █████████████████████
 문장부호       226   10%  ████
 숫자·영문      258   12%  █████
@@ -208,6 +208,32 @@ kocer ref.txt hyp.txt --diff   # 틀린 글자만 색으로 표시
 - 조수사 사전은 완전하지 않습니다. 사전에 없는 조수사는 두 읽기를 다 허용합니다. 케이스를 [tests/cases.tsv](tests/cases.tsv)에 추가하는 PR을 환영합니다.
 - 입력은 텍스트 쌍만 받습니다. 음성 파일·모델 실행은 다루지 않습니다.
 
+## 인용과 보고
+
+점수를 논문·모델카드·보고서에 적을 때는 **버전을 함께** 적어 주세요. 정규화 규칙(조수사 사전, 약어 사전)이 버전마다 바뀌어서, 버전이 다르면 같은 출력도 점수가 다릅니다. `raw_cer`도 같이 적으면 다른 도구로 잰 숫자와 비교할 수 있습니다.
+
+```
+CER 4.13% (raw) / 2.93% (kocer 0.1.4)
+```
+
+```bibtex
+@software{kocer,
+  author  = {Choi, Kwan-u},
+  title   = {kocer: fair CER/WER for Korean speech recognition},
+  year    = {2026},
+  version = {0.1.4},
+  url     = {https://github.com/Choi-kwan-u/kocer}
+}
+```
+
+깃허브 레포 오른쪽의 "Cite this repository"에서 같은 내용을 복사할 수 있습니다([CITATION.cff](CITATION.cff)). 버전은 `kocer.__version__` 또는 `kocer --version`으로 확인합니다.
+
+### 사용 사례
+
+kocer로 채점한 모델·논문·데이터셋이 있으면 [이슈](https://github.com/Choi-kwan-u/kocer/issues)로 알려주세요. 여기에 목록을 유지합니다.
+
+- (아직 없음)
+
 ## 라이선스
 
-MIT
+MIT. 사용·수정·재배포에 제한이 없고, 인용은 의무가 아니라 부탁입니다.

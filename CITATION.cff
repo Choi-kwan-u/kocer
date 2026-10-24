@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "점수를 보고할 때 kocer 버전을 함께 적어 주세요. 정규화 규칙이 바뀌면 점수가 달라집니다. / If you report kocer scores, please cite with the version number: normalization rules change between versions."
+title: "kocer: fair CER/WER for Korean speech recognition"
+type: software
+authors:
+  - family-names: Choi
+    given-names: Kwan-u
+repository-code: "https://github.com/Choi-kwan-u/kocer"
+url: "https://pypi.org/project/kocer/"
+license: MIT
+version: 0.1.4
+date-released: 2026-10-24
+keywords:
+  - korean
+  - speech recognition
+  - CER
+  - evaluation
