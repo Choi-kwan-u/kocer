@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
-BASE="/c/Users/admin/AppData/Local/Programs/Thonny/python.exe"
-cd /c/Users/admin/kocer_bench
+BASE="${PYTHON:-python3}"   # 3.10 이상, CUDA 12.4 드라이버
+cd "$(dirname "$0")/.."
 TORCH="torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124"
 COMMON="datasets soundfile librosa jiwer kocer nlptutti huggingface_hub[cli] pandas tqdm"
 

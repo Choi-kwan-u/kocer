@@ -165,6 +165,14 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 - kocer만 처리하는 숫자·영문 몫은 합산 raw 오류의 5~12%이고 거의 전부 Zeroth에서 나옵니다. Zeroth 정답은 숫자를 전부 한글로 적는데 모델은 아라비아 숫자를 뱉기 때문입니다. 이 몫만으로 합산 상위권이 바뀝니다(TeamUNIVA 4위 → 2위, BuzzASR 3위 → 1위).
 - raw > 0이고 kocer = 0인 문장 100건을 저자가 직접 읽은 결과, 99건은 표기 차이만, 0건이 실제 오류를 숨김, 1건이 띄어쓰기 동형이의어로 애매했습니다.
 
+**데이터셋 출처.** 모두 공개 데이터이고 레포의 jsonl에는 정답 전사와 모델 출력만 있습니다(음성 없음).
+
+| 데이터셋 | 분할 | 발화 | 출처 | 라이선스 |
+|---|---|---|---|---|
+| Zeroth-Korean | test | 457 | [kresnik/zeroth_korean](https://huggingface.co/datasets/kresnik/zeroth_korean) (원본 [goodatlas/zeroth](https://github.com/goodatlas/zeroth)) | CC BY 4.0 |
+| FLEURS ko_kr | test | 382 | [google/fleurs](https://huggingface.co/datasets/google/fleurs), 정답은 `raw_transcription` | CC BY 4.0 |
+| Common Voice Scripted Speech 27.0 Korean | test | 579 | [Mozilla Data Collective](https://mozilladatacollective.com/datasets/cmu5rwtaf003dnq07e7n3q6tf) | CC0 1.0 |
+
 모든 데이터셋에서 이기는 모델은 없고, 0.3%p 이하 차이는 신뢰구간과 함께 읽어야 합니다. 단계별 CER, 오류 개수 분해, 쌍별 부트스트랩, 디코딩 설정, 모델 출력 전체, 재현 스크립트는 [benchmarks/](benchmarks/)에 있습니다.
 
 ## 한계

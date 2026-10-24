@@ -18,6 +18,16 @@ python scripts/score2.py      # expects data/<dataset>/test.jsonl from the downl
 
 With kocer 0.1.4 (same scorer as 0.1.3) the `kocer` column of all 16 available files reproduces `scores2.json` to two decimals (checked 2026-10-24).
 
+## Datasets
+
+All three are public. The jsonl files here contain only the reference transcripts and model outputs, no audio. Reference text is redistributed under each dataset's license with attribution below.
+
+| Dataset | Split | Utterances | Source | License |
+|---|---|---|---|---|
+| Zeroth-Korean | test | 457 | [kresnik/zeroth_korean](https://huggingface.co/datasets/kresnik/zeroth_korean) (original: [goodatlas/zeroth](https://github.com/goodatlas/zeroth)) | CC BY 4.0 |
+| FLEURS ko_kr | test | 382 | [google/fleurs](https://huggingface.co/datasets/google/fleurs); reference = `raw_transcription` | CC BY 4.0 |
+| Common Voice Scripted Speech 27.0 Korean | test | 579 | [Mozilla Data Collective](https://mozilladatacollective.com/datasets/cmu5rwtaf003dnq07e7n3q6tf); needs a free account, terms acceptance and `MDC_API_KEY` | CC0 1.0 |
+
 ## The tables
 
 Same models, same audio, same model outputs. Only the scoring changes. Every normalization step is applied identically to reference and hypothesis.
