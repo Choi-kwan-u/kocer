@@ -21,6 +21,44 @@ ALIASES = {
 }
 
 
+# AI-Hub(ETRI) 전사 규칙. 이중 표기 "(철자)/(발음)" 예: "(3시)/(세 시)"
+DUAL = re.compile(r"\(([^()]*)\)/\(([^()]*)\)")
+# 잡음 태그 b/ l/ o/ n/ u/ (앞이 영문자가 아닌 소문자 하나 + 슬래시), 간투사 표시 "어/", 반복 "+", 불명확 "*"
+_AIHUB_TAG = re.compile(r"(?<![A-Za-z])[a-z]/")
+_AIHUB_FILLER_SLASH = re.compile(r"(?<=[가-힣])/(?=[\s.,?!]|$)")
+_AIHUB_MARKS = re.compile(r"[+*]")
+
+
+def strip_aihub_tags(text: str) -> str:
+    """AI-Hub 전사의 잡음 태그·간투사 슬래시·반복(+)·불명확(*) 표시를 지운다. 이중 표기 (A)/(B)는 건드리지 않는다."""
+    text = _AIHUB_TAG.sub(" ", text)
+    text = _AIHUB_FILLER_SLASH.sub("", text)
+    return squeeze(_AIHUB_MARKS.sub("", text))
+
+
+def dual_variants(text: str, limit: int = 16):
+    """이중 표기 (A)/(B)를 풀어 만든 후보 문자열들. 구간이 많아 조합이 limit를 넘으면 None (호출 쪽에서 구간별 선택)."""
+    spans = list(DUAL.finditer(text))
+    if not spans:
+        return [text]
+    if 2 ** len(spans) > limit:
+        return None
+    out = []
+    for mask in range(2 ** len(spans)):
+        pieces, last = [], 0
+        for i, m in enumerate(spans):
+            pieces += [text[last:m.start()], m.group(2 if mask >> i & 1 else 1)]
+            last = m.end()
+        out.append("".join(pieces) + text[last:])
+    return out
+
+
+def resolve_dual(text: str, sides) -> str:
+    """구간마다 고른 쪽(1=철자, 2=발음)으로 이중 표기를 푼다."""
+    it = iter(sides)
+    return DUAL.sub(lambda m: m.group(next(it)), text)
+
+
 def nfc(text: str) -> str:
     return unicodedata.normalize("NFC", text)
 

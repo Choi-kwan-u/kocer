@@ -92,3 +92,31 @@ def test_breakdown_counts_add_up_and_match_cer():
     assert b.cer["raw"] == pytest.approx(kocer.cer(refs, hyps, normalize=False))
     assert abs(sum(b.shares.values()) - 1) < 1e-9
     assert "진짜 오류" in str(b)
+
+
+def test_dual_notation_both_sides_accepted_and_can_be_turned_off():
+    ref = "(7시)/(일곱 시)에 만나"
+    assert kocer.cer(ref, "7시에 만나") == 0 and kocer.cer(ref, "일곱 시에 만나") == 0
+    assert kocer.cer(ref, "7시에 만나", dual=False) > 0   # 끄면 괄호·양쪽이 모두 글자로 남음
+
+
+def test_dual_notation_does_not_hide_real_errors():
+    assert kocer.cer("(7시)/(일곱 시)에 만나", "여덟 시에 만나") > 0
+
+
+def test_dual_notation_many_spans_uses_per_span_choice():
+    ref = "(1번)/(일 번) (2번)/(이 번) (3번)/(삼 번) (4번)/(사 번) (5번)/(오 번) 다 했어"
+    assert kocer.cer(ref, "일 번 2번 삼 번 4번 오 번 다 했어") == 0
+
+
+def test_aihub_tags_stripped_only_when_asked():
+    ref = "b/ 그거+ 그거 n/ *진짜 좋아 어/"
+    hyp = "그거 그거 진짜 좋아 어"
+    assert kocer.cer(ref, hyp, aihub=True) == 0
+    assert kocer.cer(ref, hyp) > 0                        # 기본은 태그를 지우지 않음
+    assert kocer.cer("C++ 배워", "C++ 배워") == 0           # 일반 텍스트의 +는 그대로
+
+
+def test_breakdown_puts_dual_notation_in_numbers_letters():
+    b = kocer.breakdown(["(7시)/(일곱 시)에 만나"], ["일곱 시에 만나"])
+    assert b.remaining == 0 and b.numbers_letters > 0 and b.spacing == 0

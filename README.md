@@ -7,8 +7,8 @@
 *Fair CER for Korean speech recognition. Number notation (3개 ↔ 세 개) is scored against every valid Korean reading, the original CER is kept alongside, and `breakdown()` tells you where your errors come from. Pure Python, zero dependencies, `jiwer`-compatible API.*
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.8/docs/breakdown-dark.svg">
-  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.8/docs/breakdown-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.2.0/docs/breakdown-dark.svg">
+  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.2.0/docs/breakdown-light.svg">
 </picture>
 
 위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER은 그대로 두고, 그 오류가 어디서 왔는지 나눠 보여줍니다.
@@ -16,7 +16,7 @@
 ```python
 >>> import kocer
 >>> print(kocer.breakdown(refs, hyps))      # whisper-large-v3, Zeroth test 457발화
-raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.1.8)
+raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.2.0)
 띄어쓰기     1,142   52%  █████████████████████
 문장부호       226   10%  ████
 숫자·영문      258   12%  █████
@@ -56,6 +56,8 @@ r.cer, r.raw_cer                                      # 0.0, 0.625  (정규화 �
 
 print(kocer.breakdown(refs, hyps))                    # 오류를 종류별로 분해 (위 출력)
 kocer.cer("유니스트 입학", "UNIST 입학", aliases={"UNIST": "유니스트"})   # 단어처럼 읽는 약어
+kocer.cer("(7시)/(일곱 시)에 만나", "7시에 만나")    # 0.0  AI-Hub 이중 표기는 양쪽 다 정답
+kocer.cer("b/ 그거+ 그거 *좋아", "그거 그거 좋아", aihub=True)   # 0.0  AI-Hub 원본 전사를 정제 없이
 ```
 
 ```bash
@@ -100,7 +102,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 | 사과 세 개 주세요 | 사과 **네** 개 주세요 | 0.100 | 0.143 | 0.143 |
 | 세 시 삼십 분 | 3시 **13**분 | 0.625 | 0.600 | 0.400 |
 
-마지막 두 줄은 진짜 인식 오류이고, kocer도 오류로 셉니다. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.1.7, 모두 기본 설정.
+마지막 두 줄은 진짜 인식 오류이고, kocer도 오류로 셉니다. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.2.0, 모두 기본 설정.
 
 여러 모델 리포트, 개체명·키워드 평가, 품질 게이트가 필요하면 nlptutti가 낫습니다. 두 도구를 같이 써도 됩니다.
 
@@ -137,6 +139,8 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 | 필러 제거 (음, 어, 그) | **끔** | `fillers=True` | 실제 단어 "그"도 지워질 수 있어 기본은 끔 |
 | 영문 약어·단위 | 켬 | `letters=False` | `AI` = `에이아이`, `NASA` = `나사`, `50%` = `50퍼센트` |
 | 숫자 후보 전개 | 켬 | `numbers=False` | `3개` = `세 개`, `3층` = `삼 층` |
+| AI-Hub 이중 표기 | 켬 | `dual=False` | `(7시)/(일곱 시)` = `7시` = `일곱 시` |
+| AI-Hub 잡음 태그·표시 제거 | **끔** | `aihub=True`로 켬 | `b/`, `n/`, `어/`, `+`, `*` 제거. 일반 텍스트의 `C++`를 지키려고 기본은 끔 |
 | 공백 제거 | CER만 | - | WER은 공백 유지 |
 
 `normalize=False`면 jiwer와 같은 순수 CER을 돌려줍니다.
@@ -181,7 +185,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 
 ## 한계
 
-- 숫자와 영문 약어가 아닌 표기 차이(구어 축약, 발음대로 적은 표기)는 오류로 셉니다.
+- 숫자와 영문 약어가 아닌 표기 차이(구어 축약, 발음대로 적은 표기)는 오류로 셉니다. 정답에 AI-Hub 이중 표기가 남아 있으면 양쪽 다 정답으로 봅니다.
 - 영문 약어 처리는 공개 데이터에 영문이 거의 없어 효과를 검증하지 못했습니다. 효과가 확인된 건 숫자입니다.
 - 내장 약어 사전은 16개뿐입니다. 단어처럼 읽는 약어는 `aliases`로 넘기세요.
 - 단위 기호는 `%`, `km`, `kg`, `cm`, `mm`, `ml`만 바꿉니다. 조수사 사전도 완전하지 않습니다. [tests/cases.tsv](tests/cases.tsv)에 케이스를 추가하는 PR을 환영합니다.
@@ -192,7 +196,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 점수를 적을 때는 버전을 함께 적어 주세요. 정규화 규칙이 버전마다 바뀌어 같은 출력도 점수가 다를 수 있습니다. `raw_cer`도 같이 적으면 다른 도구로 잰 숫자와 비교할 수 있습니다.
 
 ```
-CER 4.13% (raw) / 2.93% (kocer 0.1.8)
+CER 4.13% (raw) / 2.93% (kocer 0.2.0)
 ```
 
 레포 오른쪽의 "Cite this repository"에서 인용 형식을 복사할 수 있습니다([CITATION.cff](CITATION.cff)). kocer로 채점한 모델·논문이 있으면 [이슈](https://github.com/Choi-kwan-u/kocer/issues)로 알려주세요.
@@ -205,7 +209,7 @@ CER 4.13% (raw) / 2.93% (kocer 0.1.8)
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.1.8},
+  version = {0.2.0},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

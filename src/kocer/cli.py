@@ -1,4 +1,4 @@
-"""kocer ref.txt hyp.txt [--diff]  — 줄 단위 쌍을 채점."""
+"""kocer ref.txt hyp.txt [--diff] [--aihub]  — 줄 단위 쌍을 채점."""
 import argparse
 import sys
 
@@ -27,18 +27,21 @@ def main(argv=None) -> int:
     p.add_argument("hyp")
     p.add_argument("--diff", action="store_true", help="틀린 글자를 색으로 표시 (빨강=치환/삭제, 초록=삽입)")
     p.add_argument("--no-numbers", action="store_true", help="숫자 정규화 끔")
+    p.add_argument("--aihub", action="store_true", help="AI-Hub 전사의 잡음 태그(b/ n/ ...), 간투사 슬래시, +, * 표시를 지움")
+    p.add_argument("--no-dual", action="store_true", help="이중 표기 (3시)/(세 시)를 후보로 풀지 않음")
     p.add_argument("--version", action="version", version=__version__)
     a = p.parse_args(argv)
     refs = open(a.ref, encoding="utf-8").read().splitlines()
     hyps = open(a.hyp, encoding="utf-8").read().splitlines()
     if len(refs) != len(hyps):
         sys.exit(f"줄 수가 다릅니다: ref {len(refs)}, hyp {len(hyps)}")
+    opts = dict(numbers=not a.no_numbers, aihub=a.aihub, dual=not a.no_dual)
     if a.diff:
         for i, (r, h) in enumerate(zip(refs, hyps), 1):
-            m = measure(r, h, numbers=not a.no_numbers)
+            m = measure(r, h, **opts)
             if m.errors:
                 print(f"{i}: {render(m.alignment)}  (cer {m.cer:.3f})")
-    print(breakdown(refs, hyps, numbers=not a.no_numbers))
+    print(breakdown(refs, hyps, **opts))
     return 0
 
 

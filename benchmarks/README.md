@@ -13,11 +13,11 @@ Seven public Korean ASR settings, three public test sets (1,418 utterances) plus
 Re-score with the installed kocer:
 
 ```bash
-pip install "kocer[fast]==0.1.8" numpy nlptutti
+pip install "kocer[fast]==0.2.0" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 
-With kocer 0.1.5 to 0.1.8 (same scorer as 0.1.3; later versions change only the README) the `kocer` column of all 21 result files reproduces `scores2.json` to two decimals (checked 2026-10-24).
+With kocer 0.1.5 to 0.2.0 the `kocer` column of all 21 result files reproduces `scores2.json` exactly: same error counts for every file (0.2.0 adds AI-Hub dual-notation handling, which these references never contain; checked 2026-10-24).
 
 ## Datasets
 
@@ -115,6 +115,19 @@ With the pronunciation reference and nospace+punct scoring the base model ranks 
 3. The kocer-only share (numbers and Latin) is 1–6% of raw errors; spacing and punctuation are 44–52%.
 4. TeamUNIVA likely trained on KsponSpeech (its largest reported gain). BuzzASR and whisper-large-v3 ran away into repeated output on 19 and 25 utterances under greedy decoding without repetition penalty (6.7% and 4.5% of their kocer errors); ranks are unchanged without them.
 5. Pooled with the three public sets (7,418 utterances, KsponSpeech dominating), every pair is separated and the order is TeamUNIVA release, beta, Qwen3-ASR, BuzzASR, whisper, SenseVoice. This order reflects the KsponSpeech share of the pool; read the per-set tables first.
+
+**Raw AI-Hub transcripts, no cleaning (kocer 0.2.0).** Since 0.2.0 kocer reads the dual notation `(3시)/(세 시)` and accepts either side span by span, and `aihub=True` strips the noise tags (`b/`, `n/`, ...), filler slashes, `+` and `*`. Feeding the original `.trn` text straight in:
+
+| Model | kocer, spelling ref | kocer, pronunciation ref | kocer, raw transcript (`aihub=True`) |
+|---|---|---|---|
+| TeamUNIVA/qwen3_asr_1.7b_ko | 6.32 | 6.14 | 5.80 |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 7.08 | 6.73 | 6.48 |
+| Qwen/Qwen3-ASR-1.7B | 8.63 | 8.60 | 8.19 |
+| BuzzASR/korean | 9.71 | 9.61 | 9.22 |
+| openai/whisper-large-v3 | 11.55 | 11.62 | 11.06 |
+| SenseVoiceSmall (itn off) | 13.46 | 13.28 | 12.97 |
+
+The raw-transcript score is lower than either single side because each utterance gets credit for whichever written form matches; no utterance has more errors than with the better of the two cleaned references (checked on all 6,000 for six systems). No need to pick a side or clean the transcripts yourself.
 
 This work uses the "Korean speech" (한국어 음성) dataset provided by the National Information Society Agency (NIA) through AI-Hub. AI-Hub terms forbid redistribution, so only aggregate numbers are published here. To reproduce, apply for the dataset on AI-Hub (Korean residents), extract the eval audio and scripts, then run `scripts/prepare_kspon.py <folder>`, `scripts/run_kspon.sh`, `scripts/score_kspon.py`. The scripts print counts only, never transcript text.
 
