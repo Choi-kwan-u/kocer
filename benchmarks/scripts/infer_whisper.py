@@ -1,4 +1,5 @@
-"""Whisper-family (transformers). usage: infer_whisper.py <hf_model_id> <tag> <dataset> [batch]"""
+"""Whisper-family (transformers). usage: infer_whisper.py <hf_model_id> <tag> <dataset> [batch] [extra_gen_kwargs_json]
+extra_gen_kwargs_json, e.g. '{"no_repeat_ngram_size": 3, "repetition_penalty": 1.2}', is merged into the greedy defaults."""
 import sys, os, torch, soundfile as sf, transformers
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
 from tqdm import tqdm
@@ -8,6 +9,9 @@ model_id, tag, ds = sys.argv[1:4]; bs = int(sys.argv[4]) if len(sys.argv) > 4 el
 proc = WhisperProcessor.from_pretrained(model_id)
 model = WhisperForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.float16).cuda().eval()
 gen_kwargs = dict(num_beams=1, do_sample=False, language="ko", task="transcribe", max_new_tokens=440)
+if len(sys.argv) > 5:
+    import json as _json
+    gen_kwargs.update(_json.loads(sys.argv[5]))
 rows = load_data(ds); w = Writer(tag, ds)
 todo = [r for r in rows if r["id"] not in w.done]
 for i in tqdm(range(0, len(todo), bs)):

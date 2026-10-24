@@ -26,7 +26,7 @@ def sent(ref, hyp):
 
 def load(p): return {r["id"]: r for r in (json.loads(l) for l in open(p, encoding="utf-8"))}
 
-tags = sorted(d for d in os.listdir(os.path.join(ROOT, "results")) if os.path.isdir(os.path.join(ROOT, "results", d)))
+tags = sorted(d for d in os.listdir(os.path.join(ROOT, "results")) if os.path.isdir(os.path.join(ROOT, "results", d)) and not d.startswith("_"))  # "_" = auxiliary runs
 per = {}      # per[tag][ds] = np.array shape (n, 4, 2)  [E, N]
 nlpt = {}     # nlptutti micro cross-check
 common_ids = {}

@@ -50,3 +50,17 @@
 - 다운로드: `scripts/get_cv27.py` (MDC_API_KEY 환경변수, 약관 동의 필요; POST는 mozilladatacollective.com 호스트로 — datacollective.mozillafoundation.org는 301로 POST가 GET이 되어 405).
 - 참조: 숫자 0%, 영문 0%, 문장부호 87.2%, 평균 26.7자.
 - BuzzASR 모델카드는 CV 25 기준이라 test 세트가 다름. 비교 시 각주 필요.
+
+## KsponSpeech 준비 (2026-10-24)
+- AI-Hub "한국어 음성"(dataSetSn=123): 내국인만 신청, 재배포 금지, NIA 사업 결과 출처 표기, 국외 반출은 별도 합의. 오디오 16 kHz 16-bit 헤더 없는 PCM, 전사 EUC-KR.
+- eval_clean 3,000발화 2.6 h / eval_other 3,000발화 3.8 h.
+- 스크립트: `prepare_kspon.py <압축 푼 폴더>` (개수만 출력, 텍스트 출력 안 함), `run_kspon.sh` (7개 설정 일괄, 재시작 가능), `score_kspon.py` (철자/발음 두 참조, 5단계, 참조 선택 민감도, 쌍별 부트스트랩: Kspon 단독 / 공개 3종 합산).
+- 공개 원칙: `results/kspon_tables.md`(숫자만)만 공개. `data/kspon_*`, `results/*/kspon_*.jsonl`, `data/kspon_review/` 는 전사가 들어 있으므로 레포·아티팩트에 올리지 않음. 검수가 필요하면 로컬 HTML로.
+- 가짜 6발화로 전 과정 테스트 완료 후 삭제.
+
+## 반복 출력 폭주 판정 (2026-10-24)
+- **기준**: 문장 단위 kocer 오류 수(S+D+I)가 그 문장의 정규화된 정답 글자 수(hits+S+D)보다 많은 경우, 즉 문장 kocer CER > 1. 삽입이 정답 길이를 넘어야 가능하므로, 사실상 모델이 같은 구절을 반복해 출력이 정답보다 훨씬 길어진 경우만 걸린다.
+- **KsponSpeech 6,000발화 결과 (greedy, 반복 억제 없음)**: BuzzASR 19발화(kocer 오류의 6.7%), whisper-large-v3 25발화(4.5%), Qwen3-ASR 기본 5, SenseVoice 5, TeamUNIVA beta 2, 정식판 1. 해당 발화를 빼면 BuzzASR 9.71 → 9.07, whisper 11.55 → 11.04 (철자 정답, clean+other).
+- 판정은 텍스트를 보지 않고 숫자로만 했다(AI-Hub 약관). 기준 민감도 확인용으로 "출력 글자 수가 정답의 2배 이상"도 같이 센다(`scripts/decoding_check.py`).
+- **검증**: BuzzASR 모델카드 권장 설정(`no_repeat_ngram_size=3, repetition_penalty=1.2`)으로 KsponSpeech와 공개 3종을 다시 돌려 비교한다. 결과 태그 `_buzzasr-korean-cardgen` (밑줄로 시작하는 태그는 score2/score_kspon 본 표에서 제외).
+- **재실행 결과 (모델카드 설정, 그 외 조건 동일)**: KsponSpeech 9.71 → 10.14 (+0.43, 95% 구간 [−0.49, +1.02]), Zeroth 3.16 → 3.50, FLEURS 4.72 → 5.30, Common Voice 3.88 → 4.15 (세 공개셋은 구간이 0을 벗어남). 폭주 발화 19 → 17 (기준 B: 10 → 8). 폭주를 빼도 10.04로 greedy(9.07)보다 나쁨. 결론: KsponSpeech 4위는 우리 디코딩 조건 탓이 아니고, 폭주는 디코딩 설정보다 모델의 대화체 반응에 가까움. 표 전체 `results/decoding_check.md`.

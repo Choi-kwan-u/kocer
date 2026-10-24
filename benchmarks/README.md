@@ -113,7 +113,17 @@ With the pronunciation reference and nospace+punct scoring the base model ranks 
 1. With spacing and punctuation removed, the choice of reference side alone moves a model's CER by −0.77 to +0.85 pt, in opposite directions for digit-writing models and for the base Qwen model, which writes numbers in Hangul. With kocer the range is −0.35 to +0.07 pt; the remainder comes from the 452 non-numeric dual spellings, which kocer does not handle.
 2. Model gaps here are large (at least 0.76 pt between neighbours, except the two SenseVoice settings at 0.14 pt), so the reference choice did not change any rank. Every pair is separated by the paired bootstrap (2,000 resamples).
 3. The kocer-only share (numbers and Latin) is 1–6% of raw errors; spacing and punctuation are 44–52%.
-4. TeamUNIVA likely trained on KsponSpeech (its largest reported gain). BuzzASR and whisper-large-v3 ran away into repeated output on 19 and 25 utterances under greedy decoding without repetition penalty (6.7% and 4.5% of their kocer errors); ranks are unchanged without them.
+4. TeamUNIVA likely trained on KsponSpeech (its largest reported gain). BuzzASR and whisper-large-v3 produced runaway repeated output on 19 and 25 utterances (6.7% and 4.5% of their kocer errors); ranks are unchanged without them. **Runaway criterion:** an utterance whose kocer error count exceeds its normalized reference length (sentence kocer CER > 1), which in practice requires insertions longer than the reference. A second criterion, hypothesis at least twice as long as the reference (spaces removed), flags 10 and 14. Counted from numbers only; no transcript text was read.
+5. **Is BuzzASR's 4th place an artefact of our decoding?** No. Re-running BuzzASR with its model card's settings (`no_repeat_ngram_size=3, repetition_penalty=1.2`, everything else identical) made it *worse* on every set and barely reduced the runaways:
+
+| BuzzASR kocer CER | KsponSpeech | Zeroth | FLEURS | Common Voice 27 |
+|---|---|---|---|---|
+| greedy, no repetition penalty (main tables) | **9.71** | **3.16** | **4.72** | **3.88** |
+| model-card settings | 10.14 | 3.50 | 5.30 | 4.15 |
+| card − greedy, 95% CI | +0.43 [−0.49, +1.02] | +0.34 [+0.21, +0.46] | +0.58 [+0.39, +0.77] | +0.27 [+0.13, +0.42] |
+| runaway utterances (greedy → card) | 19 → 17 | 0 → 0 | 0 → 0 | 0 → 0 |
+
+   BuzzASR stays 4th on KsponSpeech and 1st on Common Voice either way. Details: `results/decoding_check.md` (`scripts/decoding_check.py`); public-set outputs with the card settings are in `results/_buzzasr-korean-cardgen/`.
 5. Pooled with the three public sets (7,418 utterances, KsponSpeech dominating), every pair is separated and the order is TeamUNIVA release, beta, Qwen3-ASR, BuzzASR, whisper, SenseVoice. This order reflects the KsponSpeech share of the pool; read the per-set tables first.
 
 **Raw AI-Hub transcripts, no cleaning (kocer 0.2.0).** Since 0.2.0 kocer reads the dual notation `(3시)/(세 시)` and accepts either side span by span, and `aihub=True` strips the noise tags (`b/`, `n/`, ...), filler slashes, `+` and `*`. Feeding the original `.trn` text straight in:
@@ -133,7 +143,7 @@ This work uses the "Korean speech" (한국어 음성) dataset provided by the Na
 
 <details><summary>Setup, caveats, and what is not claimed</summary>
 
-- Decoding identical for all models: language fixed to Korean, task transcribe, **greedy** (num_beams=1, no sampling, no repetition penalty), no prompt, no chunking (all clips ≤ 30 s), 16 kHz. This is deliberately not each model's best-score recipe (BuzzASR's card recommends `no_repeat_ngram_size=3, repetition_penalty=1.2`).
+- Decoding identical for all models: language fixed to Korean, task transcribe, **greedy** (num_beams=1, no sampling, no repetition penalty), no prompt, no chunking (all clips ≤ 30 s), 16 kHz. This is deliberately not each model's best-score recipe. BuzzASR's card recommends `no_repeat_ngram_size=3, repetition_penalty=1.2`; we checked it and it scores worse than greedy on all four sets (item 5 above).
 - Hypotheses stored exactly as emitted, including Whisper's leading space and trailing period. SenseVoice output passed through funasr's `rich_transcription_postprocess` (tag removal only). For Korean, SenseVoice emits numbers in Hangul even with `use_itn=True`; the flag only toggles punctuation.
 - Whisper / BuzzASR: transformers 5.20.2, fp16, batch 8. Qwen: qwen-asr 0.0.6, transformers 4.57.6, bf16, batch 4, `generation_config.do_sample=False`. SenseVoice: funasr 1.4.16. torch 2.6.0+cu124, RTX 4060 Ti 8 GB, 2026-10-24. No failed or empty outputs; all 1,418 utterances scored for every model.
 - kocer version: 0.1.3 (= 0.1.2 plus two fixes found during this run: counter `주` accepts both readings; standalone native numerals `스물`, `셋`). Colloquial decimal `쩜` is **not** accepted. The scorer was fixed *before* the review sample was drawn.

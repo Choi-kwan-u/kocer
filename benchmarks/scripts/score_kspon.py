@@ -24,7 +24,7 @@ def levels(ref, hyp):
             en(kocer.measure(ref, hyp, fillers=True))]
 
 def jl(p): return [json.loads(l) for l in open(p, encoding="utf-8")]
-tags = sorted(t for t in os.listdir(os.path.join(ROOT, "results"))
+tags = sorted(t for t in os.listdir(os.path.join(ROOT, "results")) if not t.startswith("_")  # "_" = auxiliary runs
               if all(os.path.exists(os.path.join(ROOT, "results", t, f"{s}.jsonl")) for s in SPLITS))
 if not tags:
     sys.exit("no model has results for both kspon splits yet")

@@ -179,7 +179,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 | Qwen/Qwen3-ASR-1.7B | 2.91 | 4.31 | 6.61 | 8.70 / 8.59 |
 | SenseVoiceSmall (itn 켬 / 끔) | **2.40** / 2.41 | 6.95 / 6.91 | 9.68 / 9.72 | 13.28 / 13.82, 13.09 / 13.72 |
 
-단위 %, 총 오류 / 총 정답 글자. KsponSpeech는 철자 정답 기준. 모든 데이터셋에서 이기는 모델은 없고, 각 모델은 학습 데이터와 가까운 데이터셋에서 강합니다(BuzzASR은 Common Voice, TeamUNIVA는 KsponSpeech로 보임).
+단위 %, 총 오류 / 총 정답 글자. KsponSpeech는 철자 정답 기준. 모든 데이터셋에서 이기는 모델은 없고, 각 모델은 학습 데이터와 가까운 데이터셋에서 강합니다(BuzzASR은 Common Voice, TeamUNIVA는 KsponSpeech로 보임). 디코딩은 모두 greedy이고, BuzzASR을 모델카드 권장 설정(반복 억제)으로 다시 돌리면 네 데이터셋 모두 오히려 나빠집니다([자세히](benchmarks/README.md)).
 
 </details>
 
