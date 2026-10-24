@@ -16,6 +16,7 @@ _SMALL = ["", "십", "백", "천"]
 _BIG = ["", "만", "억", "조", "경"]
 _NATIVE_TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"]
 _NATIVE_ONES = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"]
+_NATIVE_ONES_ALONE = ["", "하나", "둘", "셋", "넷", "다섯", "여섯", "일곱", "여덟", "아홉"]
 
 
 def digitwise(s: str) -> str:
@@ -63,13 +64,22 @@ def native(s: str):
     return _NATIVE_TENS[n // 10] + _NATIVE_ONES[n % 10]
 
 
+def native_forms(s: str) -> List[str]:
+    """고유어 읽기 후보 전부: 관형형(세, 스무, 스물한)과 단독형(셋, 스물, 스물하나).
+    '스물 센티미터'처럼 조수사 앞에서도 단독형으로 읽는 화자가 있어 둘 다 허용한다."""
+    pre = native(s)
+    if pre is None:
+        return []
+    n = int(s)
+    return list(dict.fromkeys([pre, _NATIVE_TENS[n // 10] + _NATIVE_ONES_ALONE[n % 10]]))
+
+
 def options(num: str, following: str) -> List[str]:
     """숫자 하나의 읽기 후보. 원문 숫자는 항상 포함."""
     kind = lookup(following.lstrip())
     opts = [num]
-    nat = native(num) if kind != "sino" else None
-    if nat:
-        opts.append(nat)
+    nat = native_forms(num) if kind != "sino" else []
+    opts.extend(nat)
     if kind != "native" or not nat:  # 고유어 읽기가 없는 수(100개 → 백 개)는 한자어로
         opts.append(sino(num))
     if len(num) >= 2 and num.isdigit() and not num.startswith("0"):
