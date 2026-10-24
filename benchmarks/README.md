@@ -1,4 +1,4 @@
-# Leaderboard re-scoring (2026-10-24)
+# Public Korean ASR models: same outputs, four scorings (2026-10-24)
 
 Seven public Korean ASR settings, three public test sets (1,418 utterances), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
 
@@ -13,11 +13,11 @@ Seven public Korean ASR settings, three public test sets (1,418 utterances), one
 Re-score with the installed kocer:
 
 ```bash
-pip install "kocer[fast]==0.1.5" numpy nlptutti
+pip install "kocer[fast]==0.1.6" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 
-With kocer 0.1.5 (same scorer as 0.1.3) the `kocer` column of all 21 result files reproduces `scores2.json` to two decimals (checked 2026-10-24).
+With kocer 0.1.5 or 0.1.6 (same scorer as 0.1.3; 0.1.6 changes only the README) the `kocer` column of all 21 result files reproduces `scores2.json` to two decimals (checked 2026-10-24).
 
 ## Datasets
 
@@ -86,7 +86,7 @@ Do not compare the columns as ratios: removing spaces shrinks the denominator by
 3. Which pooled differences are real? Pairwise paired bootstrap (2,000 sentence resamples, kocer level): BuzzASR, TeamUNIVA release and TeamUNIVA beta are not distinguishable (release − BuzzASR +0.02 pt [−0.20, +0.24]; release − beta −0.07 [−0.20, +0.05]; BuzzASR − beta −0.09 [−0.32, +0.13]); all three are ahead of Qwen3-ASR (release −0.38 [−0.55, −0.21]); BuzzASR and the release are ahead of whisper (−0.23 [−0.40, −0.06], −0.21 [−0.40, −0.04]); whisper vs beta and whisper vs Qwen3-ASR are not distinguishable; SenseVoice trails everyone by 1.5–1.9 pt and its two settings are identical. Rank intervals: BuzzASR [1, 3], TeamUNIVA release [1, 3], beta [1, 4], whisper [3, 5], Qwen3-ASR [4, 5], SenseVoice [6, 7].
 4. TeamUNIVA beta → release: the number-writing habit did not change (share of outputs with a digit: Zeroth 31.7% → 31.3%, FLEURS 23.8% → 25.4%, Common Voice 2.1% → 1.9%; base was 8.5% on Zeroth). Under the model card's own normalization (punctuation removed, case-folded) with a single public reference, both fine-tunes score *worse* than the base on Zeroth; with number readings handled, both are better. The card avoids this with hand-made TN/ITN dual references. Details: `results/univa_compare.md`. Full matrices for all levels: `results/tables2.md`.
 
-**Does the normalization hide real errors?** 100 sentences with raw CER > 0 and kocer CER = 0 were drawn at random (seed 20261024) from the Zeroth and FLEURS pool and read side by side by the author: 99 were spacing / punctuation / number-notation differences only, 0 hid a recognition error, 1 was ambiguous (`일 세기 전`/`일세기 전`: "one century ago" vs "the 1st century"). That ambiguous class is a spacing difference that creates a Korean homograph; an earlier draw with the unpatched scorer had two more (`세 배`/`세배`, `정 전 의원`/`정전 의원`). Every space-removing CER scores these as 0; none came from kocer's number candidates. Common Voice was added after the review; its kocer-only share is 0–2%, so its zero-CER sentences are almost all spacing and punctuation. Full list: `results/fake_review.tsv`.
+**Does the normalization hide real errors?** 100 sentences with raw CER > 0 and kocer CER = 0 were drawn at random (seed 20261024) from the Zeroth and FLEURS pool and read side by side by the author: 99 were spacing / punctuation / number-notation differences only, 0 hid a recognition error, 1 was ambiguous (`일 세기 전`/`일세기 전`: "one century ago" vs "the 1st century"). That ambiguous class is a spacing difference that creates a Korean homograph; an earlier draw with the unpatched scorer had two more (`세 배`/`세배`, `정 전 의원`/`정전 의원`). Every space-removing CER scores these as 0; none came from kocer's number candidates. Common Voice and the TeamUNIVA release were added after the review and are not in the sample: Common Voice's kocer-only share is 0–2%, so its zero-CER sentences are almost all spacing and punctuation, and the release writes numbers the same way as the beta, which was in the pool. Full list: `results/fake_review.tsv`.
 
 <details><summary>Setup, caveats, and what is not claimed</summary>
 

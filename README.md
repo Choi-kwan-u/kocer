@@ -7,8 +7,8 @@
 *Fair CER/WER for Korean speech recognition. Spacing, punctuation, number notation (3개 ↔ 세 개) and Latin acronyms (AI ↔ 에이아이) are not counted as errors. Unlike jiwer and nlptutti, kocer scores numbers against every valid Korean reading, keeps the original CER alongside, and tells you where your errors come from. Pure Python, zero dependencies, `jiwer`-compatible API.*
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-dark.svg">
-  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.6/docs/breakdown-dark.svg">
+  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.1.6/docs/breakdown-light.svg">
 </picture>
 
 위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER 숫자는 그대로 두고, 그 오류가 어디서 왔는지만 나눠 보여줍니다.
@@ -149,7 +149,7 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 
 **이럴 때는 nlptutti가 낫습니다.** 여러 모델의 리포트를 만들거나, 개체명·키워드 단위로 평가하거나, 기준 점수로 CI를 막고 싶을 때입니다. 두 도구를 같이 써도 됩니다.
 
-## 공개 모델 재채점
+## 공개 모델 7개, 같은 출력을 네 가지로 채점
 
 공개 한국어 ASR 7개 설정을 공개 테스트셋 세 개(Zeroth 457, FLEURS 382, Common Voice 27 579발화)에서 같은 조건(greedy, 언어 고정)으로 돌리고, 출력은 그대로 둔 채 채점만 바꿨습니다. 맨 위 그림이 그 오류 분해이고, 아래는 kocer CER입니다(단위 %, 총 오류 / 총 정답 글자).
 
@@ -165,7 +165,7 @@ CER = (치환 + 삭제 + 삽입) / 정답 글자 수. 정규화는 정답과 결
 - raw CER이 오류로 센 것의 **46~68%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호이고, 그것만 지워도 whisper-large-v3가 꼴찌에서 2위로 올라옵니다.
 - kocer만 처리하는 숫자·영문 몫은 합산 raw 오류의 5~13%이고 거의 전부 Zeroth에서 나옵니다. Zeroth 정답은 숫자를 전부 한글로 적는데 모델은 아라비아 숫자를 뱉기 때문입니다. 이 몫만으로 합산 상위권이 바뀝니다(공백·부호만 지운 단계 대비 TeamUNIVA 정식판 4위 → 2위, BuzzASR 3위 → 1위). 상위 셋(BuzzASR, TeamUNIVA 정식판, beta)은 통계적으로 구분되지 않습니다.
 - TeamUNIVA는 beta → 정식판에서 모든 데이터셋이 조금씩 좋아졌지만(합산 −0.07%p) 신뢰구간 안입니다. 숫자를 아라비아로 쓰는 습관(Zeroth 출력의 31%)은 그대로입니다. 그래서 공백·부호만 지우는 채점에서는 두 버전 모두 기본 모델보다 나빠 보이고, 숫자까지 맞추면 기본 모델보다 낫습니다. [비교표](benchmarks/results/univa_compare.md)
-- raw > 0이고 kocer = 0인 문장 100건을 저자가 직접 읽은 결과, 99건은 표기 차이만, 0건이 실제 오류를 숨김, 1건이 띄어쓰기 동형이의어로 애매했습니다.
+- raw > 0이고 kocer = 0인 문장 100건을 저자가 직접 읽은 결과, 99건은 표기 차이만, 0건이 실제 오류를 숨김, 1건이 띄어쓰기 동형이의어로 애매했습니다. 표본은 검수 당시의 6개 설정, Zeroth·FLEURS 출력에서 뽑았고, 그 뒤에 추가한 Common Voice와 TeamUNIVA 정식판 출력은 포함하지 않습니다.
 
 **데이터셋 출처.** 모두 공개 데이터이고 레포의 jsonl에는 정답 전사와 모델 출력만 있습니다(음성 없음).
 

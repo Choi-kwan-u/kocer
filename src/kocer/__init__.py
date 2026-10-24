@@ -10,7 +10,7 @@ from .align import Op, align, distance
 from .normalize import ALIASES
 from .normalize import normalize as _normalize
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __all__ = ["cer", "wer", "measure", "breakdown", "Result", "Breakdown", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
