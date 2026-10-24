@@ -1,6 +1,6 @@
 # Public Korean ASR models: same outputs, four scorings (2026-10-24)
 
-Seven public Korean ASR settings, three public test sets (1,418 utterances), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
+Seven public Korean ASR settings, three public test sets (1,418 utterances) plus KsponSpeech eval (6,000 utterances, numbers only), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
 
 - `scripts/`: data download (`prepare_data.py` for Zeroth/FLEURS, `get_cv27.py` for Common Voice 27 from Mozilla Data Collective), inference (greedy, identical settings for all models), four-level scoring with paired bootstrap (`score2.py`). Written for Windows + CUDA; paths in `setup_envs.sh` are the author's machine.
 - `results/<model>/<dataset>.jsonl`: every hypothesis exactly as emitted, with the reference. `*.meta.json` has the decoding settings and the full `pip freeze`.
@@ -87,6 +87,27 @@ Do not compare the columns as ratios: removing spaces shrinks the denominator by
 4. TeamUNIVA beta → release: the number-writing habit did not change (share of outputs with a digit: Zeroth 31.7% → 31.3%, FLEURS 23.8% → 25.4%, Common Voice 2.1% → 1.9%; base was 8.5% on Zeroth). Under the model card's own normalization (punctuation removed, case-folded) with a single public reference, both fine-tunes score *worse* than the base on Zeroth; with number readings handled, both are better. The card avoids this with hand-made TN/ITN dual references. Details: `results/univa_compare.md`. Full matrices for all levels: `results/tables2.md`.
 
 **Does the normalization hide real errors?** 100 sentences with raw CER > 0 and kocer CER = 0 were drawn at random (seed 20261024) from the Zeroth and FLEURS pool and read side by side by the author: 99 were spacing / punctuation / number-notation differences only, 0 hid a recognition error, 1 was ambiguous (`일 세기 전`/`일세기 전`: "one century ago" vs "the 1st century"). That ambiguous class is a spacing difference that creates a Korean homograph; an earlier draw with the unpatched scorer had two more (`세 배`/`세배`, `정 전 의원`/`정전 의원`). Every space-removing CER scores these as 0; none came from kocer's number candidates. Common Voice and the TeamUNIVA release were added after the review and are not in the sample: Common Voice's kocer-only share is 0–2%, so its zero-CER sentences are almost all spacing and punctuation, and the release writes numbers the same way as the beta, which was in the pool. Full list: `results/fake_review.tsv`.
+
+## KsponSpeech (AI-Hub; data and per-sentence outputs not redistributed)
+
+KsponSpeech eval_clean + eval_other: 6,000 utterances, 6.4 h of conversational speech. Its transcripts give some spans twice, spelling and pronunciation, e.g. `(3시)/(세 시)` (1,236 utterances; in 1,110 the two references differ, 452 of those without any digit or Latin letter). Papers pick one side or the other. We scored the same outputs against both. Full numbers: `results/kspon_tables.md`.
+
+| Model | kocer CER, spelling ref (clean / other) | spelling → pronunciation ref, nospace+punct | same, kocer |
+|---|---|---|---|
+| TeamUNIVA/qwen3_asr_1.7b_ko | **6.10 / 6.48** | +0.85 | −0.18 |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 6.81 / 7.26 | +0.20 | −0.35 |
+| Qwen/Qwen3-ASR-1.7B | 8.70 / 8.59 | −0.77 | −0.03 |
+| BuzzASR/korean | 10.14 / 9.41 | +0.53 | −0.10 |
+| openai/whisper-large-v3 | 11.07 / 11.87 | +0.66 | +0.07 |
+| SenseVoiceSmall (itn on / off) | 13.28 / 13.82, 13.09 / 13.72 | +0.20 / +0.19 | −0.19 / −0.19 |
+
+1. With spacing and punctuation removed, the choice of reference side alone moves a model's CER by −0.77 to +0.85 pt, in opposite directions for digit-writing models and for the base Qwen model, which writes numbers in Hangul. With kocer the range is −0.35 to +0.07 pt; the remainder comes from the 452 non-numeric dual spellings, which kocer does not handle.
+2. Model gaps here are large (at least 0.76 pt between neighbours, except the two SenseVoice settings at 0.14 pt), so the reference choice did not change any rank. Every pair is separated by the paired bootstrap (2,000 resamples).
+3. The kocer-only share (numbers and Latin) is 1–6% of raw errors; spacing and punctuation are 44–52%.
+4. TeamUNIVA likely trained on KsponSpeech (its largest reported gain). BuzzASR and whisper-large-v3 ran away into repeated output on 19 and 25 utterances under greedy decoding without repetition penalty (6.7% and 4.5% of their kocer errors); ranks are unchanged without them.
+5. Pooled with the three public sets (7,418 utterances, KsponSpeech dominating), every pair is separated and the order is TeamUNIVA release, beta, Qwen3-ASR, BuzzASR, whisper, SenseVoice. This order reflects the KsponSpeech share of the pool; read the per-set tables first.
+
+This work uses the "Korean speech" (한국어 음성) dataset provided by the National Information Society Agency (NIA) through AI-Hub. AI-Hub terms forbid redistribution, so only aggregate numbers are published here. To reproduce, apply for the dataset on AI-Hub (Korean residents), extract the eval audio and scripts, then run `scripts/prepare_kspon.py <folder>`, `scripts/run_kspon.sh`, `scripts/score_kspon.py`. The scripts print counts only, never transcript text.
 
 <details><summary>Setup, caveats, and what is not claimed</summary>
 
