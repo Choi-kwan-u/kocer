@@ -1,5 +1,7 @@
 # kocer
 
+**한국어** · [English](README.en.md)
+
 [![PyPI](https://img.shields.io/pypi/v/kocer)](https://pypi.org/project/kocer/) [![Python](https://img.shields.io/pypi/pyversions/kocer)](https://pypi.org/project/kocer/) [![tests](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml/badge.svg)](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![demo](https://img.shields.io/badge/demo-브라우저에서_써보기-2a78d6)](https://choi-kwan-u.github.io/kocer/) [![Hugging Face Space](https://img.shields.io/badge/🤗_Space-kocer-ffd21e)](https://huggingface.co/spaces/Gonow1/kocer)
 
 한국어 STT를 공정하게 채점하는 CER — 띄어쓰기·숫자·문장부호·영문 약어 표기 차이를 오류로 세지 않습니다.
