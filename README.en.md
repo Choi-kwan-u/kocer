@@ -2,7 +2,7 @@
 
 [한국어](README.md) · **English**
 
-[![PyPI](https://img.shields.io/pypi/v/kocer)](https://pypi.org/project/kocer/) [![Python](https://img.shields.io/pypi/pyversions/kocer)](https://pypi.org/project/kocer/) [![tests](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml/badge.svg)](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![demo](https://img.shields.io/badge/demo-try_in_browser-2a78d6)](https://choi-kwan-u.github.io/kocer/) [![Hugging Face Space](https://img.shields.io/badge/🤗_Space-kocer-ffd21e)](https://huggingface.co/spaces/Gonow1/kocer)
+[![PyPI](https://img.shields.io/pypi/v/kocer)](https://pypi.org/project/kocer/) [![Python](https://img.shields.io/pypi/pyversions/kocer)](https://pypi.org/project/kocer/) [![tests](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml/badge.svg)](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml)
 
 A fair character error rate (CER) for Korean speech recognition. Differences in spacing, punctuation, number notation and Latin acronyms are not counted as errors.
 
@@ -53,8 +53,10 @@ Even with spacing and punctuation removed, the conclusion flips with the referen
 - Models: [Qwen/Qwen3-ASR-1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B) and its Korean fine-tune [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko).
 - Spacing and punctuation removed (nlptutti style): with the digit reference the fine-tune is 8.50 points better; with the Hangul reference it is 4.13 points worse.
 - kocer: the fine-tune is 2.34 points better with the digit reference and 2.36 points better with the Hangul reference.
-- All four differences have sentence-level paired bootstrap 95% intervals that exclude zero. See [benchmarks/](benchmarks/README.md).
+- All four differences have sentence-level paired bootstrap 95% intervals that exclude zero.
 - The same happens on AI-Hub telephone speech (408 utterances with numbers). With spacing and punctuation removed, the fine-tune is 6.58 points better with the digit reference and not distinguishable from the base with the Hangul reference (0.47 points). With kocer it is better with both (3.82 and 3.55 points).
+
+See [benchmarks/](benchmarks/README.md) for the full numbers.
 
 </details>
 
@@ -196,8 +198,7 @@ Spacing and punctuation are removed, and numbers and acronyms are scored against
 Seven public Korean ASR settings were run on Zeroth, FLEURS, Common Voice 27 and KsponSpeech (7,418 utterances in total), and the same outputs were scored at four normalization levels. AI-Hub telephone speech (1,936 utterances) was checked separately.
 
 - On Zeroth, FLEURS and Common Voice (1,418 utterances), **46–68% of what plain CER counts as errors is notation**, mostly spacing and punctuation.
-- On sentences with numbers, the direction of the comparison under existing scoring depends on how the reference writes numbers (table above). Averaged over everything, the effect shrinks because most sentences have no numbers.
-- Where the transcripts give numbers both ways, picking one side as the reference moves CER with spacing and punctuation removed by 2.9–4.8 points per model on the telephone set. With kocer the shift is at most 0.33 points.
+- Where the transcripts give numbers both ways, picking one side as the reference moves CER with spacing and punctuation removed by 2.9–4.8 points per model (telephone set; at most 0.33 points with kocer), and on sentences with numbers it can reverse the direction of a two-model comparison ([table above](#why-it-is-needed)). Averaged over everything, the effect shrinks because most sentences have no numbers.
 - To check that normalization does not hide real errors, 100 sentences with plain CER > 0 and kocer CER = 0 were read by hand (14 involved the number step). None hid a recognition error; one was ambiguous, a spacing-induced homograph.
 
 Per-model scores, CER at each level, confidence intervals, decoding settings and scripts are in [benchmarks/](benchmarks/README.md). KsponSpeech and telephone results use the "Korean speech" and "Low-quality telephone network speech recognition" data from AI-Hub, provided by the National Information Society Agency (NIA); under its terms only score tables are published.
@@ -215,7 +216,7 @@ Per-model scores, CER at each level, confidence intervals, decoding settings and
 | SenseVoiceSmall (itn on) | **2.40** | 6.95 | 9.68 | 13.28 / 13.82 | 21.30 |
 | SenseVoiceSmall (itn off) | 2.41 | 6.91 | 9.72 | 13.09 / 13.72 | 21.55 |
 
-In %, pooled errors / pooled reference characters. KsponSpeech and telephone use the spelling-side reference. Telephone is the HR domain of the AI-Hub low-quality telephone validation split (calls from job seekers and enquiries about corporate training), 1,936 utterances. No model wins everywhere; each is strongest on data close to its training set (BuzzASR on Common Voice, TeamUNIVA apparently on KsponSpeech). All decoding is greedy. Re-running BuzzASR with its model-card settings (repetition penalties) made all five test sets worse ([details](benchmarks/README.md)).
+In %, pooled errors / pooled reference characters. KsponSpeech and telephone use the spelling-side reference. Telephone is the HR domain of the AI-Hub low-quality telephone validation split (calls from job seekers and enquiries about corporate training), 1,936 utterances. No model wins everywhere; each is strongest on data close to its training set (BuzzASR on Common Voice, TeamUNIVA apparently on KsponSpeech). On telephone speech whisper-large-v3 was strongest, and BuzzASR, fine-tuned from it on read speech (FLEURS, Common Voice), did not beat it (cause not investigated). All decoding is greedy. Re-running BuzzASR with its model-card settings (repetition penalties) made all five test sets worse ([details](benchmarks/README.md)).
 
 </details>
 
