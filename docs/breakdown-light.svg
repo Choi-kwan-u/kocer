@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="362" viewBox="0 0 760 362" font-family="-apple-system,Apple SD Gothic Neo,Malgun Gothic,Noto Sans KR,Segoe UI,Helvetica,Arial,sans-serif">
 <rect width="760" height="362" fill="#fcfcfb"/>
-<text x="16" y="26" font-size="15" font-weight="600" fill="#0b0b0b">CER가 센 오류의 절반은 모델이 틀린 게 아니라 적는 방식 차이입니다</text>
+<text x="16" y="26" font-size="15" font-weight="600" fill="#0b0b0b">CER이 센 오류의 절반 가까이는 모델이 틀린 게 아니라 적는 방식 차이입니다</text>
 <text x="16" y="46" font-size="12" fill="#52514e">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 기존 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>
 <rect x="16" y="56" width="10" height="10" rx="2" fill="#2a78d6"/><text x="31" y="65" font-size="11" fill="#52514e">띄어쓰기 차이</text>
 <rect x="130" y="56" width="10" height="10" rx="2" fill="#eb6834"/><text x="145" y="65" font-size="11" fill="#52514e">문장부호 차이</text>

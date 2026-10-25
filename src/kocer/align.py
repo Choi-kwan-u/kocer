@@ -33,7 +33,7 @@ def distance(ref: Sequence[str], hyp: Sequence[str]) -> int:
     return sum(op != "H" for op, _, _ in align(ref, hyp))
 
 
-try:  # pip install kocer[fast] — 후보 채점이 수십 배 빨라진다. 없으면 위 순수 파이썬으로.
+try:  # pip install "kocer[fast]" — 후보 채점이 수십 배 빨라진다. 없으면 위 순수 파이썬으로.
     from rapidfuzz.distance.Levenshtein import distance  # noqa: F811
 except ImportError:
     pass

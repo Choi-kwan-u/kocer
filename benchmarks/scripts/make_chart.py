@@ -17,7 +17,7 @@ for mode, t in THEMES.items():
     H = TOP + len(rows) * (BAR + GAP) + 16
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="-apple-system,Apple SD Gothic Neo,Malgun Gothic,Noto Sans KR,Segoe UI,Helvetica,Arial,sans-serif">',
          f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>',
-         f'<text x="16" y="26" font-size="15" font-weight="600" fill="{t["fg"]}">CER가 센 오류의 절반은 모델이 틀린 게 아니라 적는 방식 차이입니다</text>',
+         f'<text x="16" y="26" font-size="15" font-weight="600" fill="{t["fg"]}">CER이 센 오류의 절반 가까이는 모델이 틀린 게 아니라 적는 방식 차이입니다</text>',
          f'<text x="16" y="46" font-size="12" fill="{t["muted"]}">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 기존 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>']
     x = 16
     for c, lab in zip(t["series"], LEGEND):
