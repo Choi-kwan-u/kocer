@@ -9,8 +9,8 @@
 *Fair CER for Korean speech recognition. Number notation (3개 ↔ 세 개) is scored against every valid Korean reading, the original CER is kept alongside, and `breakdown()` tells you where your errors come from. Pure Python, zero dependencies, `jiwer`-compatible API.*
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.3.0/docs/breakdown-dark.svg">
-  <img alt="공개 한국어 ASR 모델 7개 설정의 raw CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/v0.3.0/docs/breakdown-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-dark.svg">
+  <img alt="공개 한국어 ASR 모델 7개 설정의 기존 CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~68%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-light.svg">
 </picture>
 
 위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER은 그대로 두고, 그 오류가 어디서 왔는지 나눠 보여줍니다.
@@ -33,12 +33,12 @@ raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.3.0)
 
 실제로 확인한 사례입니다. 같은 두 모델의 같은 받아쓰기 결과를, 정답의 숫자 표기만 바꿔서 채점했습니다.
 
-| 정답 전사의 숫자 표기 | 보통 CER의 결론 | kocer의 결론 |
+| 정답 전사의 숫자 표기 | 기존 CER의 결론 | kocer의 결론 |
 |---|---|---|
 | 아라비아 숫자 (`3시`) | 새 모델이 더 좋다 | 새 모델이 더 좋다 |
 | 한글 (`세 시`) | 새 모델이 **더 나쁘다** | 새 모델이 더 좋다 |
 
-보통 CER은 정답을 어떻게 적었느냐에 따라 정반대 결론을 냅니다. kocer는 같은 말을 다르게 적은 것을 맞은 것으로 보기 때문에, 어느 쪽 정답으로 재도 같은 결론이 나옵니다.
+기존 CER은 정답을 어떻게 적었느냐에 따라 정반대 결론을 냅니다. kocer는 같은 말을 다르게 적은 것을 맞은 것으로 보기 때문에, 어느 쪽 정답으로 재도 같은 결론이 나옵니다.
 
 그래서 비슷한 모델끼리, 특히 새 버전이 숫자 쓰는 습관을 바꿨을 때 필요합니다. 모델끼리 실력 차이가 크면 어떤 도구로 재도 순위는 거의 같습니다. 차이가 진짜인지는 `kocer.compare()`로 확인할 수 있습니다.
 
@@ -47,7 +47,7 @@ raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.3.0)
 
 - 데이터: AI-Hub KsponSpeech 평가셋 중 숫자가 든 628발화. 이 데이터는 숫자를 `(3시)/(세 시)`처럼 두 가지로 적어 두어서, 같은 음성에 대해 두 정답을 만들 수 있습니다.
 - 모델: 원래 모델 [Qwen/Qwen3-ASR-1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B)와, 이를 한국어 데이터로 추가 학습한 새 모델 [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko).
-- 보통 CER(띄어쓰기·문장부호만 무시): 정답이 `3시`면 새 모델이 8.50%p 좋고, `세 시`면 4.13%p 나쁩니다.
+- 기존 CER(띄어쓰기·문장부호만 무시): 정답이 `3시`면 새 모델이 8.50%p 좋고, `세 시`면 4.13%p 나쁩니다.
 - kocer: 정답이 `3시`면 새 모델이 2.34%p 좋고, `세 시`여도 2.36%p 좋습니다.
 - 네 값 모두 문장 단위 paired bootstrap 95% 신뢰구간이 0을 벗어납니다. 자세한 내용은 [benchmarks/](benchmarks/)에 있습니다.
 
@@ -188,7 +188,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 
 공개 한국어 ASR 7개 설정을 Zeroth, FLEURS, Common Voice 27, KsponSpeech(합계 7,418발화)에서 돌리고, 같은 출력을 네 단계로 채점했습니다.
 
-- raw CER이 센 오류의 **46~68%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호입니다.
+- 기존 CER이 센 오류의 **46~68%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호입니다.
 - 숫자가 든 문장에서는 기존 채점이 비교 방향을 틀립니다(위 표). 전체 평균으로 보면 숫자 없는 문장이 많아 차이가 작아집니다.
 - 정규화가 진짜 오류를 숨기지 않는지 100건을 직접 읽었습니다. 실제 오류를 숨긴 경우는 0건이었습니다.
 

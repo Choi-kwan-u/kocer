@@ -18,7 +18,7 @@ for mode, t in THEMES.items():
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="-apple-system,Apple SD Gothic Neo,Malgun Gothic,Noto Sans KR,Segoe UI,Helvetica,Arial,sans-serif">',
          f'<rect width="{W}" height="{H}" fill="{t["bg"]}"/>',
          f'<text x="16" y="26" font-size="15" font-weight="600" fill="{t["fg"]}">CER가 센 오류의 절반은 모델이 틀린 게 아니라 적는 방식 차이입니다</text>',
-         f'<text x="16" y="46" font-size="12" fill="{t["muted"]}">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 보통 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>']
+         f'<text x="16" y="46" font-size="12" fill="{t["muted"]}">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 기존 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>']
     x = 16
     for c, lab in zip(t["series"], LEGEND):
         o.append(f'<rect x="{x}" y="56" width="10" height="10" rx="2" fill="{c}"/><text x="{x + 15}" y="65" font-size="11" fill="{t["muted"]}">{lab}</text>')
@@ -28,7 +28,7 @@ for mode, t in THEMES.items():
     cut = LABEL + span * 0.60
     o.append(f'<text x="{(LABEL + cut) / 2:.0f}" y="{TOP - 12}" font-size="11" text-anchor="middle" fill="{t["muted"]}">← 표기만 다름: kocer는 오류로 안 셈 →</text>')
     o.append(f'<text x="{(cut + LABEL + span) / 2:.0f}" y="{TOP - 12}" font-size="11" text-anchor="middle" fill="{t["fg"]}">← 진짜 오류 →</text>')
-    o.append(f'<text x="{LABEL + span + 10}" y="{TOP - 12}" font-size="11" fill="{t["muted"]}">보통 CER → kocer</text>')
+    o.append(f'<text x="{LABEL + span + 10}" y="{TOP - 12}" font-size="11" fill="{t["muted"]}">기존 CER → kocer</text>')
     for i, (name, parts, cer) in enumerate(rows):
         y = TOP + i * (BAR + GAP); total = sum(parts); x = LABEL
         o.append(f'<text x="{LABEL - 10}" y="{y + 15}" font-size="12" text-anchor="end" fill="{t["fg"]}">{name}</text>')

@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="362" viewBox="0 0 760 362" font-family="-apple-system,Apple SD Gothic Neo,Malgun Gothic,Noto Sans KR,Segoe UI,Helvetica,Arial,sans-serif">
 <rect width="760" height="362" fill="#fcfcfb"/>
 <text x="16" y="26" font-size="15" font-weight="600" fill="#0b0b0b">CER가 센 오류의 절반은 모델이 틀린 게 아니라 적는 방식 차이입니다</text>
-<text x="16" y="46" font-size="12" fill="#52514e">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 보통 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>
+<text x="16" y="46" font-size="12" fill="#52514e">공개 한국어 STT 모델 7개 설정, 테스트 1,418발화. 막대 전체가 기존 CER(jiwer)이 센 오류이고, kocer는 노란 부분만 셉니다.</text>
 <rect x="16" y="56" width="10" height="10" rx="2" fill="#2a78d6"/><text x="31" y="65" font-size="11" fill="#52514e">띄어쓰기 차이</text>
 <rect x="130" y="56" width="10" height="10" rx="2" fill="#eb6834"/><text x="145" y="65" font-size="11" fill="#52514e">문장부호 차이</text>
 <rect x="244" y="56" width="10" height="10" rx="2" fill="#1baf7a"/><text x="259" y="65" font-size="11" fill="#52514e">숫자·영문 표기 차이</text>
 <rect x="402" y="56" width="10" height="10" rx="2" fill="#eda100"/><text x="417" y="65" font-size="11" fill="#52514e">진짜 오류 (kocer CER)</text>
 <text x="297" y="96" font-size="11" text-anchor="middle" fill="#52514e">← 표기만 다름: kocer는 오류로 안 셈 →</text>
 <text x="542" y="96" font-size="11" text-anchor="middle" fill="#0b0b0b">← 진짜 오류 →</text>
-<text x="650" y="96" font-size="11" fill="#52514e">보통 CER → kocer</text>
+<text x="650" y="96" font-size="11" fill="#52514e">기존 CER → kocer</text>
 <text x="140" y="123" font-size="12" text-anchor="end" fill="#0b0b0b">BuzzASR/korean</text>
 <rect x="150.0" y="108" width="111.7" height="22" rx="2" fill="#2a78d6"/>
 <text x="205.8" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
