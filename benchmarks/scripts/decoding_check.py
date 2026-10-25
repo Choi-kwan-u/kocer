@@ -19,7 +19,7 @@ def en(m): return sum(m.ops.values()), m.hits + m.ops["S"] + m.ops["D"]
 ids = json.load(open(os.path.join(ROOT, "results", "common_ids.json"), encoding="utf-8"))
 def pairs(ds):
     """[(ref, hyp_by_tag)] for a dataset, refs from data (spelling side for Kspon)."""
-    if ds in KSPON:
+    if ds in KSPON + ["tel_hr"]:
         data = {r["id"]: r for r in jl(os.path.join(ROOT, "data", ds, "test.jsonl"))}; keys = sorted(data)
         ref = {k: data[k]["ref"] for k in keys}
     else:
@@ -37,7 +37,7 @@ def stats(rows, tag):
     return np.array(a, dtype=np.int64)
 
 out = []; cache = {}
-groups = {"KsponSpeech (clean+other, spelling ref)": KSPON, "Zeroth": ["zeroth"], "FLEURS": ["fleurs"], "Common Voice 27": ["commonvoice"]}
+groups = {"KsponSpeech (clean+other, spelling ref)": KSPON, "Zeroth": ["zeroth"], "FLEURS": ["fleurs"], "Common Voice 27": ["commonvoice"], "AI-Hub telephone HR (spelling ref)": ["tel_hr"]}
 for gname, dss in groups.items():
     rows = sum((pairs(d) for d in dss), [])
     S = {t: stats(rows, t) for t in [GREEDY, CARD] + OTHERS}; cache[gname] = S

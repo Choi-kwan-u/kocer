@@ -42,3 +42,14 @@ kocer ranking with both BuzzASR runs: 1. qwen3-asr-1.7b-ko-univa-release 4.25; 2
 card - greedy, kocer: +0.27 pt [+0.13, +0.42] *
 kocer ranking with both BuzzASR runs: 1. BuzzASR greedy 3.88; 2. BuzzASR card settings 4.15; 3. whisper-large-v3 5.80; 4. qwen3-asr-1.7b-ko-univa-release 6.00; 5. qwen3-asr-1.7b-ko-univa 6.08; 6. qwen3-asr-1.7b 6.61; 7. sensevoice-small-itn 9.68; 8. sensevoice-small-noitn 9.72
 (whisper-large-v3 greedy runaway A/B: 0/0)
+
+## AI-Hub telephone HR (spelling ref) (1936 utt.)
+
+| BuzzASR decoding | nospace+punct CER | kocer CER | runaway A (CER>1) | runaway B (len>=2x) | kocer CER without A |
+|---|---|---|---|---|---|
+| greedy, no repetition penalty (published) | 5.97 | 5.61 | 0 | 0 | 5.61 |
+| model-card settings | 6.87 | 6.50 | 0 | 0 | 6.50 |
+
+card - greedy, kocer: +0.90 pt [+0.77, +1.02] *
+kocer ranking with both BuzzASR runs: 1. whisper-large-v3 5.02; 2. BuzzASR greedy 5.61; 3. qwen3-asr-1.7b-ko-univa-release 5.76; 4. BuzzASR card settings 6.50; 5. qwen3-asr-1.7b-ko-univa 9.17; 6. qwen3-asr-1.7b 10.76; 7. sensevoice-small-itn 21.30; 8. sensevoice-small-noitn 21.55
+(whisper-large-v3 greedy runaway A/B: 1/0)

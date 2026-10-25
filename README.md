@@ -54,6 +54,7 @@ raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.3.0)
 - 띄어쓰기·문장부호를 뺀 CER(nlptutti 방식): 정답이 `3시`면 새 모델이 8.50%p 좋고, `세 시`면 4.13%p 나쁩니다.
 - kocer: 정답이 `3시`면 새 모델이 2.34%p 좋고, `세 시`여도 2.36%p 좋습니다.
 - 네 값 모두 문장 단위 paired bootstrap 95% 신뢰구간이 0을 벗어납니다. 자세한 내용은 [benchmarks/](benchmarks/)에 있습니다.
+- AI-Hub 전화 음성(숫자가 든 408발화)에서도 같은 일이 생깁니다. 띄어쓰기·문장부호를 뺀 CER로는 정답이 `3시`면 새 모델이 6.58%p 좋고, `세 시`면 0.47%p 차이로 구분되지 않습니다. kocer로는 3.82%p, 3.55%p로 둘 다 새 모델이 좋습니다.
 
 </details>
 
@@ -190,28 +191,29 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 
 ## 공개 모델 벤치마크
 
-공개 한국어 ASR 7개 설정을 Zeroth, FLEURS, Common Voice 27, KsponSpeech(합계 7,418발화)에서 돌리고, 같은 출력을 네 단계로 채점했습니다.
+공개 한국어 ASR 7개 설정을 Zeroth, FLEURS, Common Voice 27, KsponSpeech(합계 7,418발화)에서 돌리고, 같은 출력을 네 단계로 채점했습니다. AI-Hub 전화 음성(1,936발화)에서도 따로 확인했습니다.
 
 - Zeroth·FLEURS·Common Voice(1,418발화) 기준으로, 기존 CER이 센 오류의 **46~68%는 표기 차이**였습니다. 대부분은 띄어쓰기와 문장부호입니다.
 - 숫자가 든 문장에서는 기존 채점의 비교 방향이 정답의 숫자 표기에 따라 달라집니다(위 표). 전체 평균으로 보면 숫자 없는 문장이 많아 차이가 작아집니다.
+- 정답에 이중 표기가 있는 데이터에서는 어느 쪽을 정답으로 고르느냐에 따라 띄어쓰기·문장부호를 뺀 CER이 바뀝니다. 전화 음성에서는 모델마다 2.9~4.8%p, kocer로는 0.33%p 이하입니다.
 - 정규화가 진짜 오류를 숨기지 않는지, 기존 CER > 0이고 kocer CER = 0인 문장 100건을 직접 읽었습니다(그중 14건은 숫자 단계가 작동한 문장). 실제 오류를 숨긴 경우는 0건이었고, 1건은 띄어쓰기에 따라 뜻이 갈리는 동형이의어라 애매했습니다.
 
-모델별 점수, 단계별 CER, 신뢰구간, 디코딩 설정, 재현 스크립트는 [benchmarks/](benchmarks/)에 있습니다. KsponSpeech 결과는 한국지능정보사회진흥원(NIA)의 AI-Hub에서 제공한 '한국어 음성' 데이터를 활용했고, 약관상 숫자 표만 공개합니다.
+모델별 점수, 단계별 CER, 신뢰구간, 디코딩 설정, 재현 스크립트는 [benchmarks/](benchmarks/)에 있습니다. KsponSpeech와 전화 음성 결과는 한국지능정보사회진흥원(NIA)의 AI-Hub에서 제공한 '한국어 음성', '저음질 전화망 음성인식' 데이터를 활용했고, 약관상 숫자 표만 공개합니다.
 
 <details>
 <summary>모델별 kocer CER</summary>
 
-| 모델 | Zeroth | FLEURS | Common Voice 27 | KsponSpeech clean / other |
-|---|---|---|---|---|
-| TeamUNIVA/qwen3_asr_1.7b_ko | 2.37 | **4.25** | 6.00 | **6.10 / 6.48** |
-| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | 4.31 | 6.08 | 6.81 / 7.26 |
-| BuzzASR/korean | 3.16 | 4.72 | **3.88** | 10.14 / 9.41 |
-| openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 11.07 / 11.87 |
-| Qwen/Qwen3-ASR-1.7B | 2.91 | 4.31 | 6.61 | 8.70 / 8.59 |
-| SenseVoiceSmall (itn 켬) | **2.40** | 6.95 | 9.68 | 13.28 / 13.82 |
-| SenseVoiceSmall (itn 끔) | 2.41 | 6.91 | 9.72 | 13.09 / 13.72 |
+| 모델 | Zeroth | FLEURS | Common Voice 27 | KsponSpeech clean / other | 전화 (HR) |
+|---|---|---|---|---|---|
+| TeamUNIVA/qwen3_asr_1.7b_ko | 2.37 | **4.25** | 6.00 | **6.10 / 6.48** | 5.76 |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | 4.31 | 6.08 | 6.81 / 7.26 | 9.17 |
+| BuzzASR/korean | 3.16 | 4.72 | **3.88** | 10.14 / 9.41 | 5.61 |
+| openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 11.07 / 11.87 | **5.02** |
+| Qwen/Qwen3-ASR-1.7B | 2.91 | 4.31 | 6.61 | 8.70 / 8.59 | 10.76 |
+| SenseVoiceSmall (itn 켬) | **2.40** | 6.95 | 9.68 | 13.28 / 13.82 | 21.30 |
+| SenseVoiceSmall (itn 끔) | 2.41 | 6.91 | 9.72 | 13.09 / 13.72 | 21.55 |
 
-단위 %, 총 오류 / 총 정답 글자. KsponSpeech는 철자 정답 기준. 모든 데이터셋에서 이기는 모델은 없고, 각 모델은 학습 데이터와 가까운 데이터셋에서 강합니다(BuzzASR은 Common Voice, TeamUNIVA는 KsponSpeech로 보임). 디코딩은 모두 greedy이고, BuzzASR을 모델카드 권장 설정(반복 억제)으로 다시 돌리면 네 데이터셋 모두 오히려 나빠집니다([자세히](benchmarks/README.md)).
+단위 %, 총 오류 / 총 정답 글자. KsponSpeech와 전화는 철자 정답 기준. 전화는 AI-Hub 저음질 전화망 검증셋의 HR 분야(구직·교육 문의 통화) 1,936발화입니다. 모든 데이터셋에서 이기는 모델은 없고, 각 모델은 학습 데이터와 가까운 데이터셋에서 강합니다(BuzzASR은 Common Voice, TeamUNIVA는 KsponSpeech로 보임). 디코딩은 모두 greedy이고, BuzzASR을 모델카드 권장 설정(반복 억제)으로 다시 돌리면 다섯 데이터셋 모두 오히려 나빠집니다([자세히](benchmarks/README.md)).
 
 </details>
 

@@ -1,6 +1,6 @@
 # Public Korean ASR models: same outputs, four scorings (2026-10-24)
 
-Seven public Korean ASR settings, three public test sets (1,418 utterances) plus KsponSpeech eval (6,000 utterances, numbers only), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
+Seven public Korean ASR settings, three public test sets (1,418 utterances) plus KsponSpeech eval (6,000 utterances, numbers only) and AI-Hub telephone speech (1,936 utterances, numbers only), one set of model outputs, four ways of scoring. Everything needed to recompute the tables is in this folder except the audio.
 
 Model names used here: **Qwen3-ASR base** = [Qwen/Qwen3-ASR-1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B); **TeamUNIVA ko beta** = [TeamUNIVA/qwen3_asr_1.7b_ko_beta](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko_beta), a Korean fine-tune of the base (Aug 2026); **TeamUNIVA ko** = [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko), its successor trained further from the beta (Oct 2026). Result folders: `qwen3-asr-1.7b` = base, `qwen3-asr-1.7b-ko-univa` = TeamUNIVA ko beta, `qwen3-asr-1.7b-ko-univa-release` = TeamUNIVA ko, `_buzzasr-korean-cardgen` = BuzzASR with its model-card decoding settings.
 
@@ -118,15 +118,15 @@ With the pronunciation reference and nospace+punct scoring the Qwen3-ASR base ra
 4. TeamUNIVA likely trained on KsponSpeech (its largest reported gain). BuzzASR and whisper-large-v3 produced runaway repeated output on 19 and 25 utterances (6.7% and 4.5% of their kocer errors); ranks are unchanged without them. **Runaway criterion:** an utterance whose kocer error count exceeds its normalized reference length (sentence kocer CER > 1), which in practice requires insertions longer than the reference. A second criterion, hypothesis at least twice as long as the reference (spaces removed), flags 10 and 14. Counted from numbers only; no transcript text was read.
 5. **Is BuzzASR's 4th place an artefact of our decoding?** No. Re-running BuzzASR with its model card's settings (`no_repeat_ngram_size=3, repetition_penalty=1.2`, everything else identical) made it *worse* on every set and barely reduced the runaways:
 
-| BuzzASR kocer CER | KsponSpeech | Zeroth | FLEURS | Common Voice 27 |
-|---|---|---|---|---|
-| greedy, no repetition penalty (main tables) | **9.71** | **3.16** | **4.72** | **3.88** |
-| model-card settings | 10.14 | 3.50 | 5.30 | 4.15 |
-| card − greedy, 95% CI | +0.43 [−0.49, +1.02] | +0.34 [+0.21, +0.46] | +0.58 [+0.39, +0.77] | +0.27 [+0.13, +0.42] |
-| runaway utterances (greedy → card) | 19 → 17 | 0 → 0 | 0 → 0 | 0 → 0 |
+| BuzzASR kocer CER | KsponSpeech | Zeroth | FLEURS | Common Voice 27 | Telephone (HR) |
+|---|---|---|---|---|---|
+| greedy, no repetition penalty (main tables) | **9.71** | **3.16** | **4.72** | **3.88** | **5.61** |
+| model-card settings | 10.14 | 3.50 | 5.30 | 4.15 | 6.50 |
+| card − greedy, 95% CI | +0.43 [−0.49, +1.02] | +0.34 [+0.21, +0.46] | +0.58 [+0.39, +0.77] | +0.27 [+0.13, +0.42] | +0.90 [+0.77, +1.02] |
+| runaway utterances (greedy → card) | 19 → 17 | 0 → 0 | 0 → 0 | 0 → 0 | 0 → 0 |
 
-   BuzzASR stays 4th on KsponSpeech and 1st on Common Voice either way. Details: `results/decoding_check.md` (`scripts/decoding_check.py`); public-set outputs with the card settings are in `results/_buzzasr-korean-cardgen/`.
-5. Pooled with the three public sets (7,418 utterances, KsponSpeech dominating), every pair is separated and the order is TeamUNIVA ko, TeamUNIVA ko beta, Qwen3-ASR base, BuzzASR, whisper, SenseVoice. This order reflects the KsponSpeech share of the pool; read the per-set tables first.
+   BuzzASR stays 4th on KsponSpeech and 1st on Common Voice either way. Details: `results/decoding_check.md` (`scripts/decoding_check.py`); public-set outputs with the card settings are in `results/_buzzasr-korean-cardgen/`. The telephone column is from the section below.
+6. Pooled with the three public sets (7,418 utterances, KsponSpeech dominating), every pair is separated and the order is TeamUNIVA ko, TeamUNIVA ko beta, Qwen3-ASR base, BuzzASR, whisper, SenseVoice. This order reflects the KsponSpeech share of the pool; read the per-set tables first.
 
 **Raw AI-Hub transcripts, no cleaning (kocer 0.2.0).** Since 0.2.0 kocer reads the dual notation `(3시)/(세 시)` and accepts either side span by span, and `aihub=True` strips the noise tags (`b/`, `n/`, ...), filler slashes, `+` and `*`. Feeding the original `.trn` text straight in:
 
@@ -143,10 +143,38 @@ The raw-transcript score is lower than either single side because each utterance
 
 This work uses the "Korean speech" (한국어 음성) dataset provided by the National Information Society Agency (NIA) through AI-Hub. AI-Hub terms forbid redistribution, so only aggregate numbers are published here. To reproduce, apply for the dataset on AI-Hub (Korean residents), extract the eval audio and scripts, then run `scripts/prepare_kspon.py <folder>`, `scripts/run_kspon.sh`, `scripts/score_kspon.py`. The scripts print counts only, never transcript text.
 
+## Telephone speech (AI-Hub; data and per-sentence outputs not redistributed)
+
+AI-Hub "Low-quality telephone network speech recognition data" (저음질 전화망 음성인식 데이터), **validation** split, HR domain (D03: calls from job applicants and job seekers, and enquiries about corporate training): 1,936 utterances, 3.6 h, 85 calls. The audio is 8 kHz, upsampled to 16 kHz, and no clip is longer than 30 s. Decoding is the same as everywhere else (greedy). The transcripts use the same dual notation as KsponSpeech: in 563 utterances the spelling and pronunciation references differ. Numbers are twice as common as in KsponSpeech: 408 of 1,936 utterances (21%) have a digit in the spelling reference, against 628 of 6,000 (10%). Full numbers: `results/tel_hr_tables.md`.
+
+| Model | kocer, spelling ref | nospace+punct, spelling ref | raw, spelling ref | spelling → pronunciation ref, nospace+punct | same, kocer | kocer, raw transcript (`aihub=True`) |
+|---|---|---|---|---|---|---|
+| openai/whisper-large-v3 | **5.02** | **5.44** | 8.10 | +4.81 | +0.31 | **4.92** |
+| BuzzASR/korean | 5.61 | 5.97 | 8.17 | +4.65 | +0.33 | 5.50 |
+| TeamUNIVA/qwen3_asr_1.7b_ko | 5.76 | 6.26 | **6.73** | +4.52 | +0.28 | 5.64 |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 9.17 | 9.83 | 10.64 | +4.03 | +0.14 | 8.97 |
+| Qwen/Qwen3-ASR-1.7B | 10.76 | 12.01 | 12.96 | +2.92 | +0.18 | 10.59 |
+| SenseVoiceSmall (itn on / off) | 21.30 / 21.55 | 21.66 / 21.86 | 23.32 / 24.57 | +3.18 / +3.15 | +0.09 / +0.04 | 21.08 / 21.32 |
+
+1. **Reference choice.** With spacing and punctuation removed, choosing the pronunciation side instead of the spelling side raises every model's CER by 2.9–4.8 pt. With kocer the shift is 0.04–0.33 pt.
+2. **The 408 utterances whose spelling reference contains a digit** (TeamUNIVA ko minus Qwen3-ASR base, negative = TeamUNIVA ko better):
+
+   | reference side | nospace+punct | kocer |
+   |---|---|---|
+   | spelling | −6.58 pt [−7.46, −5.73] | −3.82 pt [−4.38, −3.28] |
+   | pronunciation | −0.47 pt [−1.30, +0.43], not separated | −3.55 pt [−4.08, −3.01] |
+
+   With conventional scoring, the reference side decides whether the fine-tune is 6.6 pt better or not distinguishable from the base. kocer gives about the same answer with either side. This is the KsponSpeech pattern again, on a second dataset.
+3. **Ranks** are the same at every level and with every reference except raw CER, where TeamUNIVA ko is 1st because it gets spacing right more often (spacing is 20% of its raw errors, against 38–42% for whisper and BuzzASR). whisper-large-v3 is ahead of everyone (paired bootstrap, 2,000 resamples). BuzzASR and TeamUNIVA ko are not separated (0.15 pt [−0.44, +0.12]), and every other pair is.
+4. **Runaway outputs** (criterion in KsponSpeech item 4): 0 for BuzzASR and TeamUNIVA ko, 1 for whisper and the Qwen3-ASR base, 2 for the beta. BuzzASR with its model-card settings: 6.50 (+0.90 pt [+0.77, +1.02] against greedy), still no runaways.
+5. One domain only. The dataset has other domains.
+
+This work uses the "Low-quality telephone network speech recognition" (저음질 전화망 음성인식) dataset provided by the National Information Society Agency (NIA) through AI-Hub. Only aggregate numbers are published here. To reproduce: download `VL_D03.zip` and `VS_D03.zip` from the validation split, then run `scripts/prepare_tel.py VL_D03.zip VS_D03.zip tel_hr`, `scripts/run_tel.sh`, and `scripts/score_tel.py tel_hr`.
+
 <details><summary>Setup, caveats, and what is not claimed</summary>
 
-- Decoding identical for all models: language fixed to Korean, task transcribe, **greedy** (num_beams=1, no sampling, no repetition penalty), no prompt, no chunking (all clips ≤ 30 s), 16 kHz. This is deliberately not each model's best-score recipe. BuzzASR's card recommends `no_repeat_ngram_size=3, repetition_penalty=1.2`; we checked it and it scores worse than greedy on all four sets (item 5 above).
-- Hypotheses stored exactly as emitted, including Whisper's leading space and trailing period. SenseVoice output passed through funasr's `rich_transcription_postprocess` (tag removal only). For Korean, SenseVoice emits numbers in Hangul even with `use_itn=True`; the flag only toggles punctuation.
+- Decoding identical for all models: language fixed to Korean, task transcribe, **greedy** (num_beams=1, no sampling, no repetition penalty), no prompt, no chunking (all clips ≤ 30 s), 16 kHz. This is deliberately not each model's best-score recipe. BuzzASR's card recommends `no_repeat_ngram_size=3, repetition_penalty=1.2`; we checked it and it scores worse than greedy on all five sets (KsponSpeech item 5).
+- Hypotheses stored exactly as emitted, including Whisper's leading space and trailing period. SenseVoice output passed through funasr's `rich_transcription_postprocess` (tag removal only). For Korean, `use_itn` hardly changes how SenseVoice writes numbers. Outputs containing a digit, with the flag on / off: Zeroth 0 / 0, FLEURS 32 / 32, Common Voice 12 / 11, KsponSpeech 435 / 430, telephone 410 / 408.
 - Whisper / BuzzASR: transformers 5.20.2, fp16, batch 8. Qwen: qwen-asr 0.0.6, transformers 4.57.6, bf16, batch 4, `generation_config.do_sample=False`. SenseVoice: funasr 1.4.16. torch 2.6.0+cu124, RTX 4060 Ti 8 GB, 2026-10-24. No failed or empty outputs; all 1,418 utterances scored for every model.
 - kocer version: 0.1.3 (= 0.1.2 plus two fixes found during this run: counter `주` accepts both readings; standalone native numerals `스물`, `셋`). Colloquial decimal `쩜` is **not** accepted. The scorer was fixed *before* the review sample was drawn.
 - **Common Voice.** Hugging Face copies of Common Voice are empty since October 2025; the data came from Mozilla Data Collective ("Common Voice Scripted Speech 27.0 - Korean", CC0). BuzzASR's card reports Common Voice **25**, so the test set is not identical. Overlap check: none of the 579 CV27 test sentences, clips or speakers appear in the CV17 train split; 195 are the CV17 test set carried forward. CV keeps its test split stable across releases, so the BuzzASR lead on CV reads as in-domain training data, not test leakage. We cannot check CV25 train directly.
