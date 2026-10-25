@@ -57,7 +57,7 @@ Even with spacing and punctuation removed, the conclusion flips with the referen
 
 </details>
 
-kocer matters most for close models, especially when a new version changes how it writes numbers. When models differ a lot, any metric gives roughly the same ranking. `kocer.compare()` tells you whether a difference is real.
+kocer matters most for close models, especially when a new version changes how it writes numbers. When models differ a lot, any metric gives roughly the same ranking. `kocer.compare()` tells you whether a difference is statistically distinguishable.
 
 ## Install
 
@@ -195,8 +195,8 @@ Spacing and punctuation are removed, and numbers and acronyms are scored against
 Seven public Korean ASR settings were run on Zeroth, FLEURS, Common Voice 27 and KsponSpeech (7,418 utterances in total), and the same outputs were scored at four normalization levels.
 
 - On Zeroth, FLEURS and Common Voice (1,418 utterances), **46–68% of what plain CER counts as errors is notation**, mostly spacing and punctuation.
-- On sentences with numbers, existing scoring gets the direction of the comparison wrong (table above). Averaged over everything, the effect shrinks because most sentences have no numbers.
-- To check that normalization does not hide real errors, 100 sentences with plain CER > 0 and kocer CER = 0 were read by hand. None hid a recognition error.
+- On sentences with numbers, the direction of the comparison under existing scoring depends on how the reference writes numbers (table above). Averaged over everything, the effect shrinks because most sentences have no numbers.
+- To check that normalization does not hide real errors, 100 sentences with plain CER > 0 and kocer CER = 0 were read by hand (14 involved the number step). None hid a recognition error; one was ambiguous, a spacing-induced homograph.
 
 Per-model scores, CER at each level, confidence intervals, decoding settings and scripts are in [benchmarks/](benchmarks/README.md). KsponSpeech results use the "Korean speech" data from AI-Hub, provided by the National Information Society Agency (NIA); under its terms only score tables are published.
 
@@ -230,7 +230,7 @@ In %, pooled errors / pooled reference characters. KsponSpeech uses the spelling
 Please report the version with any score. Normalization rules change between versions, so the same outputs can score differently. Reporting `raw_cer` as well makes your numbers comparable with other tools.
 
 ```
-CER 4.13% (raw) / 2.93% (kocer 0.3.0)
+CER 8.60% (raw) / 2.93% (kocer 0.3.0)
 ```
 
 Use "Cite this repository" on the right side of the repo page to copy a citation ([CITATION.cff](CITATION.cff)).
