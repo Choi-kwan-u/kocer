@@ -98,7 +98,7 @@ r = kocer.measure("세 시 삼십 분", "3시 30분")
 r.ops         # {'S': 0, 'D': 0, 'I': 0}
 r.alignment   # [('H', '세', '세'), ...]
 r.chosen_ref  # 숫자 후보 중 실제로 채택된 정답
-r.chosen_hyp  # '세시삼십분'
+r.chosen_hyp  # '세시 삼십분'
 
 b = kocer.breakdown(refs, hyps)
 b.spacing, b.punctuation, b.numbers_letters, b.remaining   # 합이 b.raw_errors
