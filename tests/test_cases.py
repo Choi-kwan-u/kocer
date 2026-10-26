@@ -166,3 +166,61 @@ def test_cli_compare_mode(tmp_path, capsys):
     assert main([str(tmp_path / "ref.txt"), str(tmp_path / "a.txt"), str(tmp_path / "b.txt"), "--boot", "100"]) == 0
     out = capsys.readouterr().out
     assert "1. a" in out and "a − b" in out
+
+
+def test_denominator_depends_only_on_reference():
+    ref = "AI 기술 2024년 오늘 날씨"
+    a = kocer.measure(ref, "AI 기술 2024년 오늘 날시")
+    b = kocer.measure(ref, "에이아이 기술 이천이십사년 오늘 날시")
+    assert a.ref_len == b.ref_len == 13 and a.errors == b.errors == 1 and a.cer == b.cer
+    assert kocer.measure("(3시)/(세 시)에 만나", "세 시에 만나").ref_len == 5   # 이중 표기는 철자 쪽 길이
+
+
+def test_raw_cer_strips_outer_whitespace_like_jiwer():
+    assert kocer.measure(" 사과", "사과").raw_cer == 0
+    assert kocer.cer(" 사과 ", "사과", normalize=False) == 0
+    assert kocer.cer("사 과", "사과", normalize=False) == pytest.approx(1 / 3)   # 문장 안 공백은 그대로 오류
+    jiwer = pytest.importorskip("jiwer")
+    pairs = [(" 오늘 날씨가 좋다.", "오늘 날씨가 좋다"), ("네, 알겠습니다.", " 네 알겠습니다."), ("가나다", "가나다 ")]
+    for r, h in pairs:
+        assert kocer.cer(r, h, normalize=False) == pytest.approx(jiwer.cer(r, h))
+
+
+def test_breakdown_is_never_negative():
+    refs = ["50%", "오십 퍼센트", "3km", "삼 킬로미터", "AI 모델", "세 시 삼십 분", "(7시)/(일곱 시)에 만나", "영하 오 도", "$100"]
+    hyps = ["50프로", "50%", "삼 킬로", "3km", "ai 모델", "3:30", "일곱 시에 만나", "-5도", "백 달러"]
+    b = kocer.breakdown(refs, hyps)
+    assert min(b.spacing, b.punctuation, b.numbers_letters, b.remaining) >= 0
+    assert b.remaining == 0
+
+
+def test_digitwise_reading_does_not_hide_real_errors():
+    assert kocer.cer("삼 사 일", "34일") > 0                  # 3~4일과 34일은 다른 말
+    assert kocer.cer("이공이사 년", "2024년") == 0           # 4자리는 자릿수 읽기 허용
+    assert kocer.cer("삼사", "34") == 0                       # 조수사가 없으면 허용
+    assert kocer.cer("이십 명", "20명") == 0 and kocer.cer("일공 명", "10명") > 0   # 20 이상은 한자어도, 자릿수 읽기는 조수사 앞에서 불허
+
+
+def test_unicode_cleanup_and_cli_bom(tmp_path, capsys):
+    assert kocer.cer("ＡＩ 모델", "AI 모델") == 0
+    assert kocer.cer("\ufeff사과 세 개", "사과 3개") == 0
+    assert kocer.cer("사과\u200b 세 개", "사과 3개") == 0
+    from kocer.cli import main
+    (tmp_path / "ref.txt").write_text("\ufeff사과 세 개\n", encoding="utf-8")
+    (tmp_path / "hyp.txt").write_text("사과 3개\n", encoding="utf-8")
+    assert main([str(tmp_path / "ref.txt"), str(tmp_path / "hyp.txt")]) == 0
+    assert "kocer CER 0.00%" in capsys.readouterr().out
+
+
+def test_aihub_extra_tags():
+    assert kocer.cer("음 (NO:) 알겠어", "음 알겠어", aihub=True) == 0
+    assert kocer.cer("/(noise) 알겠어 @웃음", "알겠어", aihub=True) == 0
+    assert kocer.cer("(3시)/(세 시)에 b/ 만나", "3시에 만나", aihub=True) == 0   # 이중 표기의 /(B)는 지우지 않음
+    assert kocer.cer("@이름1 왔어", "철수 왔어", aihub=True) > 0                 # 가림 태그는 그대로 (한계)
+
+
+def test_wer_numbers_off_by_default():
+    assert kocer.wer("사과 세 개", "사과 세 개") == 0
+    assert kocer.wer("사과 세 개", "사과 3개") > 0
+    assert kocer.wer("오늘 3시", "오늘 3시", numbers=True) == 0
+

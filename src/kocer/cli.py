@@ -35,19 +35,19 @@ def main(argv=None) -> int:
     p.add_argument("--boot", type=int, default=2000, help="비교 모드의 bootstrap 반복 수 (기본 2000)")
     p.add_argument("--version", action="version", version=__version__)
     a = p.parse_args(argv)
-    refs = open(a.ref, encoding="utf-8").read().splitlines()
+    refs = open(a.ref, encoding="utf-8-sig").read().splitlines()
     opts = dict(numbers=not a.no_numbers, aihub=a.aihub, dual=not a.no_dual)
     if len(a.hyp) > 1:
         systems = {}
         for path in a.hyp:
-            lines = open(path, encoding="utf-8").read().splitlines()
+            lines = open(path, encoding="utf-8-sig").read().splitlines()
             if len(lines) != len(refs):
                 sys.exit(f"줄 수가 다릅니다: ref {len(refs)}, {path} {len(lines)}")
             name = os.path.splitext(os.path.basename(path))[0]
             systems[name if name not in systems else path] = lines
         print(compare(refs, systems, n_boot=a.boot, **opts))
         return 0
-    hyps = open(a.hyp[0], encoding="utf-8").read().splitlines()
+    hyps = open(a.hyp[0], encoding="utf-8-sig").read().splitlines()
     if len(refs) != len(hyps):
         sys.exit(f"줄 수가 다릅니다: ref {len(refs)}, hyp {len(hyps)}")
     if a.diff:

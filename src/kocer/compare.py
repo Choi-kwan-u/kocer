@@ -102,7 +102,7 @@ def compare(references: Sequence[str], systems: Mapping[str, Sequence[str]], *, 
     for name, hyps in systems.items():
         rs = [measure(r, h, **opts) for r, h in zip(references, hyps)]
         E[name] = [x.errors for x in rs]
-        N[name] = [x.hits + x.substitutions + x.deletions for x in rs]
+        N[name] = [x.ref_len for x in rs]
     cer = {s: sum(E[s]) / max(sum(N[s]), 1) for s in systems}
     boot = _bootstrap(E, N, n, n_boot, seed)
     a_lo, a_hi = (1 - confidence) / 2, 1 - (1 - confidence) / 2

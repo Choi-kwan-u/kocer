@@ -14,7 +14,7 @@ from .normalize import normalize as _normalize
 from .normalize import resolve_dual as _resolve_dual
 from .normalize import strip_aihub_tags as _strip_aihub
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 __all__ = ["cer", "wer", "measure", "breakdown", "compare", "Result", "Breakdown", "Comparison", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
@@ -22,12 +22,13 @@ Text = Union[str, Sequence[str]]
 
 @dataclass
 class Result:
-    cer: float            # 정규화 후 오류율 (unit="word"면 WER)
-    raw_cer: float        # 정규화 전 오류율 (jiwer와 같은 값)
+    cer: float            # 정규화 후 오류율 = errors / ref_len (unit="word"면 WER)
+    raw_cer: float        # 정규화 전 오류율 (jiwer.cer와 같은 값: 앞뒤 공백만 뗀다)
     hits: int
     substitutions: int
     deletions: int
     insertions: int
+    ref_len: int          # 분모. 정답을 적힌 그대로 정규화한 글자 수(이중 표기는 철자 쪽). 결과가 무엇이든 같다
     alignment: List[Op] = field(repr=False)
     chosen_ref: str = ""  # 숫자 후보 중 실제로 채택된 정답
     chosen_hyp: str = ""
@@ -48,8 +49,8 @@ def _units(text: str, unit: str) -> List[str]:
 def _normalized(ref: str, hyp: str, unit: str, numbers: bool, punct: bool, fillers: bool, letters: bool,
                 aliases: Optional[Dict[str, str]]):
     """정규화 + 숫자·영문 후보 선택 후의 (ref, hyp, alignment)."""
-    ref = _normalize(ref, punct, fillers, letters)
-    hyp = _normalize(hyp, punct, fillers, letters)
+    ref = _normalize(ref, punct, fillers)
+    hyp = _normalize(hyp, punct, fillers)
     table = {**ALIASES, **(aliases or {})} if letters else None
     if numbers or letters:
         # shortcut: hyp 후보를 먼저 ref 원문에 맞춰 고르고, 그다음 ref 후보를 고른 hyp에 맞춤(양쪽 곱집합 아님), 혼합 표기에서 틀리면 곱집합으로 올릴 것
@@ -77,16 +78,19 @@ def measure(reference: str, hypothesis: str, *, unit: str = "char", normalize: b
     """aliases: 단어처럼 읽는 약어 사전 (예: {"NASA": "나사"}). 내장 ALIASES 위에 덮어쓴다.
     dual: AI-Hub 이중 표기 "(3시)/(세 시)"의 양쪽을 모두 정답 후보로 본다 (기본 켬).
     aihub: AI-Hub 전사의 잡음 태그(b/ n/ ...), 간투사 슬래시, 반복(+)·불명확(*) 표시를 지운다 (기본 끔)."""
-    raw_ref, raw_hyp = (reference.split(), hypothesis.split()) if unit == "word" else (list(reference), list(hypothesis))
+    raw_ref, raw_hyp = (reference.split(), hypothesis.split()) if unit == "word" else (list(reference.strip()), list(hypothesis.strip()))
     raw = distance(raw_ref, raw_hyp) / max(len(raw_ref), 1)
 
     if not normalize:
         ops = align(raw_ref, raw_hyp)
-        ref, hyp = reference, hypothesis
+        ref, hyp = reference.strip(), hypothesis.strip()
+        ref_len = len(raw_ref)
     else:
         ref_text, hyp_text = reference, hypothesis
         if aihub:
             ref_text, hyp_text = _strip_aihub(ref_text), _strip_aihub(hyp_text)
+        # 분모는 정답만으로 정한다: 후보 선택 전, 이중 표기는 철자 쪽. 모델이 숫자를 어떻게 썼든 같은 분모
+        ref_len = len(_units(_normalize(_DUAL.sub(r"\1", ref_text) if dual else ref_text, punct, fillers), unit))
         args = (unit, numbers, punct, fillers, letters, aliases)
         if dual and (_DUAL.search(ref_text) or _DUAL.search(hyp_text)):
             refs, hyps = _dual_variants(ref_text), _dual_variants(hyp_text)
@@ -113,8 +117,7 @@ def measure(reference: str, hypothesis: str, *, unit: str = "char", normalize: b
             ref, hyp, ops = _normalized(ref_text, hyp_text, *args)
     counts = {k: sum(op == k for op, _, _ in ops) for k in "HSDI"}
     err = counts["S"] + counts["D"] + counts["I"]
-    n = counts["H"] + counts["S"] + counts["D"]
-    return Result(err / max(n, 1), raw, counts["H"], counts["S"], counts["D"], counts["I"], ops, ref, hyp)
+    return Result(err / max(ref_len, 1), raw, counts["H"], counts["S"], counts["D"], counts["I"], ref_len, ops, ref, hyp)
 
 
 def _rate(reference: Text, hypothesis: Text, unit: str, **opts) -> float:
@@ -123,8 +126,7 @@ def _rate(reference: Text, hypothesis: Text, unit: str, **opts) -> float:
     if len(reference) != len(hypothesis):
         raise ValueError("reference and hypothesis must have the same length")
     results = [measure(r, h, unit=unit, **opts) for r, h in zip(reference, hypothesis)]
-    total = sum(x.hits + x.substitutions + x.deletions for x in results)
-    return sum(x.errors for x in results) / max(total, 1)
+    return sum(x.errors for x in results) / max(sum(x.ref_len for x in results), 1)
 
 
 def cer(reference: Text, hypothesis: Text, **opts) -> float:
@@ -133,7 +135,9 @@ def cer(reference: Text, hypothesis: Text, **opts) -> float:
 
 
 def wer(reference: Text, hypothesis: Text, **opts) -> float:
-    """jiwer.wer 호환. 띄어쓰기 차이는 오류로 센다 (한국어 WER의 한계)."""
+    """jiwer.wer 호환. 띄어쓰기 차이는 오류로 센다 (한국어 WER의 한계).
+    숫자 정규화는 기본으로 끈다: 3개 → 세 개처럼 어절 수가 바뀌어 단어 정렬이 어긋난다. numbers=True로 켤 수 있다."""
+    opts.setdefault("numbers", False)
     return _rate(reference, hypothesis, "word", **opts)
 
 
@@ -164,7 +168,8 @@ class Breakdown:
 
 def breakdown(reference: Text, hypothesis: Text, **opts) -> Breakdown:
     """raw → 공백 제거 → 공백·부호 제거 → kocer 네 단계로 채점해 오류가 어디서 사라지는지 개수로 센다.
-    각 단계는 정답과 결과에 똑같이 적용된다. opts는 cer()와 같다(aliases 등)."""
+    각 단계는 정답과 결과에 똑같이 적용된다. 분모는 단계마다 그 단계의 정답 글자 수(공백·부호 제거 뒤 두 단계는 같은 분모).
+    opts는 cer()와 같다(aliases 등)."""
     if isinstance(reference, str):
         reference, hypothesis = [reference], [hypothesis]
     if len(reference) != len(hypothesis):
@@ -177,7 +182,7 @@ def breakdown(reference: Text, hypothesis: Text, **opts) -> Breakdown:
         for i, lv in enumerate(levels):
             m = measure(r, h, **{**opts, **lv}) if lv else measure(r, h, **opts)
             E[i] += m.errors
-            N[i] += m.hits + m.substitutions + m.deletions
+            N[i] += m.ref_len
     cer = dict(zip(("raw", "nospace", "nopunct", "kocer"), (e / max(n, 1) for e, n in zip(E, N))))
     return Breakdown(len(reference), E[0], E[0] - E[1], E[1] - E[2], E[2] - E[3], E[3], cer)
 
