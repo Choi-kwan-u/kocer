@@ -113,7 +113,7 @@ b.cer                             # {'raw':…, 'nospace':…, 'nopunct':…, 'k
 
 c = kocer.compare(refs, {"A": hyps_a, "B": hyps_b, "C": hyps_c}, n_boot=2000, seed=0)
 c.cer                             # CER per system
-c.pairs[("A", "B")]               # (CER A − CER B, 95% low, high), sentence-level paired bootstrap
+c.difference("A", "B")            # (CER A − CER B, 95% low, high), sentence-level paired bootstrap, either order
 c.significant("A", "B")           # is the difference non-zero?
 c.ranks["A"]                      # (best rank, worst rank, probability of rank 1)
 print(c)                          # table; uses numpy if installed, pure Python otherwise

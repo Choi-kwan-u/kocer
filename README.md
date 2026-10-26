@@ -109,7 +109,7 @@ b.cer                             # {'raw':…, 'nospace':…, 'nopunct':…, 'k
 
 c = kocer.compare(refs, {"A": hyps_a, "B": hyps_b, "C": hyps_c}, n_boot=2000, seed=0)
 c.cer                             # 시스템별 CER
-c.pairs[("A", "B")]               # (CER A − CER B, 95% 하한, 상한). 문장 단위 paired bootstrap
+c.difference("A", "B")            # (CER A − CER B, 95% 하한, 상한). 문장 단위 paired bootstrap, 순서 무관
 c.significant("A", "B")           # 차이가 0이 아닌가
 c.ranks["A"]                      # (순위 하한, 상한, 1위 확률)
 print(c)                          # 표로 출력. numpy가 있으면 빠르게, 없으면 순수 파이썬으로 계산
