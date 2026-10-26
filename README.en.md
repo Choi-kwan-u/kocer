@@ -13,7 +13,7 @@ A fair character error rate (CER) for Korean speech recognition. Differences in 
   <img alt="Stacked bars for 7 public Korean ASR settings, splitting plain CER errors into spacing, punctuation, number/Latin notation and real errors. 46 to 64 percent are notation." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-en-light.svg">
 </picture>
 
-You get the chart above for your own model in one call. Your existing CER stays as it is; kocer shows where those errors came from.
+You get one bar of the chart above for your own model in one call. Your existing CER stays as it is; kocer shows where those errors came from.
 
 > **Plain CER** compares the reference and the hypothesis character by character, including spaces and punctuation. This is what [jiwer](https://github.com/jitsi/jiwer)'s `cer()` and Hugging Face `evaluate`'s `cer` compute, and it is the `raw CER` in the output below.
 

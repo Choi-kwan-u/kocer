@@ -13,7 +13,7 @@
   <img alt="공개 한국어 ASR 모델 7개 설정의 기존 CER 오류를 띄어쓰기·문장부호·숫자/영문·진짜 오류로 나눈 누적 막대. 모델에 따라 46~64%가 표기 차이다." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-light.svg">
 </picture>
 
-위 그림을 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER은 그대로 두고, 그 오류가 어디서 왔는지 나눠 보여줍니다.
+위 그림의 막대 하나를 **내 모델 출력으로 한 줄에** 얻습니다. 기존 CER은 그대로 두고, 그 오류가 어디서 왔는지 나눠 보여줍니다.
 
 > **기존 CER**은 정답과 받아쓰기를 글자 그대로 비교한 값입니다. 띄어쓰기와 문장부호도 글자로 셉니다. [jiwer](https://github.com/jitsi/jiwer)의 `cer()`와 Hugging Face `evaluate`의 `cer`가 이렇게 계산하고, 아래 출력의 `raw CER`이 이 값입니다.
 
