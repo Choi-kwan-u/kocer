@@ -200,7 +200,7 @@ Seven public Korean ASR settings were run on Zeroth, FLEURS, Common Voice 27 and
 
 - On Zeroth, FLEURS and Common Voice (1,418 utterances), **46–64% of what plain CER counts as errors is notation**, mostly spacing and punctuation.
 - Where the transcripts give numbers both ways, picking one side as the reference moves CER with spacing and punctuation removed by 2.9–4.8 points per model (telephone set; at most 0.04 points with kocer), and on sentences with numbers it can reverse the direction of a two-model comparison ([table above](#why-it-is-needed)). Averaged over everything, the effect shrinks because most sentences have no numbers.
-- To check that normalization does not hide real errors, 100 sentences with plain CER > 0 and kocer CER = 0 were read by hand (14 involved the number step). None hid a recognition error; one was ambiguous, a spacing-induced homograph.
+- To check that normalization does not hide real errors, 100 sentences with plain CER > 0 and kocer CER = 0 were read by hand (14 involved the number step). None hid a recognition error; one was ambiguous, a spacing-induced homograph. For 0.4.0, 100 more sentences where only the number/Latin step makes the sentence correct were read: 0 hidden errors, 1 ambiguous (the same kind: `일 세기 전`/`1세기 전`).
 
 Per-model scores, CER at each level, confidence intervals, decoding settings and scripts are in [benchmarks/](benchmarks/README.md). KsponSpeech and telephone results use the "Korean speech" and "Low-quality telephone network speech recognition" data from AI-Hub, provided by the National Information Society Agency (NIA); under its terms only score tables are published.
 
