@@ -140,6 +140,15 @@ def test_compare_identical_systems_not_significant():
     assert not c.significant("a", "b")
 
 
+def test_significant_is_symmetric():
+    from kocer.compare import Comparison
+    c = Comparison(cer={"A": .1, "B": .1}, pairs={("B", "A"): (-0.0015, -0.0110, 0.0083)},
+                   ranks={}, n=10, n_boot=10, confidence=0.95)
+    assert not c.significant("B", "A") and not c.significant("A", "B")
+    c.pairs = {("B", "A"): (0.10, 0.05, 0.15)}
+    assert c.significant("A", "B") and c.significant("B", "A")
+
+
 def test_compare_input_checks():
     with pytest.raises(ValueError):
         kocer.compare(["가"], {"only": ["가"]})

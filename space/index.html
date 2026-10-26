@@ -56,7 +56,7 @@ async function boot() {
   try {
     py = await loadPyodide();
     await py.loadPackage("micropip");
-    await py.pyimport("micropip").install("kocer==0.3.0");
+    await py.pyimport("micropip").install("kocer==0.3.1");
     py.FS.writeFile("demo_core.py", await (await fetch("demo_core.py")).text());
     const core = py.pyimport("demo_core");
     score = core.score;

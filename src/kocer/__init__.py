@@ -14,7 +14,7 @@ from .normalize import normalize as _normalize
 from .normalize import resolve_dual as _resolve_dual
 from .normalize import strip_aihub_tags as _strip_aihub
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __all__ = ["cer", "wer", "measure", "breakdown", "compare", "Result", "Breakdown", "Comparison", "ALIASES"]
 
 Text = Union[str, Sequence[str]]

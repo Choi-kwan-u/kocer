@@ -242,7 +242,7 @@ CER 8.60% (raw) / 2.93% (kocer 0.3.0)
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.3.0},
+  version = {0.3.1},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

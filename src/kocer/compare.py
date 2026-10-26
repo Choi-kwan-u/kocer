@@ -21,7 +21,11 @@ class Comparison:
 
     def significant(self, a: str, b: str) -> bool:
         """a와 b의 차이가 신뢰구간 기준으로 0이 아닌가."""
-        d, lo, hi = self.pairs[(a, b)] if (a, b) in self.pairs else tuple(-x for x in reversed(self.pairs[(b, a)]))
+        if (a, b) in self.pairs:
+            d, lo, hi = self.pairs[(a, b)]
+        else:
+            d, lo, hi = self.pairs[(b, a)]
+            d, lo, hi = -d, -hi, -lo
         return lo > 0 or hi < 0
 
     def __str__(self) -> str:

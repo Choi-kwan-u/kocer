@@ -1,2 +1,2 @@
-kocer[fast]==0.3.0
+kocer[fast]==0.3.1
 huggingface_hub<1.0  # gradio 4.44.1은 HfFolder를 씀 (hub 1.0에서 제거됨)
