@@ -122,7 +122,7 @@ With the pronunciation reference and nospace+punct scoring the Qwen3-ASR base ra
 |---|---|---|---|---|---|
 | greedy, no repetition penalty (main tables) | **9.62** | **3.10** | **4.31** | **3.88** | **5.36** |
 | model-card settings | 10.05 | 3.43 | 4.90 | 4.15 | 6.26 |
-| card − greedy, 95% CI | +0.43 [−0.49, +1.02] | +0.34 [+0.21, +0.46] | +0.58 [+0.39, +0.77] | +0.27 [+0.13, +0.42] | +0.90 [+0.78, +1.02] |
+| card − greedy, 95% CI | +0.43 [−0.49, +1.02] | +0.34 [+0.21, +0.46] | +0.59 [+0.39, +0.78] | +0.27 [+0.13, +0.42] | +0.90 [+0.78, +1.02] |
 | runaway utterances (greedy → card) | 19 → 17 | 0 → 0 | 0 → 0 | 0 → 0 | 0 → 0 |
 
    BuzzASR stays 4th on KsponSpeech and 1st on Common Voice either way. Details: `results/decoding_check.md` (`scripts/decoding_check.py`); public-set outputs with the card settings are in `results/_buzzasr-korean-cardgen/`. The telephone column is from the section below.
