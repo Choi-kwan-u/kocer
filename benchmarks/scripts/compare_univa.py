@@ -17,7 +17,7 @@ def card_norm(s, keep_space):
     s = _ws.sub(" " if keep_space else "", s).strip()
     return s
 
-def en(m): return sum(m.ops.values()), m.hits + m.ops["S"] + m.ops["D"]
+def en(m): return sum(m.ops.values()), m.ref_len  # kocer >= 0.4.0: 분모는 정답만으로 정해짐
 
 LEVELS = ["raw", "card (punct+case, spaces kept)", "card + spaces removed", "kocer"]
 def levels(ref, hyp):

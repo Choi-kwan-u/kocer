@@ -224,3 +224,13 @@ def test_wer_numbers_off_by_default():
     assert kocer.wer("사과 세 개", "사과 3개") > 0
     assert kocer.wer("오늘 3시", "오늘 3시", numbers=True) == 0
 
+
+
+def test_compare_difference_is_sign_consistent():
+    refs = ["사과 세 개 주세요", "세 시 삼십 분", "오늘 날씨 좋다", "네 알겠습니다"] * 25
+    good = ["사과 3개 주세요", "3시 30분", "오늘 날씨 좋다", "네 알겠습니다"] * 25
+    bad = ["사과 네 개 주세요", "3시 13분", "오늘 날씨 춥다", "네 알겠어요"] * 25
+    c = kocer.compare(refs, {"good": good, "bad": bad}, n_boot=300)
+    d, lo, hi = c.difference("bad", "good")
+    d2, lo2, hi2 = c.difference("good", "bad")
+    assert (d, lo, hi) == pytest.approx((-d2, -hi2, -lo2)) and lo <= d <= hi and d > 0

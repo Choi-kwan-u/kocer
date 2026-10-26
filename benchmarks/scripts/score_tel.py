@@ -23,7 +23,7 @@ H = {SHORT[t]: [hyp[t][i] for i in ids] for t in TAGS}
 def corpus(rs, hs, **o):
     E = N = 0
     for r, h in zip(rs, hs):
-        m = kocer.measure(r, h, **o); E += m.errors; N += m.hits + m.substitutions + m.deletions
+        m = kocer.measure(r, h, **o); E += m.errors; N += m.ref_len
     return E / max(N, 1) * 100
 
 LEVELS = [("raw", dict(normalize=False)), ("nospace+punct", dict(numbers=False, letters=False, dual=False)), ("kocer", {})]
@@ -71,7 +71,7 @@ for rk in ["spelling", "pronunciation"]:
 # runaway outputs (criterion: sentence kocer errors > normalized reference length)
 out.append("\n## Runaway outputs (sentence kocer CER > 1, spelling reference)\n")
 for s, hs in H.items():
-    n = sum(1 for r, h in zip(refs["spelling"], hs) if (lambda m: m.errors > m.hits + m.substitutions + m.deletions)(kocer.measure(r, h)))
+    n = sum(1 for r, h in zip(refs["spelling"], hs) if (lambda m: m.errors > m.ref_len)(kocer.measure(r, h)))
     out.append(f"- {s}: {n}")
 
 txt = "\n".join(out)

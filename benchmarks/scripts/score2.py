@@ -16,7 +16,7 @@ LEVELS = ["raw", "nospace", "nopunct", "kocer"]
 DATASETS = [d for d in ["zeroth", "fleurs", "commonvoice"] if os.path.exists(os.path.join(ROOT, "data", d, "test.jsonl"))]
 _ws = re.compile(r"\s+")
 
-def en(m): return sum(m.ops.values()), m.hits + m.ops["S"] + m.ops["D"]
+def en(m): return sum(m.ops.values()), m.ref_len  # kocer >= 0.4.0: 분모는 정답만으로 정해짐
 def sent(ref, hyp):
     r1, h1 = _ws.sub("", ref), _ws.sub("", hyp)
     return [en(kocer.measure(ref, hyp, normalize=False)),
@@ -119,7 +119,7 @@ for name in ["raw", "nopunct", "kocer"]:
 
 txt = "\n".join(out)
 open(os.path.join(ROOT, "results", "tables2.md"), "w", encoding="utf-8").write(txt + "\n")
-json.dump(dict(scores=scores, pairs=pair_stats, levels=LEVELS, kocer_version="0.1.2 + local patch (counter 주 both readings; standalone native forms)"), open(os.path.join(ROOT, "results", "scores2.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+json.dump(dict(scores=scores, pairs=pair_stats, levels=LEVELS, kocer_version=kocer.__version__), open(os.path.join(ROOT, "results", "scores2.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 json.dump(common_ids, open(os.path.join(ROOT, "results", "common_ids.json"), "w", encoding="utf-8"))
 with open(os.path.join(ROOT, "results", "fake_error_pool.jsonl"), "w", encoding="utf-8") as f:
     for r in fake_pool: f.write(json.dumps(r, ensure_ascii=False) + "\n")

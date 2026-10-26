@@ -15,7 +15,7 @@ REFS = {"spelling": "ref", "pronunciation": "ref_pron"}
 LEVELS = ["raw", "nospace", "nopunct", "kocer", "kocer+fillers"]
 _ws = re.compile(r"\s+")
 
-def en(m): return sum(m.ops.values()), m.hits + m.ops["S"] + m.ops["D"]
+def en(m): return sum(m.ops.values()), m.ref_len  # kocer >= 0.4.0: 분모는 정답만으로 정해짐
 def levels(ref, hyp):
     return [en(kocer.measure(ref, hyp, normalize=False)),
             en(kocer.measure(_ws.sub("", ref), _ws.sub("", hyp), normalize=False)),

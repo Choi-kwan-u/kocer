@@ -14,7 +14,7 @@ OTHERS = ["qwen3-asr-1.7b-ko-univa-release", "qwen3-asr-1.7b-ko-univa", "qwen3-a
 PUBLIC = ["zeroth", "fleurs", "commonvoice"]; KSPON = ["kspon_clean", "kspon_other"]
 _ws = re.compile(r"\s+")
 def jl(p): return [json.loads(l) for l in open(p, encoding="utf-8")]
-def en(m): return sum(m.ops.values()), m.hits + m.ops["S"] + m.ops["D"]
+def en(m): return sum(m.ops.values()), m.ref_len  # kocer >= 0.4.0: 분모는 정답만으로 정해짐
 
 ids = json.load(open(os.path.join(ROOT, "results", "common_ids.json"), encoding="utf-8"))
 def pairs(ds):

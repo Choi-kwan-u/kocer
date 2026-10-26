@@ -28,6 +28,13 @@ class Comparison:
             d, lo, hi = -d, -hi, -lo
         return lo > 0 or hi < 0
 
+    def difference(self, a: str, b: str) -> Tuple[float, float, float]:
+        """(CER a − CER b, 하한, 상한). 저장된 방향의 반대로 물어도 부호를 맞춰 돌려준다."""
+        if (a, b) in self.pairs:
+            return self.pairs[(a, b)]
+        d0, lo0, hi0 = self.pairs[(b, a)]
+        return (-d0, -hi0, -lo0)
+
     def __str__(self) -> str:
         order = sorted(self.cer, key=self.cer.get)
         w = max(len(s) for s in order)

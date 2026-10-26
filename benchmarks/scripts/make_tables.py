@@ -61,8 +61,8 @@ for t in models:
         re_, rn, ke, kn = [], [], [], []
         for r in rows:
             a = kocer.measure(r["ref"], r["hyp"], normalize=False); b = kocer.measure(r["ref"], r["hyp"])
-            re_.append(sum(a.ops.values())); rn.append(a.hits + a.ops["S"] + a.ops["D"])
-            ke.append(sum(b.ops.values())); kn.append(b.hits + b.ops["S"] + b.ops["D"])
+            re_.append(sum(a.ops.values())); rn.append(a.ref_len)
+            ke.append(sum(b.ops.values())); kn.append(b.ref_len)
         re_, rn, ke, kn = map(np.array, (re_, rn, ke, kn)); N = len(rows)
         diffs = []
         for _ in range(1000):

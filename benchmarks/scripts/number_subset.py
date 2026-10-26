@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(__file__)); from common import ROOT
 TAGS = ["qwen3-asr-1.7b-ko-univa-release", "qwen3-asr-1.7b-ko-univa", "qwen3-asr-1.7b", "buzzasr-korean",
         "whisper-large-v3", "sensevoice-small-itn", "sensevoice-small-noitn"]
 def jl(p): return [json.loads(l) for l in open(p, encoding="utf-8")]
-def en(m): return sum(m.ops.values()), m.hits + m.ops["S"] + m.ops["D"]
+def en(m): return sum(m.ops.values()), m.ref_len  # kocer >= 0.4.0: 분모는 정답만으로 정해짐
 digit = re.compile(r"\d")
 
 sets = {}

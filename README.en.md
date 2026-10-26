@@ -10,7 +10,7 @@ A fair character error rate (CER) for Korean speech recognition. Differences in 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-en-dark.svg">
-  <img alt="Stacked bars for 7 public Korean ASR settings, splitting plain CER errors into spacing, punctuation, number/Latin notation and real errors. 46 to 68 percent are notation." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-en-light.svg">
+  <img alt="Stacked bars for 7 public Korean ASR settings, splitting plain CER errors into spacing, punctuation, number/Latin notation and real errors. 46 to 64 percent are notation." src="https://raw.githubusercontent.com/Choi-kwan-u/kocer/main/docs/breakdown-en-light.svg">
 </picture>
 
 You get the chart above for your own model in one call. Your existing CER stays as it is; kocer shows where those errors came from.
@@ -20,11 +20,11 @@ You get the chart above for your own model in one call. Your existing CER stays 
 ```python
 >>> import kocer
 >>> print(kocer.breakdown(refs, hyps))      # whisper-large-v3, Zeroth test, 457 utterances
-raw CER 8.60%  →  kocer CER 2.93%   (2,191 raw errors, 457 pairs, kocer 0.3.0)
-띄어쓰기     1,142   52%  █████████████████████
-문장부호       226   10%  ████
-숫자·영문      258   12%  █████
-진짜 오류      565   26%  ██████████
+raw CER 6.88%  →  kocer CER 2.90%   (1,753 raw errors, 457 pairs, kocer 0.4.0)
+띄어쓰기       704   40%  ████████████████
+문장부호       226   13%  █████
+숫자·영문      263   15%  ██████
+진짜 오류      560   32%  █████████████
 ```
 
 The four rows are spacing, punctuation, number/Latin notation and real errors. They always add up to the raw error count.
@@ -52,9 +52,9 @@ Even with spacing and punctuation removed, the conclusion flips with the referen
 - Data: 628 utterances containing numbers from the AI-Hub KsponSpeech eval set. This corpus writes numbers both ways, as in `(3시)/(세 시)`, so two references can be built for the same audio.
 - Models: [Qwen/Qwen3-ASR-1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B) and its Korean fine-tune [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko).
 - Spacing and punctuation removed (nlptutti style): with the digit reference the fine-tune is 8.50 points better; with the Hangul reference it is 4.13 points worse.
-- kocer: the fine-tune is 2.34 points better with the digit reference and 2.36 points better with the Hangul reference.
+- kocer: the fine-tune is 2.32 points better with the digit reference and 2.41 points better with the Hangul reference.
 - All four differences have sentence-level paired bootstrap 95% intervals that exclude zero.
-- The same happens on AI-Hub telephone speech (408 utterances with numbers). With spacing and punctuation removed, the fine-tune is 6.58 points better with the digit reference and not distinguishable from the base with the Hangul reference (0.47 points). With kocer it is better with both (3.82 and 3.55 points).
+- The same happens on AI-Hub telephone speech (408 utterances with numbers). With spacing and punctuation removed, the fine-tune is 6.58 points better with the digit reference and not distinguishable from the base with the Hangul reference (0.47 points). With kocer it is better with both (3.79 and 3.66 points).
 
 See [benchmarks/](benchmarks/README.md) for the full numbers.
 
@@ -104,6 +104,7 @@ r.ops         # {'S': 0, 'D': 0, 'I': 0}
 r.alignment   # [('H', '세', '세'), ...]
 r.chosen_ref  # the reading chosen for the reference
 r.chosen_hyp  # '세시 삼십분'
+r.ref_len     # 5: the denominator, the normalized reference length; the same whatever the hypothesis
 
 b = kocer.breakdown(refs, hyps)
 b.spacing, b.punctuation, b.numbers_letters, b.remaining   # sums to b.raw_errors
@@ -137,7 +138,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 | 사과 세 개 주세요 | 사과 **네** 개 주세요 | 0.100 | 0.143 | 0.143 |
 | 세 시 삼십 분 | 3시 **13**분 | 0.625 | 0.600 | 0.400 |
 
-The last two rows are real recognition errors ("four apples", "3:13"), and kocer counts them. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.3.0, all with default settings.
+The last two rows are real recognition errors ("four apples", "3:13"), and kocer counts them. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.4.0, all with default settings.
 
 If you need entity or keyword error rates, or a quality gate that fails CI below a threshold, nlptutti is the better tool. The two work fine side by side.
 
@@ -163,33 +164,33 @@ For `오십 퍼센트` / `50%` ("fifty percent"), jiwer and nlptutti give 1.000 
 
 ## Scoring rules
 
-Spacing and punctuation are removed, and numbers and acronyms are scored against the reading that gives the lowest CER. Every step can be turned off, and the plain CER (`raw_cer`) is always returned alongside. Normalization can hide real errors, so report both values.
+kocer measures whether two strings **read as the same words**, not whether they are spelled the same. Spacing and punctuation are removed, and numbers, acronyms and unit symbols are scored against the reading that gives the lowest CER. Every step can be turned off, and the plain CER (`raw_cer`) is always returned alongside. Normalization can hide real errors, and sometimes the spelling itself is the product (subtitles), so report both values.
 
 <details>
 <summary>Steps, number candidates, formula</summary>
 
 | Step | Default | Switch | Example |
 |---|---|---|---|
-| Unicode NFC | on | - | decomposed jamo input |
+| Unicode NFKC, zero-width characters removed | on | - | decomposed jamo input, full-width `ＡＩ` = `AI`, `㎞` = `km`, BOM and `\u200b` dropped |
 | Remove punctuation | on | `punct=False` | `네, 알겠습니다.` = `네 알겠습니다` |
 | Remove fillers (음, 어, 그) | **off** | `fillers=True` | off by default because "그" is also a real word |
-| Acronyms and units | on | `letters=False` | `AI` = `에이아이`, `NASA` = `나사`, `50%` = `50퍼센트` |
-| Number candidates | on | `numbers=False` | `3개` = `세 개`, `3층` = `삼 층` |
+| Acronyms and units | on | `letters=False` | `AI` = `ai` = `에이아이`, `CEO` = `씨이오`, `NASA` = `나사`, `50%` = `오십 퍼센트` = `50프로`, `5m` = `오 미터`, `C4` = `씨포` |
+| Number candidates | on | `numbers=False` | `3개` = `세 개`, `3층` = `삼 층`, `3:30` = `세 시 삼십 분`, `-5도` = `영하 오 도`, `$100` = `백 달러`, `6월` = `유월`, `1만` = `만` |
 | AI-Hub dual transcripts | on | `dual=False` | `(7시)/(일곱 시)` = `7시` = `일곱 시` |
-| Strip AI-Hub noise tags and marks | **off** | `aihub=True` | removes `b/`, `n/`, `어/`, `+`, `*`; off by default to keep things like `C++` intact |
-| Remove spaces | CER only | - | WER keeps spaces |
+| Strip AI-Hub noise tags and marks | **off** | `aihub=True` | removes `b/`, `n/`, `어/`, `+`, `*`, `(NO:)`, `/(noise)`, `@웃음`; masking tags (`@이름1`, `&이름&`) are kept (see Limitations); off by default to keep things like `C++` intact |
+| Remove spaces | CER only | - | WER keeps spaces. WER also leaves number candidates off by default (`3개` → `세 개` changes the word count) |
 
-`normalize=False` returns the same plain CER as jiwer.
+`normalize=False` returns the same plain CER as jiwer (only outer whitespace is stripped).
 
 **Numbers: a set of candidates, not one answer.** Because the reading depends on the counter word, no single rule produces the right reference. kocer builds candidates for every number, `{digits as written, Sino-Korean reading, native Korean reading, digit-by-digit reading}`, and picks the combination with the lowest CER.
 
-- If the counter word is in the counter dictionary ([counters.py](src/kocer/counters.py)), only its reading is allowed; otherwise both readings are accepted.
+- If the counter word is in the counter dictionary ([counters.py](src/kocer/counters.py)), only its reading is allowed; otherwise both readings are accepted. With a native counter and a number of 20 or more, the Sino-Korean reading is accepted too (`35명` = `삼십오 명` = `서른다섯 명`).
 - It works in both directions: Hangul in the reference and digits in the hypothesis, or the reverse.
-- Phone numbers and years also get the digit-by-digit reading (010 = 공일공, 2024 = 이공이사).
-- Native readings cover 1 to 99, in both the attributive form (세, 스무) and the standalone form (셋, 스물). Decimals accept `점` only, not the colloquial `쩜`.
+- Phone numbers and years also get the digit-by-digit reading (`010` = `공일공` = `영일영`, `2024` = `이공이사`). For two- and three-digit numbers it is allowed only when no counter word follows: `34일` (the 34th) and `삼 사 일` (three or four days) are different words.
+- Native readings cover 1 to 99, in both the attributive form (세, 스무) and the standalone form (셋, 스물). Decimals accept `점` only, not the colloquial `쩜`. `6월` = `유월`, `10월` = `시월`, `1번째` = `첫 번째`.
 - If there are more than 64 candidate combinations, each number span is optimized separately.
 
-**Formula.** CER = (substitutions + deletions + insertions) / reference characters. Normalization is applied to both sides in the same order, and characters are counted with spaces removed. The denominator is the normalized reference length, so `raw_cer` and `cer` have different denominators. Do not compare them as ratios; use `breakdown()` for error counts. Results are deterministic.
+**Formula.** CER = (substitutions + deletions + insertions) / reference characters. Normalization is applied to both sides in the same order, and characters are counted with spaces removed. The denominator (`ref_len`) is the length of the reference normalized as written, independent of candidate selection, so the same sentence gets the same denominator however the model wrote its numbers (dual transcripts: the spelling side). `raw_cer` keeps spaces in its denominator, so do not compare the two as ratios; use `breakdown()` for error counts. Results are deterministic.
 
 </details>
 
@@ -197,8 +198,8 @@ Spacing and punctuation are removed, and numbers and acronyms are scored against
 
 Seven public Korean ASR settings were run on Zeroth, FLEURS, Common Voice 27 and KsponSpeech (7,418 utterances in total), and the same outputs were scored at four normalization levels. AI-Hub telephone speech (1,936 utterances) was checked separately.
 
-- On Zeroth, FLEURS and Common Voice (1,418 utterances), **46–68% of what plain CER counts as errors is notation**, mostly spacing and punctuation.
-- Where the transcripts give numbers both ways, picking one side as the reference moves CER with spacing and punctuation removed by 2.9–4.8 points per model (telephone set; at most 0.33 points with kocer), and on sentences with numbers it can reverse the direction of a two-model comparison ([table above](#why-it-is-needed)). Averaged over everything, the effect shrinks because most sentences have no numbers.
+- On Zeroth, FLEURS and Common Voice (1,418 utterances), **46–64% of what plain CER counts as errors is notation**, mostly spacing and punctuation.
+- Where the transcripts give numbers both ways, picking one side as the reference moves CER with spacing and punctuation removed by 2.9–4.8 points per model (telephone set; at most 0.04 points with kocer), and on sentences with numbers it can reverse the direction of a two-model comparison ([table above](#why-it-is-needed)). Averaged over everything, the effect shrinks because most sentences have no numbers.
 - To check that normalization does not hide real errors, 100 sentences with plain CER > 0 and kocer CER = 0 were read by hand (14 involved the number step). None hid a recognition error; one was ambiguous, a spacing-induced homograph.
 
 Per-model scores, CER at each level, confidence intervals, decoding settings and scripts are in [benchmarks/](benchmarks/README.md). KsponSpeech and telephone results use the "Korean speech" and "Low-quality telephone network speech recognition" data from AI-Hub, provided by the National Information Society Agency (NIA); under its terms only score tables are published.
@@ -208,13 +209,13 @@ Per-model scores, CER at each level, confidence intervals, decoding settings and
 
 | Model | Zeroth | FLEURS | Common Voice 27 | KsponSpeech clean / other | Telephone (HR) |
 |---|---|---|---|---|---|
-| TeamUNIVA/qwen3_asr_1.7b_ko | 2.37 | **4.25** | 6.00 | **6.10 / 6.48** | 5.76 |
-| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.46 | 4.31 | 6.08 | 6.81 / 7.26 | 9.17 |
-| BuzzASR/korean | 3.16 | 4.72 | **3.88** | 10.14 / 9.41 | 5.61 |
-| openai/whisper-large-v3 | 2.93 | 4.37 | 5.80 | 11.07 / 11.87 | **5.02** |
-| Qwen/Qwen3-ASR-1.7B | 2.91 | 4.31 | 6.61 | 8.70 / 8.59 | 10.76 |
-| SenseVoiceSmall (itn on) | **2.40** | 6.95 | 9.68 | 13.28 / 13.82 | 21.30 |
-| SenseVoiceSmall (itn off) | 2.41 | 6.91 | 9.72 | 13.09 / 13.72 | 21.55 |
+| TeamUNIVA/qwen3_asr_1.7b_ko | 2.34 | **4.19** | 6.00 | **6.09 / 6.46** | 5.75 |
+| TeamUNIVA/qwen3_asr_1.7b_ko_beta | 2.44 | 4.25 | 6.08 | 6.80 / 7.24 | 9.12 |
+| BuzzASR/korean | 3.10 | 4.31 | **3.88** | 10.07 / 9.30 | 5.36 |
+| openai/whisper-large-v3 | 2.90 | 4.25 | 5.80 | 11.06 / 11.86 | **5.02** |
+| Qwen/Qwen3-ASR-1.7B | 2.90 | 4.25 | 6.61 | 8.69 / 8.58 | 10.75 |
+| SenseVoiceSmall (itn on) | **2.40** | 6.83 | 9.68 | 13.28 / 13.79 | 21.33 |
+| SenseVoiceSmall (itn off) | 2.41 | 6.79 | 9.72 | 13.09 / 13.69 | 21.53 |
 
 In %, pooled errors / pooled reference characters. KsponSpeech and telephone use the spelling-side reference. Telephone is the HR domain of the AI-Hub low-quality telephone validation split (calls from job seekers and enquiries about corporate training), 1,936 utterances. No model wins everywhere; each is strongest on data close to its training set (BuzzASR on Common Voice, TeamUNIVA apparently on KsponSpeech). On telephone speech whisper-large-v3 was strongest, and BuzzASR, fine-tuned from it on read speech (FLEURS, Common Voice), did not beat it (cause not investigated). All decoding is greedy. Re-running BuzzASR with its model-card settings (repetition penalties) made all five test sets worse ([details](benchmarks/README.md)).
 
@@ -225,15 +226,17 @@ In %, pooled errors / pooled reference characters. KsponSpeech and telephone use
 - Notation differences other than numbers and acronyms (colloquial contractions, spelling as pronounced) are counted as errors.
 - Acronym handling could not be validated, because the public test sets contain almost no Latin text. The measured effect comes from numbers.
 - The built-in acronym dictionary has 16 entries. Pass acronyms that are read as words through `aliases`.
-- Only `%`, `km`, `kg`, `cm`, `mm` and `ml` are converted as unit symbols, and the counter dictionary is incomplete. Pull requests that add cases to [tests/cases.tsv](tests/cases.tsv) are welcome.
+- Only `%`, `m`, `cm`, `mm`, `km`, `g`, `kg`, `ml`, `℃` and the currency signs `$ ₩ € £ ¥` are read as units, and the counter dictionary is incomplete. Pull requests that add cases to [tests/cases.tsv](tests/cases.tsv) are welcome.
 - WER counts spacing differences as errors. For Korean, CER is recommended.
+- AI-Hub masking tags (`@이름1`, `&이름&`) are not removed even with `aihub=True`: removing them would turn every real name the model transcribed into insertions. Leave those utterances out.
+- Split long documents into sentences. Alignment is quadratic in length, so thousands of characters in one string are slow and memory-hungry.
 
 ## Citing and reporting
 
-Please report the version with any score. Normalization rules change between versions, so the same outputs can score differently. Reporting `raw_cer` as well makes your numbers comparable with other tools.
+Please report the version with any score. Normalization rules change between versions, so the same outputs can score differently. 0.4.0 changed the denominator and the candidate rules, so do not mix its scores with 0.3 or earlier ([CHANGELOG](CHANGELOG.md)). Reporting `raw_cer` as well makes your numbers comparable with other tools.
 
 ```
-CER 8.60% (raw) / 2.93% (kocer 0.3.0)
+CER 6.88% (raw) / 2.90% (kocer 0.4.0)
 ```
 
 Use "Cite this repository" on the right side of the repo page to copy a citation ([CITATION.cff](CITATION.cff)).
@@ -246,7 +249,7 @@ Use "Cite this repository" on the right side of the repo page to copy a citation
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.3.1},
+  version = {0.4.0},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

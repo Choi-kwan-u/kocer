@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kocer"
-version = "0.3.1"
+version = "0.4.0"
 description = "한국어 STT를 공정하게 채점하는 CER/WER — 띄어쓰기·숫자·문장부호 차이를 오류로 세지 않음"
 readme = "README.md"
 license = "MIT"
