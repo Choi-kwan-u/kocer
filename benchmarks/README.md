@@ -15,7 +15,7 @@ Model names used here: **Qwen3-ASR base** = [Qwen/Qwen3-ASR-1.7B](https://huggin
 Re-score with the installed kocer:
 
 ```bash
-pip install "kocer[fast]==0.4.0" numpy nlptutti
+pip install "kocer[fast]==0.4.1" numpy nlptutti
 python scripts/score2.py      # expects data/<dataset>/test.jsonl from the download scripts
 ```
 

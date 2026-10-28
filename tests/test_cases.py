@@ -234,3 +234,22 @@ def test_compare_difference_is_sign_consistent():
     d, lo, hi = c.difference("bad", "good")
     d2, lo2, hi2 = c.difference("good", "bad")
     assert (d, lo, hi) == pytest.approx((-d2, -hi2, -lo2)) and lo <= d <= hi and d > 0
+
+
+def test_rapidfuzz_alignment_matches_pure_python_error_count():
+    pytest.importorskip("rapidfuzz")
+    import random
+    import importlib
+    al = importlib.import_module("kocer.align")
+    assert al.align is al._align_rf
+    rng = random.Random(0)
+    chars = list("가나다라마 바사아")
+    for _ in range(300):
+        a = [rng.choice(chars) for _ in range(rng.randint(0, 30))]
+        b = [rng.choice(chars) for _ in range(rng.randint(0, 30))]
+        for ops in (al._align_rf(a, b), al._align_py(a, b)):
+            assert [r for op, r, _ in ops if op != "I"] == a and [h for op, _, h in ops if op != "D"] == b
+            assert all((op == "H") == (r == h) for op, r, h in ops if op in "HS")
+        assert sum(op != "H" for op, _, _ in al._align_rf(a, b)) == sum(op != "H" for op, _, _ in al._align_py(a, b))
+    words = (["오늘", "날씨", "좋다"], ["오늘", "춥다"])
+    assert sum(op != "H" for op, _, _ in al._align_rf(*words)) == 2

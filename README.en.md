@@ -229,7 +229,7 @@ In %, pooled errors / pooled reference characters. KsponSpeech and telephone use
 - Only `%`, `m`, `cm`, `mm`, `km`, `g`, `kg`, `ml`, `℃` and the currency signs `$ ₩ € £ ¥` are read as units, and the counter dictionary is incomplete. Pull requests that add cases to [tests/cases.tsv](tests/cases.tsv) are welcome.
 - WER counts spacing differences as errors. For Korean, CER is recommended.
 - AI-Hub masking tags (`@이름1`, `&이름&`) are not removed even with `aihub=True`: removing them would turn every real name the model transcribed into insertions. Leave those utterances out.
-- Split long documents into sentences. Alignment is quadratic in length, so thousands of characters in one string are slow and memory-hungry.
+- Use `kocer[fast]` for long text (8,200 characters in one string: 0.03 s). Without rapidfuzz, the pure-Python alignment is quadratic in length, so thousands of characters in one string are slow and memory-hungry; split them into sentences in that case.
 
 ## Citing and reporting
 
@@ -249,7 +249,7 @@ Use "Cite this repository" on the right side of the repo page to copy a citation
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.4.0},
+  version = {0.4.1},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

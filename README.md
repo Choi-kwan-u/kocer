@@ -62,7 +62,7 @@ raw CER 6.88%  →  kocer CER 2.90%   (1,753 raw errors, 457 pairs, kocer 0.4.0)
 
 ```bash
 pip install kocer          # 순수 파이썬, 의존성 없음
-pip install "kocer[fast]"  # rapidfuzz로 수십 배 빠름. 긴 문장을 많이 잴 때 권장
+pip install "kocer[fast]"  # rapidfuzz로 수십 배 빠름. 많이 재거나 긴 글을 잴 때 권장
 ```
 
 ## 사용
@@ -225,7 +225,7 @@ kocer는 글자가 같은지가 아니라 **읽으면 같은 말인지**를 잽�
 - 단위는 `%`, `m`, `cm`, `mm`, `km`, `g`, `kg`, `ml`, `℃`, 통화 기호 `$ ₩ € £ ¥`만 읽습니다. 조수사 사전도 완전하지 않습니다. [tests/cases.tsv](tests/cases.tsv)에 케이스를 추가하는 PR을 환영합니다.
 - WER은 띄어쓰기 차이를 오류로 셉니다. 한국어에서는 CER을 권합니다.
 - AI-Hub 가림 태그(`@이름1`, `&이름&`)는 `aihub=True`로도 지우지 않습니다. 지우면 모델이 받아쓴 실제 이름이 전부 삽입 오류가 되기 때문입니다. 그런 문장은 빼고 재세요.
-- 긴 문서는 문장 단위로 나눠 넣으세요. 정렬이 글자 수의 제곱에 비례해서 수천 자를 한 덩어리로 넣으면 느리고 메모리를 많이 씁니다.
+- 긴 글은 `kocer[fast]`로 재세요(8,200자 한 덩어리 0.03초). rapidfuzz 없이 순수 파이썬으로는 정렬이 글자 수의 제곱에 비례해서, 수천 자를 한 덩어리로 넣으면 느리고 메모리를 많이 씁니다. 그때는 문장 단위로 나눠 넣으세요.
 
 ## 인용과 보고
 
@@ -245,7 +245,7 @@ CER 6.88% (raw) / 2.90% (kocer 0.4.0)
   author  = {Choi, Kwan-u},
   title   = {kocer: fair CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.4.0},
+  version = {0.4.1},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

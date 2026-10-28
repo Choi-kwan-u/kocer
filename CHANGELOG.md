@@ -2,6 +2,13 @@
 
 점수가 바뀌는 수정은 마이너 버전(0.x.0)에 "채점 규칙 변경"으로 표시한다. 점수가 안 바뀌는 수정(버그, 속도, 문서)은 패치 버전(0.x.y).
 
+## 0.4.1 (2026-10-28)
+
+점수는 바뀌지 않는다. 공개·AI-Hub 벤치마크 전체를 다시 채점해 결과 파일이 바이트 단위로 같음을 확인했다.
+
+- **긴 입력이 빨라짐 ([#1](https://github.com/Choi-kwan-u/kocer/issues/1)).** rapidfuzz가 있으면(`kocer[fast]`) 정렬도 rapidfuzz로 한다. 전에는 후보 채점만 rapidfuzz였고 최종 정렬은 순수 파이썬 전체 행렬이었다. 8,200자 한 덩어리: `measure()` 76초·1.2 GB → 0.03초·2 MB, `breakdown()` 366초·2.2 GB → 0.10초·4 MB.
+- 편집거리가 같은 정렬이 여럿일 때 rapidfuzz와 순수 파이썬이 다른 경로를 고를 수 있다. 오류 총수, `cer`, `breakdown()`, `compare()`는 같고, `Result`의 S/D/I 내역과 `--diff` 색칠 위치만 다를 수 있다.
+
 ## 0.4.0 (2026-10-26) — 채점 규칙 변경
 
 같은 출력도 0.3.x와 점수가 다르다. 공개 벤치마크를 전부 다시 채점했고, 전후 비교는 [benchmarks/results/before_after_040.md](benchmarks/results/before_after_040.md)에 있다 (kocer CER 변화는 최대 0.4%p, 순위 변화는 FLEURS 3·4위 교대뿐).
