@@ -4,7 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/kocer)](https://pypi.org/project/kocer/) [![Python](https://img.shields.io/pypi/pyversions/kocer)](https://pypi.org/project/kocer/) [![tests](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml/badge.svg)](https://github.com/Choi-kwan-u/kocer/actions/workflows/tests.yml)
 
-A fair character error rate (CER) for Korean speech recognition. Differences in spacing, punctuation, number notation and Latin acronyms are not counted as errors.
+A character error rate (CER) for Korean speech recognition that scores whether the text reads the same, not whether it is spelled the same. Differences in spacing, punctuation, number notation (3개 = 세 개) and Latin acronyms (AI = 에이아이) are not counted as errors.
 
 **[Try it in your browser, no install →](https://choi-kwan-u.github.io/kocer/)** Paste references and ASR outputs to see plain CER, kocer CER and where the errors come from. The demo page is in Korean, but the input boxes and numbers work the same.
 
