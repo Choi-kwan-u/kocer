@@ -1394,6 +1394,7 @@
 {"model": "buzzasr-korean", "dataset": "fleurs", "id": "1672_6271140565544746922", "ref": "원단이 너무 뜨거워지지 않도록 주의하세요(원단이 수축하거나 그을릴 수 있습니다).", "hyp": "원단이 너무 뜨거워지지 않도록 주의하세요 원단이 수축하거나 그을릴 수 있습니다"}
 {"model": "buzzasr-korean", "dataset": "fleurs", "id": "1674_10667839008527105971", "ref": "일부 지역에서는 1분간 물을 끓이는 것으로 충분하다. 다른 지역에서는 수 분 동안 물을 끓일 필요가 있다.", "hyp": "일부 지역에서는 1분간 물을 끓이는 것으로 충분하다 다른 지역에서는 수분 동안 물을 끓일 필요가 있다"}
 {"model": "buzzasr-korean", "dataset": "fleurs", "id": "1674_1568771216237690102", "ref": "일부 지역에서는 1분간 물을 끓이는 것으로 충분하다. 다른 지역에서는 수 분 동안 물을 끓일 필요가 있다.", "hyp": "일부 지역에서는 1분간 물을 끓이는 것으로 충분하다 다른 지역에서는 수분 동안 물을 끓일 필요가 있다"}
+{"model": "buzzasr-korean", "dataset": "fleurs", "id": "1675_15954904112024043496", "ref": "당신이라는 의미의 Sie라는 단어와 함께 쓰이는 모든 명사는 문장의 중간에서도 항상 대문자로 시작된다.", "hyp": "당신이라는 의미의 si이라는 단어와 함께 쓰이는 모든 명사는 문장의 중간에서도 항상 대문자로 시작된다"}
 {"model": "buzzasr-korean", "dataset": "fleurs", "id": "1676_1441445080190694850", "ref": "모든 남아프리카 국립공원과 마찬가지로, 공원에는 매일 보존료와 입장료가 있습니다.", "hyp": "모든 남아프리카 국립공원과 마찬가지로 공원에는 매일 보존료와 입장료가 있습니다"}
 {"model": "buzzasr-korean", "dataset": "fleurs", "id": "1676_1750841025264760931", "ref": "모든 남아프리카 국립공원과 마찬가지로, 공원에는 매일 보존료와 입장료가 있습니다.", "hyp": "모든 남아프리카 국립공원과 마찬가지로 공원에는 매일 보존료와 입장료가 있습니다"}
 {"model": "buzzasr-korean", "dataset": "fleurs", "id": "1677_2695369876430250203", "ref": "오늘날 날개를 접을 수 없는 곤충은 잠자리와 파리밖에 없습니다.", "hyp": "오늘날 날개를 접을 수 없는 곤충은 잠자리와 파리밖에 없습니다"}
@@ -2234,6 +2235,7 @@
 {"model": "whisper-large-v3", "dataset": "fleurs", "id": "1672_6271140565544746922", "ref": "원단이 너무 뜨거워지지 않도록 주의하세요(원단이 수축하거나 그을릴 수 있습니다).", "hyp": " 원단이 너무 뜨거워지지 않도록 주의하세요. 원단이 수축하거나 그을릴 수 있습니다."}
 {"model": "whisper-large-v3", "dataset": "fleurs", "id": "1674_10667839008527105971", "ref": "일부 지역에서는 1분간 물을 끓이는 것으로 충분하다. 다른 지역에서는 수 분 동안 물을 끓일 필요가 있다.", "hyp": " 일부 지역에서는 일분간 물을 끓이는 것으로 충분하다 다른 지역에서는 수분 동안 물을 끓일 필요가 있다"}
 {"model": "whisper-large-v3", "dataset": "fleurs", "id": "1674_1568771216237690102", "ref": "일부 지역에서는 1분간 물을 끓이는 것으로 충분하다. 다른 지역에서는 수 분 동안 물을 끓일 필요가 있다.", "hyp": " 일부 지역에서는 일 분간 물을 끓이는 것으로 충분하다 다른 지역에서는 수 분 동안 물을 끓일 필요가 있다"}
+{"model": "whisper-large-v3", "dataset": "fleurs", "id": "1675_15954904112024043496", "ref": "당신이라는 의미의 Sie라는 단어와 함께 쓰이는 모든 명사는 문장의 중간에서도 항상 대문자로 시작된다.", "hyp": " 당신이라는 의미의 sie라는 단어와 함께 쓰이는 모든 명사는 문장의 중간에서도 항상 대문자로 시작된다."}
 {"model": "whisper-large-v3", "dataset": "fleurs", "id": "1676_1441445080190694850", "ref": "모든 남아프리카 국립공원과 마찬가지로, 공원에는 매일 보존료와 입장료가 있습니다.", "hyp": " 모든 남아프리카 국립공원과 마찬가지로 공원에는 매일 보존료와 입장료가 있습니다."}
 {"model": "whisper-large-v3", "dataset": "fleurs", "id": "1676_1750841025264760931", "ref": "모든 남아프리카 국립공원과 마찬가지로, 공원에는 매일 보존료와 입장료가 있습니다.", "hyp": " 모든 남아프리카 국립공원과 마찬가지로 공원에는 매일 보존료와 입장료가 있습니다."}
 {"model": "whisper-large-v3", "dataset": "fleurs", "id": "1677_2695369876430250203", "ref": "오늘날 날개를 접을 수 없는 곤충은 잠자리와 파리밖에 없습니다.", "hyp": " 오늘날 날개를 접을 수 없는 곤충은 잠자리와 파리밖에 없습니다"}
@@ -2852,6 +2854,7 @@
 {"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_36890640", "ref": "살아생전 다시는 만나 보지 못할 것처럼 영신의 표정은 전에 없이 애련하다.", "hyp": "살아 생전 다시는 만나보지 못할 것처럼 영신의 표정은 전에 없이 애련하다."}
 {"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_36890701", "ref": "그러나 실제로 뽑은 숫자는 지난 주에 미치지 못한 것으로 나타났다.", "hyp": "그러나 실제로 뽑은 숫자는 지난주에 미치지 못한 것으로 나타났다."}
 {"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_37018708", "ref": "저리 안 가?", "hyp": "저리 안가?"}
+{"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_37211921", "ref": "애완동물을 기르는 인구가 전체 인구의 사 분의 일이 되었습니다.", "hyp": "애완동물을 기르는 인구가 전체 인구의 1/4이 되었습니다."}
 {"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_37211943", "ref": "제 그곳을 지배하는 무시무시한 정적", "hyp": "제 그곳을 지배하는 무시무시한 정적."}
 {"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_37211971", "ref": "그는 이러한 생각을 하며 쌀항아리를 다시금 들여다보았다.", "hyp": "그는 이러한 생각을 하며 쌀 항아리를 다시금 들여다보았다."}
 {"model": "qwen3-asr-1.7b-ko-univa", "dataset": "commonvoice", "id": "common_voice_ko_37211988", "ref": "사별한 첫째 부인 사이에서는 자식이 아예 없었고", "hyp": "사별한 첫째 부인 사이에서는 자식이 아예 없었고."}
@@ -2962,6 +2965,7 @@
 {"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_36838378", "ref": "밝은 달은 우리 가슴", "hyp": "밝은 달은 우리 가슴."}
 {"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_36890642", "ref": "서면역에서 술 한잔 했어요.", "hyp": "서면역에서 술 한잔했어요."}
 {"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_36890701", "ref": "그러나 실제로 뽑은 숫자는 지난 주에 미치지 못한 것으로 나타났다.", "hyp": "그러나 실제로 뽑은 숫자는 지난주에 미치지 못한 것으로 나타났다."}
+{"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_37211921", "ref": "애완동물을 기르는 인구가 전체 인구의 사 분의 일이 되었습니다.", "hyp": "애완동물을 기르는 인구가 전체 인구의 1/4이 되었습니다."}
 {"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_37211925", "ref": "시간 재고 잠복기를 줄이려고요", "hyp": "시간 재고 잠복기를 줄이려고요."}
 {"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_37211936", "ref": "신철이는 우미관 앞에서 오 전짜리 우동 두 그릇을 사먹고 나서야 기운이 났다.", "hyp": "신철이는 우미관 앞에서 5전짜리 우동 2그릇을 사 먹고 나서야 기운이 났다."}
 {"model": "qwen3-asr-1.7b-ko-univa-release", "dataset": "commonvoice", "id": "common_voice_ko_37211943", "ref": "제 그곳을 지배하는 무시무시한 정적", "hyp": "제 그곳을 지배하는 무시무시한 정적."}

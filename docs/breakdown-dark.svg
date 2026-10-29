@@ -14,39 +14,39 @@
 <text x="205.8" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
 <rect x="263.6" y="108" width="139.5" height="22" rx="2" fill="#d95926"/>
 <text x="333.4" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">29%</text>
-<rect x="405.1" y="108" width="58.7" height="22" rx="2" fill="#199e70"/>
-<text x="434.5" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">12%</text>
-<rect x="465.9" y="108" width="172.1" height="22" rx="2" fill="#c98500"/>
-<text x="551.9" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">36%</text>
-<text x="650" y="123" font-size="11" fill="#c3c2b7">7.83% → 3.72%</text>
+<rect x="405.1" y="108" width="59.5" height="22" rx="2" fill="#199e70"/>
+<text x="434.9" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">13%</text>
+<rect x="466.6" y="108" width="171.4" height="22" rx="2" fill="#c98500"/>
+<text x="552.3" y="123" font-size="11" text-anchor="middle" fill="#0b0b0b">35%</text>
+<text x="650" y="123" font-size="11" fill="#c3c2b7">7.83% → 3.71%</text>
 <text x="140" y="157" font-size="12" text-anchor="end" fill="#f0efec">TeamUNIVA ko</text>
 <rect x="150.0" y="142" width="120.1" height="22" rx="2" fill="#3987e5"/>
 <text x="210.0" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">25%</text>
 <rect x="272.1" y="142" width="109.6" height="22" rx="2" fill="#d95926"/>
 <text x="326.9" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">23%</text>
-<rect x="383.7" y="142" width="62.7" height="22" rx="2" fill="#199e70"/>
-<text x="415.1" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">13%</text>
-<rect x="448.4" y="142" width="189.6" height="22" rx="2" fill="#c98500"/>
-<text x="543.2" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">39%</text>
-<text x="650" y="157" font-size="11" fill="#c3c2b7">7.43% → 3.89%</text>
+<rect x="383.7" y="142" width="63.6" height="22" rx="2" fill="#199e70"/>
+<text x="415.5" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">13%</text>
+<rect x="449.3" y="142" width="188.7" height="22" rx="2" fill="#c98500"/>
+<text x="543.7" y="157" font-size="11" text-anchor="middle" fill="#0b0b0b">39%</text>
+<text x="650" y="157" font-size="11" fill="#c3c2b7">7.43% → 3.87%</text>
 <text x="140" y="191" font-size="12" text-anchor="end" fill="#f0efec">TeamUNIVA ko beta</text>
 <rect x="150.0" y="176" width="118.5" height="22" rx="2" fill="#3987e5"/>
 <text x="209.3" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">25%</text>
 <rect x="270.5" y="176" width="114.2" height="22" rx="2" fill="#d95926"/>
 <text x="327.6" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">24%</text>
-<rect x="386.7" y="176" width="60.7" height="22" rx="2" fill="#199e70"/>
-<text x="417.0" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">13%</text>
-<rect x="449.4" y="176" width="188.6" height="22" rx="2" fill="#c98500"/>
-<text x="543.7" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">39%</text>
-<text x="650" y="191" font-size="11" fill="#c3c2b7">7.61% → 3.96%</text>
+<rect x="386.7" y="176" width="61.5" height="22" rx="2" fill="#199e70"/>
+<text x="417.5" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">13%</text>
+<rect x="450.3" y="176" width="187.7" height="22" rx="2" fill="#c98500"/>
+<text x="544.1" y="191" font-size="11" text-anchor="middle" fill="#0b0b0b">39%</text>
+<text x="650" y="191" font-size="11" fill="#c3c2b7">7.61% → 3.94%</text>
 <text x="140" y="225" font-size="12" text-anchor="end" fill="#f0efec">whisper-large-v3</text>
 <rect x="150.0" y="210" width="125.7" height="22" rx="2" fill="#3987e5"/>
 <text x="212.9" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
 <rect x="277.7" y="210" width="119.9" height="22" rx="2" fill="#d95926"/>
 <text x="337.7" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">25%</text>
-<rect x="399.6" y="210" width="38.7" height="22" rx="2" fill="#199e70"/>
+<rect x="399.6" y="210" width="38.8" height="22" rx="2" fill="#199e70"/>
 <text x="419.0" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">8%</text>
-<rect x="440.3" y="210" width="197.7" height="22" rx="2" fill="#c98500"/>
+<rect x="440.4" y="210" width="197.6" height="22" rx="2" fill="#c98500"/>
 <text x="539.2" y="225" font-size="11" text-anchor="middle" fill="#0b0b0b">41%</text>
 <text x="650" y="225" font-size="11" fill="#c3c2b7">7.48% → 4.08%</text>
 <text x="140" y="259" font-size="12" text-anchor="end" fill="#f0efec">Qwen3-ASR-1.7B</text>
@@ -59,24 +59,24 @@
 <rect x="415.6" y="244" width="222.4" height="22" rx="2" fill="#c98500"/>
 <text x="526.8" y="259" font-size="11" text-anchor="middle" fill="#0b0b0b">46%</text>
 <text x="650" y="259" font-size="11" fill="#c3c2b7">6.97% → 4.27%</text>
-<text x="140" y="293" font-size="12" text-anchor="end" fill="#f0efec">SenseVoice (itn on)</text>
-<rect x="150.0" y="278" width="89.3" height="22" rx="2" fill="#3987e5"/>
-<text x="194.7" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">19%</text>
-<rect x="241.3" y="278" width="104.5" height="22" rx="2" fill="#d95926"/>
-<text x="293.6" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">22%</text>
-<rect x="347.9" y="278" width="26.5" height="22" rx="2" fill="#199e70"/>
-<text x="361.1" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">6%</text>
-<rect x="376.4" y="278" width="261.6" height="22" rx="2" fill="#c98500"/>
-<text x="507.2" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">54%</text>
-<text x="650" y="293" font-size="11" fill="#c3c2b7">7.98% → 5.74%</text>
-<text x="140" y="327" font-size="12" text-anchor="end" fill="#f0efec">SenseVoice (itn off)</text>
-<rect x="150.0" y="312" width="84.0" height="22" rx="2" fill="#3987e5"/>
-<text x="192.0" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">18%</text>
-<rect x="236.0" y="312" width="126.4" height="22" rx="2" fill="#d95926"/>
-<text x="299.2" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
-<rect x="364.5" y="312" width="24.7" height="22" rx="2" fill="#199e70"/>
-<text x="376.8" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">5%</text>
-<rect x="391.2" y="312" width="246.8" height="22" rx="2" fill="#c98500"/>
-<text x="514.6" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">51%</text>
-<text x="650" y="327" font-size="11" fill="#c3c2b7">8.45% → 5.74%</text>
+<text x="140" y="293" font-size="12" text-anchor="end" fill="#f0efec">SenseVoice (itn off)</text>
+<rect x="150.0" y="278" width="84.0" height="22" rx="2" fill="#3987e5"/>
+<text x="192.0" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">18%</text>
+<rect x="236.0" y="278" width="126.4" height="22" rx="2" fill="#d95926"/>
+<text x="299.2" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">26%</text>
+<rect x="364.5" y="278" width="25.4" height="22" rx="2" fill="#199e70"/>
+<text x="377.1" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">6%</text>
+<rect x="391.8" y="278" width="246.2" height="22" rx="2" fill="#c98500"/>
+<text x="514.9" y="293" font-size="11" text-anchor="middle" fill="#0b0b0b">51%</text>
+<text x="650" y="293" font-size="11" fill="#c3c2b7">8.45% → 5.73%</text>
+<text x="140" y="327" font-size="12" text-anchor="end" fill="#f0efec">SenseVoice (itn on)</text>
+<rect x="150.0" y="312" width="89.3" height="22" rx="2" fill="#3987e5"/>
+<text x="194.7" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">19%</text>
+<rect x="241.3" y="312" width="104.5" height="22" rx="2" fill="#d95926"/>
+<text x="293.6" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">22%</text>
+<rect x="347.9" y="312" width="27.0" height="22" rx="2" fill="#199e70"/>
+<text x="361.4" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">6%</text>
+<rect x="376.9" y="312" width="261.1" height="22" rx="2" fill="#c98500"/>
+<text x="507.4" y="327" font-size="11" text-anchor="middle" fill="#0b0b0b">54%</text>
+<text x="650" y="327" font-size="11" fill="#c3c2b7">7.98% → 5.73%</text>
 </svg>
