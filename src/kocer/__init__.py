@@ -14,10 +14,11 @@ from .normalize import normalize as _normalize
 from .normalize import resolve_dual as _resolve_dual
 from .normalize import strip_aihub_tags as _strip_aihub
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 __all__ = ["cer", "wer", "measure", "breakdown", "compare", "Result", "Breakdown", "Comparison", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
+JOINT_LIMIT = 4096  # 정답 후보 × 출력 후보 조합이 이 이하이면 전수 탐색
 
 
 @dataclass
@@ -48,14 +49,22 @@ def _units(text: str, unit: str) -> List[str]:
 
 def _normalized(ref: str, hyp: str, unit: str, numbers: bool, punct: bool, fillers: bool, letters: bool,
                 aliases: Optional[Dict[str, str]]):
-    """정규화 + 숫자·영문 후보 선택 후의 (ref, hyp, alignment)."""
-    ref = _normalize(ref, punct, fillers)
-    hyp = _normalize(hyp, punct, fillers)
+    """정규화 + 숫자·영문 후보 선택 후의 (ref, hyp, alignment).
+    정답 후보 × 출력 후보 조합이 JOINT_LIMIT 이하이면 함께 전수 탐색해 오류가 가장 적은 쌍을 고른다(0.5.0, #7).
+    넘으면 출력 후보를 먼저 원문 정답에 맞춰 고르고, 그다음 정답 후보를 고른 출력에 맞춘다. 이 경로도 원문보다 나빠지지 않는다."""
+    ref = _normalize(ref, punct, fillers, fractions=numbers)
+    hyp = _normalize(hyp, punct, fillers, fractions=numbers)
     table = {**ALIASES, **(aliases or {})} if letters else None
     if numbers or letters:
-        # shortcut: hyp 후보를 먼저 ref 원문에 맞춰 고르고, 그다음 ref 후보를 고른 hyp에 맞춤(양쪽 곱집합 아님), 혼합 표기에서 틀리면 곱집합으로 올릴 것
-        hyp = _numbers.best(hyp, lambda c: distance(_units(ref, unit), _units(c, unit)), digits=numbers, aliases=table)
-        ref = _numbers.best(ref, lambda c: distance(_units(c, unit), _units(hyp, unit)), digits=numbers, aliases=table)
+        rc = _numbers.candidates(ref, digits=numbers, aliases=table, limit=JOINT_LIMIT)
+        hc = _numbers.candidates(hyp, digits=numbers, aliases=table, limit=JOINT_LIMIT) if rc is not None else None
+        if rc is not None and hc is not None and len(rc) * len(hc) <= JOINT_LIMIT:
+            ru, hu = [_units(c, unit) for c in rc], [_units(c, unit) for c in hc]
+            _, i, j = min((distance(a, b), i, j) for i, a in enumerate(ru) for j, b in enumerate(hu))
+            ref, hyp = rc[i], hc[j]
+        else:
+            hyp = _numbers.best(hyp, lambda c: distance(_units(ref, unit), _units(c, unit)), digits=numbers, aliases=table)
+            ref = _numbers.best(ref, lambda c: distance(_units(c, unit), _units(hyp, unit)), digits=numbers, aliases=table)
     return ref, hyp, align(_units(ref, unit), _units(hyp, unit))
 
 

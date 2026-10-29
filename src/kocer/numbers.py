@@ -13,14 +13,23 @@ NUMBER = re.compile(r"\d+(?:\.\d+)?")  # 천 단위 콤마는 normalize 단계�
 LATIN = re.compile(r"[A-Za-z]+")
 _TIME = re.compile(r"(?<![\d.])(\d+):(\d+)(?![\d.])")              # 3:30 시각, 3:1 비율
 _CURRENCY = re.compile(r"([$₩€£¥])\s*(\d+(?:\.\d+)?)")              # $100
-_TEMP = re.compile(r"(\d+(?:\.\d+)?)\s*(℃|°C|°)(?![A-Za-z])")        # 25℃ (NFKC 뒤에는 °C)
+_TEMP = re.compile(r"(\d+(?:\.\d+)?)\s*(℃|°C|℉|°F|°)(?![A-Za-z])")  # 25℃ (NFKC 뒤에는 °C), 50℉
+_FRACTION = re.compile(r"(?<![\d/])(\d{1,3})/(\d{1,3})(?![\d/])")    # 1/2 = 이분의 일 (normalize가 fractions=True일 때만 / 를 남김)
 _NEG = re.compile(r"(?<!\S)-(?=\d)")                                 # -5도. 하이픈(A-1, 010-1234)은 normalize가 이미 지움
 _ALNUM = re.compile(r"(?<![A-Za-z\d])(?:([A-Za-z]+)(\d+)|(\d+)([A-Za-z]+))(?![A-Za-z\d])")  # C4, 5G, MP3
-# 숫자 뒤 단위 기호. 소문자만: 5G는 단위가 아니라 영문+숫자
-UNITS: Dict[str, List[str]] = {"%": ["퍼센트", "프로"], "km": ["킬로미터", "킬로", "키로"], "kg": ["킬로그램", "킬로", "키로"],
-                               "cm": ["센티미터", "센티"], "mm": ["밀리미터", "밀리"], "ml": ["밀리리터"], "m": ["미터"], "g": ["그램"]}
-_UNIT = re.compile(r"(?<=\d)\s*(?:(km|kg|cm|mm|ml|m|g)(?![A-Za-z])|(%))")
-_UNIT_AT_START = re.compile(r"^\s*(?:(km|kg|cm|mm|ml|m|g)(?![A-Za-z])|(%))")
+# 숫자 뒤 단위 기호. 대소문자를 구분한다: 5G는 단위가 아니라 영문+숫자. NFKC가 ㎡ → m2, ㎾ → kW 로 바꿔 둔다.
+UNITS: Dict[str, List[str]] = {
+    "%": ["퍼센트", "프로"], "km": ["킬로미터", "킬로", "키로"], "kg": ["킬로그램", "킬로", "키로"],
+    "cm": ["센티미터", "센티"], "mm": ["밀리미터", "밀리"], "ml": ["밀리리터"], "mL": ["밀리리터"], "m": ["미터"], "g": ["그램"],
+    "km2": ["제곱킬로미터"], "m2": ["제곱미터", "평방미터"], "cm2": ["제곱센티미터"], "m3": ["세제곱미터"],
+    "L": ["리터"], "t": ["톤"], "mi": ["마일"], "ft": ["피트"], "kcal": ["킬로칼로리"], "cal": ["칼로리"],
+    "W": ["와트"], "kW": ["킬로와트"], "MW": ["메가와트"], "kWh": ["킬로와트시"],
+    "KB": ["킬로바이트", "킬로"], "MB": ["메가바이트", "메가"], "GB": ["기가바이트", "기가"], "TB": ["테라바이트", "테라"],
+    "Hz": ["헤르츠"], "kHz": ["킬로헤르츠"], "MHz": ["메가헤르츠"], "GHz": ["기가헤르츠"],
+}
+_UNIT_ALT = "|".join(map(re.escape, sorted((k for k in UNITS if k != "%"), key=len, reverse=True)))
+_UNIT = re.compile(r"(?<=\d)\s*(?:(" + _UNIT_ALT + r")(?![A-Za-z\d])|(%))")
+_UNIT_AT_START = re.compile(r"^\s*(?:(" + _UNIT_ALT + r")(?![A-Za-z\d])|(%))")
 _CURRENCY_WORD = {"$": "달러", "₩": "원", "€": "유로", "£": "파운드", "¥": "엔"}
 _ENGLISH_DIGIT = {"0": ["제로", "오"], "1": ["원"], "2": ["투"], "3": ["쓰리"], "4": ["포"], "5": ["파이브"],
                   "6": ["식스"], "7": ["세븐"], "8": ["에잇", "에이트"], "9": ["나인"]}
@@ -152,9 +161,18 @@ def currency_options(sym: str, num: str) -> List[str]:
 
 def temperature_options(num: str, sym: str) -> List[str]:
     out = [num + sym]
+    scale = "화씨" if sym in ("℉", "°F") else "섭씨"
     for r in dict.fromkeys([num, sino(num)]):
-        out += [f"{r}도", f"섭씨 {r}도"]
+        out += [f"{r}도", f"{scale} {r}도"]
     return out
+
+
+def fraction_options(a: str, b: str, following: str) -> List[str]:
+    """1/2 → 이분의 일. 첫 후보 'a b'는 / 를 문장부호로 지웠을 때와 같은 글자(숫자 정규화를 끈 것과 같은 출발점).
+    각 숫자를 따로 읽는 후보(일 이)도 남긴다."""
+    out = [f"{a} {b}"] + [f"{x} {y}" for x in options(a, "") for y in options(b, following)]
+    out += [f"{sino(b)}분의 {sino(a)}", f"{b}분의 {a}"]
+    return list(dict.fromkeys(out))
 
 
 def unit_options(sym: str) -> List[str]:
@@ -196,6 +214,8 @@ def _spans(text: str, digits: bool, aliases: Optional[Dict[str, str]]) -> List[T
             add(m.start(), m.end(), currency_options(m.group(1), m.group(2)))
         for m in _TEMP.finditer(text):
             add(m.start(), m.end(), temperature_options(m.group(1), m.group(2)))
+        for m in _FRACTION.finditer(text):
+            add(m.start(), m.end(), fraction_options(m.group(1), m.group(2), text[m.end():m.end() + 6]))
         for m in _NEG.finditer(text):
             add(m.start(), m.end(), ["-", "마이너스", "영하"])
     if letters:
@@ -222,6 +242,17 @@ def _build(text: str, spans, choice: Sequence[str]) -> str:
     return text
 
 
+def candidates(text: str, digits: bool = True, aliases: Optional[Dict[str, str]] = None, limit: int = 4096):
+    """text를 후보로 바꿔 본 모든 문자열. 조합이 limit를 넘으면 None (호출 쪽에서 best()로 고른다)."""
+    spans = _spans(text, digits, aliases)
+    total = 1
+    for _, _, o in spans:
+        total *= len(o)
+        if total > limit:
+            return None
+    return [_build(text, spans, c) for c in product(*(o for _, _, o in spans))] if spans else [text]
+
+
 def best(text: str, score: Callable[[str], float], limit: int = 64, digits: bool = True,
          aliases: Optional[Dict[str, str]] = None) -> str:
     """text의 숫자(digits)와 영문·단위 토큰(aliases가 None이 아니면)을 후보로 바꿔 본 문자열 중 score가 최소인 것."""
@@ -233,9 +264,21 @@ def best(text: str, score: Callable[[str], float], limit: int = 64, digits: bool
         total *= len(o)
     if total <= limit:
         return min((_build(text, spans, c) for c in product(*(o for _, _, o in spans))), key=score)
-    # shortcut: 후보 조합이 limit 초과면 구간별로 따로 고름(다른 구간은 원문 유지), 인접 구간 간섭으로 틀리면 묶음 전개로 올릴 것
-    base = [o[0] for _, _, o in spans]
-    choice = []
-    for i, (_, _, o) in enumerate(spans):
-        choice.append(min(o, key=lambda opt: score(_build(text, spans, base[:i] + [opt] + base[i + 1:]))))
+    # 후보가 너무 많으면 좌표 하강: 원문에서 시작해 구간 하나씩 바꿔 보고 점수가 줄 때만 채택(두 바퀴).
+    # 원문(숫자·영문을 그대로 둔 것)보다 나빠질 수 없다. 0.4.x는 구간마다 따로 고른 최선을 한꺼번에 적용해서
+    # 반복 루프처럼 숫자가 아주 많은 출력에서 오히려 나빠질 수 있었다 (#7).
+    choice = [text[s:e] if text[s:e] in o else o[0] for s, e, o in spans]
+    cur = score(_build(text, spans, choice))
+    for _ in range(2):
+        improved = False
+        for i, (_, _, o) in enumerate(spans):
+            for opt in o:
+                if opt == choice[i]:
+                    continue
+                trial = choice[:i] + [opt] + choice[i + 1:]
+                sc = score(_build(text, spans, trial))
+                if sc < cur:
+                    cur, choice, improved = sc, trial, True
+        if not improved:
+            break
     return _build(text, spans, choice)

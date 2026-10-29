@@ -253,3 +253,21 @@ def test_rapidfuzz_alignment_matches_pure_python_error_count():
         assert sum(op != "H" for op, _, _ in al._align_rf(a, b)) == sum(op != "H" for op, _, _ in al._align_py(a, b))
     words = (["오늘", "날씨", "좋다"], ["오늘", "춥다"])
     assert sum(op != "H" for op, _, _ in al._align_rf(*words)) == 2
+
+
+def test_joint_search_finds_case_folded_match():
+    # 0.4.x picked the hypothesis reading first and missed SIE = SIE (#7)
+    assert kocer.cer("의미의 Sie라는 단어", "의미의 sie라는 단어") == 0
+
+
+def test_never_worse_than_without_number_normalization():
+    # many number spans -> fallback search; it must not do worse than leaving the digits as they are (#7)
+    ref = "오늘 회의는 세 번 했다"
+    hyp = "오늘 회의는 " + "1번" * 120
+    assert kocer.measure(ref, hyp).errors <= kocer.measure(ref, hyp, numbers=False, letters=False).errors
+
+
+def test_fraction_slash_only_kept_when_numbers_on():
+    assert kocer.cer("이분의 일", "1/2") == 0
+    assert kocer.cer("이분의 일", "1/2", numbers=False) > 0
+    assert kocer.measure("1/2", "1 2", numbers=False, letters=False).errors == 0   # slash is still punctuation there

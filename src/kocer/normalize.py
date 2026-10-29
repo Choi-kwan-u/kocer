@@ -109,10 +109,18 @@ def squeeze(text: str) -> str:
     return " ".join(text.split())
 
 
-def normalize(text: str, punct: bool = True, fillers: bool = False) -> str:
+_FRACTION_SLASH = re.compile(r"(?<![\d/])(\d{1,3})/(\d{1,3})(?![\d/])")
+_KEEP = ""  # placeholder for a fraction slash while punctuation is stripped
+
+
+def normalize(text: str, punct: bool = True, fillers: bool = False, fractions: bool = False) -> str:
+    """fractions=True keeps the slash of a simple a/b (1/2, 3/4) so the number step can read it as 이분의 일.
+    Without it the slash is punctuation, as before."""
     text = nfkc(text)
     if punct:
-        text = strip_punct(text)
+        if fractions:
+            text = _FRACTION_SLASH.sub(lambda m: m.group(1) + _KEEP + m.group(2), text)
+        text = strip_punct(text).replace(_KEEP, "/")
     if fillers:
         text = strip_fillers(text)
     return squeeze(text)
