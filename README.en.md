@@ -249,7 +249,7 @@ Use "Cite this repository" on the right side of the repo page to copy a citation
   author  = {Choi, Kwan-u},
   title   = {kocer: reading-based CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.5.0},
+  version = {0.5.1},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

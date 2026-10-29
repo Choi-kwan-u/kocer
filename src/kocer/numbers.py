@@ -65,6 +65,8 @@ def sino(s: str) -> str:
         return sino(whole) + "점" + digitwise(frac)
     if s.startswith("0") and len(s) > 1:
         return digitwise(s)
+    if len(s) > 4 * len(_BIG):  # 10^20 이상은 큰 단위(경) 밖이라 한 자리씩 읽는다 (0.5.0까지는 IndexError)
+        return digitwise(s)
     n = int(s)
     if n == 0:
         return "영"

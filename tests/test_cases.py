@@ -271,3 +271,14 @@ def test_fraction_slash_only_kept_when_numbers_on():
     assert kocer.cer("이분의 일", "1/2") == 0
     assert kocer.cer("이분의 일", "1/2", numbers=False) > 0
     assert kocer.measure("1/2", "1 2", numbers=False, letters=False).errors == 0   # slash is still punctuation there
+
+
+def test_numbers_beyond_the_largest_unit_do_not_crash():
+    # 21+ digits ran past 경 (10^16) and raised IndexError up to 0.5.0
+    long = "1" * 21
+    assert kocer.measure("일", long).errors > 0
+    assert kocer.measure(long, long).errors == 0
+    assert kocer.cer("일" * 21, long) == 0                   # read digit by digit
+    for text in ["번호 " + "9" * 25, "오후 3:" + "1" * 22, "$" + "1" * 22, "1" * 22 + "℃", "1" * 30 + ".5"]:
+        kocer.measure(text, text)
+    assert numbers.sino("1" * 20) == "천백십일경천백십일조천백십일억천백십일만천백십일"   # 20 digits: still read with units
