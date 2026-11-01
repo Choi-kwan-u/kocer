@@ -298,6 +298,7 @@ def test_style_counts_notation_without_changing_cer():
     assert kocer.measure("25분", "이십오 분", style="digits").notation == 3
     assert kocer.measure("2024년", "이천이십사년", style="digits").notation == 5
     assert kocer.measure("가", "가", style="digits").notation == 0
+    assert kocer.measure("오늘 날씨", "오늘 세 시 날씨", style="digits").notation == 1   # 정답에 수가 없어도 결과만 본다
 
 
 def test_style_hangul_detection_is_conservative():
@@ -330,6 +331,9 @@ def test_keywords_match_readings_spacing_and_repeats():
     k2 = kocer.keywords(["서초점 서초점", "발레파킹"], ["서초점 사당점", "발렛 파킹 발레파킹"], ["서초점", "발레파킹"])
     assert k2.counts["서초점"] == (2, 1, 0) and k2.counts["발레파킹"] == (1, 1, 0) and k2.rate == pytest.approx(1 / 3)
     assert kocer.keywords(["가"], ["서초점"], ["서초점"]).counts["서초점"] == (0, 0, 1)   # 결과에만 나오면 추가
+    k3 = kocer.keywords(["강남지점 서초점은 어디", "서초점 서초점"], ["강남 지점 서초점은 어디", "서초 점"], ["점", "서초점", "서초 점"])
+    assert k3.counts["점"] == (0, 0, 1)                        # 어절 중간의 글자는 세지 않는다 (지점, 서초점); 띄어 쓴 '점'만 센다
+    assert k3.counts["서초점"] == (3, 2, 0) and k3.counts["서초 점"] == (3, 2, 0)   # 조사가 붙어도, 띄어 써도 같은 키워드
     assert "keyword error rate" in str(k2)
     with pytest.raises(TypeError):
         kocer.keywords("가", "가", ["가"])
@@ -340,6 +344,7 @@ def test_cli_style_and_keywords(tmp_path, capsys):
     (tmp_path / "ref.txt").write_text("서초점 3시\n", encoding="utf-8")
     (tmp_path / "hyp.txt").write_text("서초점 세 시\n", encoding="utf-8")
     (tmp_path / "kw.txt").write_text("서초점\n3시\n", encoding="utf-8")
-    assert main([str(tmp_path / "ref.txt"), str(tmp_path / "hyp.txt"), "--style", "digits", "--keywords", str(tmp_path / "kw.txt")]) == 0
-    out = capsys.readouterr().out
-    assert "표기 위반 (digits) 1자" in out and "keyword error rate 0.00%" in out
+    assert main([str(tmp_path / "ref.txt"), str(tmp_path / "hyp.txt"), "--style", "digits"]) == 0
+    assert "표기 위반 (digits) 1자" in capsys.readouterr().out
+    assert main(["keywords", str(tmp_path / "ref.txt"), str(tmp_path / "hyp.txt"), "--list", str(tmp_path / "kw.txt")]) == 0
+    assert "keyword error rate 0.00%" in capsys.readouterr().out

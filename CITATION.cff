@@ -9,7 +9,7 @@ repository-code: "https://github.com/Choi-kwan-u/kocer"
 url: "https://pypi.org/project/kocer/"
 license: MIT
 version: 0.5.2
-date-released: 2026-10-29
+date-released: 2026-11-01
 keywords:
   - korean
   - speech recognition

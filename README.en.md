@@ -85,14 +85,11 @@ print(kocer.compare(refs, {"new": new, "old": old}))  # ranking and 95% interval
 kocer.cer("유니스트 입학", "UNIST 입학", aliases={"UNIST": "유니스트"})   # acronyms read as words
 kocer.cer("(7시)/(일곱 시)에 만나", "7시에 만나")    # 0.0  AI-Hub dual transcripts: both sides count
 kocer.cer("b/ 그거+ 그거 *좋아", "그거 그거 좋아", aihub=True)   # 0.0  raw AI-Hub transcripts as-is
-print(kocer.breakdown(refs, hyps, style="digits"))   # when the spelling is the product (subtitles): numbers written in Hangul are counted separately as notation violations
-print(kocer.keywords(refs, hyps, ["서초점", "3시"]))  # keyword error rate: did the branch name or the time survive? ('3시' = '세 시')
 ```
 
 ```bash
 kocer ref.txt hyp.txt          # one pair per line: raw CER, kocer CER, breakdown
 kocer ref.txt hyp.txt --diff   # color only the wrong characters
-kocer ref.txt hyp.txt --style digits --keywords kw.txt   # notation violations, keyword error rate
 kocer ref.txt new.txt old.txt  # two or more hypothesis files: compare models
 ```
 
@@ -119,15 +116,6 @@ c.cer                             # CER per system
 c.difference("A", "B")            # (CER A − CER B, 95% low, high), sentence-level paired bootstrap, either order
 c.significant("A", "B")           # is the difference non-zero?
 c.ranks["A"]                      # (best rank, worst rank, probability of rank 1)
-
-r = kocer.measure("세 시", "세 시", style="digits")   # notation check: did the output write numbers in the wanted style ("digits" | "hangul")?
-r.cer, r.notation, r.service_cer  # 0.0, 1, 1.0: heard correctly (cer) but wrote it in Hangul (notation). service_cer = (errors + violations) / ref_len
-b = kocer.breakdown(refs, hyps, style="digits")
-b.notation, b.cer["service"]      # violating characters, CER with recognition errors and violations added; everything else is unchanged
-
-k = kocer.keywords(refs, hyps, ["서초 점", "3시", "KBO"])   # the keyword list is yours: it differs per domain, so there is no built-in one
-k.counts["3시"]                   # (occurrences in the references, hits in the hypotheses, extra in the hypotheses). '3시' = '세 시', 'KBO' = '케이비오'
-k.rate                            # keyword error rate = missed / occurrences. Multi-word keywords and repeats within a sentence are fine
 print(c)                          # table; uses numpy if installed, pure Python otherwise
 
 kocer.cer("엘지 트윈스", "LG 트윈스")      # 0.0  runs of capitals are spelled out letter by letter
@@ -135,6 +123,37 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 ```
 
 </details>
+
+## More features: notation check and keyword error rate
+
+Both arrived in 0.5.2 from practitioner requests, and neither touches the default score (`cer`).
+
+**Notation check `style`.** kocer CER measures only whether the model heard the words. When the spelling is the product (subtitles), you also need to know whether it wrote numbers in the wanted style, and that is a different problem: a model that mishears needs replacing, while a model that hears correctly but writes numbers in Hangul only needs post-processing. With `style="digits"` (or `"hangul"`), numbers written against that style are counted separately as **notation violations**. Even if the reference says `세 시`, an output of `세 시` is a `digits` violation and `3시` passes.
+
+```python
+r = kocer.measure("세 시", "세 시", style="digits")
+r.cer, r.notation, r.service_cer   # 0.0, 1, 1.0: heard correctly (cer) but wrote it in Hangul (notation). service_cer = (errors + violations) / ref_len
+
+b = kocer.breakdown(refs, hyps, style="digits")
+b.notation, b.cer["service"]       # violating characters, CER with recognition errors and violations added; everything else is unchanged
+```
+
+```bash
+kocer ref.txt hyp.txt --style digits
+```
+
+**Keyword error rate `keywords()`.** For phone surveys or call bots, "did it get the branch name, the time, the amount?" matters more than the overall CER. Pass a keyword list and it counts, per keyword, the occurrences in the references and how many survived in the hypotheses. The list is yours: it differs per domain, so there is no built-in one. Matching goes through kocer normalization (`3시` = `세 시`, `KBO` = `케이비오`), starts at the beginning of a word, ignores spaces inside the keyword (`서초 점` = `서초점`) and tolerates attached particles (`서초점은`). Characters inside another word (`점` in `지점`) are not counted.
+
+```python
+k = kocer.keywords(refs, hyps, ["서초 점", "3시", "KBO"])
+k.counts["3시"]    # (occurrences in the references, hits in the hypotheses, extra in the hypotheses)
+k.rate             # keyword error rate = missed / occurrences
+print(k)           # table per keyword
+```
+
+```bash
+kocer keywords ref.txt hyp.txt --list kw.txt   # one keyword per line
+```
 
 ## Compared with existing tools
 
@@ -240,7 +259,7 @@ In %, pooled errors / pooled reference characters. KsponSpeech and telephone use
 - The built-in acronym dictionary has 16 entries. Pass acronyms that are read as words through `aliases`.
 - Only `%`, length/area/volume (`m`, `km`, `m2` ...), weight (`g`, `kg`, `t`), `L`, power (`W`, `kWh`), storage (`KB` to `TB`), frequency (`Hz` to `GHz`), `℃`/`℉` and the currency signs `$ ₩ € £ ¥` are read as units; fractions only in the form `1/2`, not dates (`2026/10/29`), and the counter dictionary is incomplete. Pull requests that add cases to [tests/cases.tsv](tests/cases.tsv) are welcome.
 - WER counts spacing differences as errors. For Korean, CER is recommended.
-- The Hangul-numeral detection behind `style="digits"` is an approximation: it catches numerals before a counter or unit, numbers containing a place word (십·백·천·만), and native tens such as 스물 or 서른; a one-syllable numeral that doubles as a demonstrative (`이` in `이 사람`) is skipped when written with a space. Words such as `세대` or `만일` can be miscounted as numbers. `keywords()` matches substrings with spaces removed, so a one-character keyword like `점` also matches `지점`; use keywords of two or more characters.
+- The Hangul-numeral detection behind `style="digits"` is an approximation: it catches numerals before a counter or unit, numbers containing a place word (십·백·천·만), and native tens such as 스물 or 서른; a one-syllable numeral that doubles as a demonstrative (`이` in `이 사람`) is skipped when written with a space. Words such as `세대` or `만일` can be miscounted as numbers. `keywords()` matches from the start of a word, so a one-character keyword like `점` counts `점수` but not `지점`; use keywords of two or more characters.
 - AI-Hub masking tags (`@이름1`, `&이름&`) are not removed even with `aihub=True`: removing them would turn every real name the model transcribed into insertions. Leave those utterances out.
 - Use `kocer[fast]` for long text (8,200 characters in one string: 0.03 s). Without rapidfuzz, the pure-Python alignment is quadratic in length, so thousands of characters in one string are slow and memory-hungry; split them into sentences in that case.
 

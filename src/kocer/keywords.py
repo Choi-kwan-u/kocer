@@ -1,6 +1,7 @@
 """키워드 오류율 (#5). 사용자가 넘긴 키워드(지점명, 상품명, 시각, 금액 ...)가 정답에 나온 횟수와 결과에서 살아남은 횟수를 센다.
 키워드 목록은 패키지에 없다. 도메인마다 달라서 사용자가 넘긴다.
-판정은 kocer 정규화 뒤 공백을 뺀 문자열의 부분 문자열 일치. 키워드와 문장의 숫자·영문은 읽기 후보로 전개해서 '3시' = '세 시', 'KBO' = '케이비오'."""
+판정: kocer 정규화 뒤, 키워드는 공백을 빼고 어절 첫머리에서부터 맞춘다. 어절 안의 공백은 무시하고('서초 점' = '서초점'), 조사는 붙어도 된다('서초점은').
+'지점'의 '점'처럼 어절 중간에 섞인 글자는 세지 않는다. 키워드와 문장의 숫자·영문은 읽기 후보로 전개해서 '3시' = '세 시', 'KBO' = '케이비오'."""
 from __future__ import annotations
 
 import re
@@ -43,14 +44,16 @@ class Keywords:
         return "\n".join(out)
 
 
-def _nospace(s: str) -> str:
-    return s.replace(" ", "")
-
-
 def _forms(text: str, numbers: bool, table: Optional[Dict[str, str]], limit: int) -> List[str]:
-    """text를 읽기 후보로 바꿔 본 문자열들(공백 제거). 조합이 limit를 넘으면 원문만."""
+    """text를 읽기 후보로 바꿔 본 문자열들. 조합이 limit를 넘으면 원문만."""
     c = _numbers.candidates(text, digits=numbers, aliases=table, limit=limit) if (numbers or table is not None) else None
-    return list(dict.fromkeys(_nospace(x) for x in (c or [text])))
+    return list(dict.fromkeys(c or [text]))
+
+
+def _pattern(forms: Sequence[str]) -> re.Pattern:
+    """어절 첫머리에서 시작하고, 키워드 글자 사이의 공백은 무시."""
+    alts = sorted({f.replace(" ", "") for f in forms if f.strip()}, key=len, reverse=True)
+    return re.compile(r"(?<!\S)(?:" + "|".join(r"\s*".join(map(re.escape, a)) for a in alts) + ")")
 
 
 def _count(pattern: re.Pattern, forms: Sequence[str]) -> int:
@@ -67,10 +70,7 @@ def keywords(references: Sequence[str], hypotheses: Sequence[str], words: Sequen
     if len(references) != len(hypotheses):
         raise ValueError("references and hypotheses must have the same length")
     table = {**ALIASES, **(aliases or {})} if letters else None
-    pats = {}
-    for w in words:
-        forms = _forms(_normalize(w, punct, fillers, fractions=numbers), numbers, table, 4096)
-        pats[w] = re.compile("|".join(map(re.escape, sorted(forms, key=len, reverse=True))))
+    pats = {w: _pattern(_forms(_normalize(w, punct, fillers, fractions=numbers), numbers, table, 4096)) for w in words}
     counts = {w: [0, 0, 0] for w in words}
     for r, h in zip(references, hypotheses):
         if aihub:

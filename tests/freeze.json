@@ -1,0 +1,29 @@
+{
+ "version": "0.5.1",
+ "digests": {
+  "_buzzasr-korean-cardgen/zeroth": "0a365f1ee47d5f6e7f5b6bb2fc18c8baa9431c3ecaaaa0d4df9822d710b5adb3",
+  "_buzzasr-korean-cardgen/fleurs": "c195b45d20d32185a9095ed919ee6031df45de1f46361fe9274c67454d60ccf0",
+  "_buzzasr-korean-cardgen/commonvoice": "165619b5b81349fda9fcb94827a216e64696c793ea477bc9bff74722c002b54a",
+  "buzzasr-korean/zeroth": "dd8d7d17447513d35b9167bb4e9a050412974b9bbc46a4cb1fcaf45005bf6119",
+  "buzzasr-korean/fleurs": "165bd26821261dcad7ed3b22f5c5f16a51c29b274194b2b2cdf63ce0efbdf7d6",
+  "buzzasr-korean/commonvoice": "0fbd505f6c6da6eb49955d243262fcf97e65a7fc0d8bababf1580c9f4c9197e2",
+  "qwen3-asr-1.7b/zeroth": "97d3b4551da688ee56ff773a477126d45b5a1ec83cff2a79da72c0fe3da79a6d",
+  "qwen3-asr-1.7b/fleurs": "40f2d60ffccfcaf7d54bf8bdfaf92e27ec34873e5cf2c980159df4c4c0509974",
+  "qwen3-asr-1.7b/commonvoice": "209ccc2d8ebf21b9466db1a6e6e4014fca3c75d0cbeab53b7b12f5a584c23fd3",
+  "qwen3-asr-1.7b-ko-univa/zeroth": "c33d08c1b1cabe765fba9d9c5f08827fa903ac5ff9c739c631dbc8b27cc6721a",
+  "qwen3-asr-1.7b-ko-univa/fleurs": "244ae9e7d042614f386bd4ecde8692254b8cd47e639151642a018ce1fbf057db",
+  "qwen3-asr-1.7b-ko-univa/commonvoice": "4833296c09051efddc12eaf5eddaf33426c3f6fdc9c233d38288ac884b1eae18",
+  "qwen3-asr-1.7b-ko-univa-release/zeroth": "d772690ff55b78ebd550fe3e8a0a21c0db5d25de491a5f1f0baefbceba7040ad",
+  "qwen3-asr-1.7b-ko-univa-release/fleurs": "73dcd7c79e991c2504ef2b76c8ef5774e477ac431793f83a8c44b75af4fbb9aa",
+  "qwen3-asr-1.7b-ko-univa-release/commonvoice": "bf5c0e0067c889e7c59008e4339222195b7d9e44f1a35aeec22742a206d86971",
+  "sensevoice-small-itn/zeroth": "6a4c15efa0593a079021deac07bcdd5b1c4bd4e9d2f3e294a8eb2665594ad480",
+  "sensevoice-small-itn/fleurs": "fa7a132dc75c98976c103a75efce90a5c27fd8af058a9910048c3e6a2cbfc87f",
+  "sensevoice-small-itn/commonvoice": "91b91ec4d6c4bccfb94fb91e9ab0ca6d74b8a631a014525016e06db9c371c339",
+  "sensevoice-small-noitn/zeroth": "76cd5e5922bdcab3afaf65be43aaec5705667b8c1deb13dab95abbbe13404544",
+  "sensevoice-small-noitn/fleurs": "0d54a0d1336dda010019e6715e916dacad322dfbc3212c90d066b60e6962ff3b",
+  "sensevoice-small-noitn/commonvoice": "9da4c6d3741cc70972a7de9da0c2a849a2f2eadc42e5ce54401a8939bda657f8",
+  "whisper-large-v3/zeroth": "0d6d56db03d43398bd4236aeab8a91a30decc84fc01288e704a82f3504ff223a",
+  "whisper-large-v3/fleurs": "30da30e4b6de3decc9a5f0824612f77a40051e4818a635288f7640fd4a839dc0",
+  "whisper-large-v3/commonvoice": "09dfbca1a8863af44bcb27f0ed35f347e8e62747f41f8cd1a4b2bc147b9ce2eb"
+ }
+}
