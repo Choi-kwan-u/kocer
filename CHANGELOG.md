@@ -7,7 +7,7 @@
 점수는 바뀌지 않는다 (`style` 없는 기본 채점은 0.5.1과 같고, `tests/test_freeze.py`로 확인).
 
 - 버그: `style="digits"`가 `네 알겠습니다`의 `네`를 수사로 셌다. `알`이 조수사 사전에 있어서 다음 낱말의 첫 글자를 조수사로 본 것. 이제 조수사 뒤에 조사·어미·공백·끝이 올 때만 수사로 센다 (`세 시에`, `두 시간이나`, `오 분쯤`은 그대로 위반).
-- README: `service_cer` 예시 값 오류(1.0 → 0.5)를 고치고, `breakdown(style=)`과 `keywords()`의 출력 예를 넣었다.
+- README: `service_cer` 예시 값 오류(1.0 → 0.5)를 고치고, `breakdown(style=)`과 `keywords()`의 출력 예를 넣었다. 기능 비교표에 `keywords()`와 `style`을 반영했고, 벤치마크 설명에서 다른 모델의 학습 데이터를 단정하던 표현을 뺐다 ([#9](https://github.com/Choi-kwan-u/kocer/issues/9)).
 
 ## 0.5.2 (2026-11-01) — 새 기능
 

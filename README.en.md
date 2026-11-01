@@ -199,7 +199,7 @@ kocer keywords ref.txt hyp.txt --list kw.txt   # one keyword per line; several h
 
 The last two rows are real recognition errors ("four apples", "3:13"), and kocer counts them. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.5.0, all with default settings.
 
-If you need entity or keyword error rates, or a quality gate that fails CI below a threshold, nlptutti is the better tool. The two work fine side by side.
+If you need a quality gate that fails CI below a threshold, or entity-level evaluation, nlptutti is the better tool. kocer's `keywords()` counts only a keyword list you pass, and treats matching readings of numbers and Latin as hits. The two work fine side by side.
 
 <details>
 <summary>Feature table</summary>
@@ -213,7 +213,8 @@ If you need entity or keyword error rates, or a quality gate that fails CI below
 | Split errors into spacing, punctuation, numbers, real | no | no | `breakdown()` |
 | Compare systems with pairwise intervals | no | yes | `compare()` |
 | Quality gate (fail CI below a threshold) | no | yes | no |
-| Entity and keyword error rates | no | yes | no |
+| Entity and keyword error rates | no | yes (entity evaluation) | `keywords()` (your keyword list, reading-based matching) |
+| Notation violations counted apart from recognition errors (세 시 vs 3시) | no | no | `style="digits"` |
 | Metrics | WER, CER, MER, WIL, WIP | CER, WER, CRR | CER, WER |
 | Required dependencies | rapidfuzz, click | jiwer | none |
 
@@ -276,7 +277,7 @@ Per-model scores, CER at each level, confidence intervals, decoding settings and
 | SenseVoiceSmall (itn on) | **2.40** | 6.81 | 9.68 | 13.26 / 13.77 | 21.29 |
 | SenseVoiceSmall (itn off) | 2.41 | 6.76 | 9.72 | 13.07 / 13.67 | 21.49 |
 
-In %, pooled errors / pooled reference characters. KsponSpeech and telephone use the spelling-side reference. Telephone is the HR domain of the AI-Hub low-quality telephone validation split (calls from job seekers and enquiries about corporate training), 1,936 utterances. No model wins everywhere; each is strongest on data close to its training set (BuzzASR on Common Voice, TeamUNIVA apparently on KsponSpeech). On telephone speech whisper-large-v3 was strongest, and BuzzASR, fine-tuned from it on read speech (FLEURS, Common Voice), did not beat it (cause not investigated). All decoding is greedy. Re-running BuzzASR with its model-card settings (repetition penalties) made all five test sets worse ([details](benchmarks/README.md)).
+In %, pooled errors / pooled reference characters. KsponSpeech and telephone use the spelling-side reference. Telephone is the HR domain of the AI-Hub low-quality telephone validation split (calls from job seekers and enquiries about corporate training), 1,936 utterances. No model wins everywhere. The models' training data is not described in detail on their model cards, so we could not check it. On telephone speech whisper-large-v3 was strongest, and BuzzASR did not beat whisper-large-v3, the model it was fine-tuned from (cause not investigated). All decoding is greedy. Re-running BuzzASR with its model-card settings (repetition penalties) made all five test sets worse ([details](benchmarks/README.md)).
 
 </details>
 

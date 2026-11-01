@@ -195,7 +195,7 @@ kocer keywords ref.txt hyp.txt --list kw.txt   # kw.txt는 줄마다 키워드 �
 
 마지막 두 줄은 진짜 인식 오류이고, kocer도 오류로 셉니다. jiwer 4.0.0, nlptutti 0.0.0.24, kocer 0.5.0, 모두 기본 설정.
 
-개체명·키워드 평가나 품질 게이트(기준 점수로 CI 막기)가 필요하면 nlptutti가 낫습니다. 두 도구를 같이 써도 됩니다.
+품질 게이트(기준 점수로 CI 막기)나 개체명 단위 평가가 필요하면 nlptutti가 낫습니다. kocer의 `keywords()`는 사용자가 넘긴 키워드 목록만 세고, 숫자·영문 읽기가 같으면 맞음으로 봅니다. 두 도구를 같이 써도 됩니다.
 
 <details>
 <summary>기능 비교표</summary>
@@ -209,7 +209,8 @@ kocer keywords ref.txt hyp.txt --list kw.txt   # kw.txt는 줄마다 키워드 �
 | 오류를 띄어쓰기·문장부호·숫자·진짜 오류로 분해 | 없음 | 없음 | `breakdown()` |
 | 여러 모델 비교, 쌍별 신뢰구간 | 없음 | 있음 | `compare()` |
 | 품질 게이트 (기준 점수로 CI 막기) | 없음 | 있음 | 없음 |
-| 개체명·키워드 오류율 | 없음 | 있음 | 없음 |
+| 개체명·키워드 오류율 | 없음 | 있음 (개체명 평가) | `keywords()` (사용자 키워드 목록, 읽기 기준 판정) |
+| 표기 위반을 인식 오류와 따로 셈 (세 시 vs 3시) | 없음 | 없음 | `style="digits"` |
 | 지원 지표 | WER, CER, MER, WIL, WIP | CER, WER, CRR | CER, WER |
 | 필수 의존성 | rapidfuzz, click | jiwer | 없음 |
 
@@ -272,7 +273,7 @@ kocer는 글자가 같은지가 아니라 **읽으면 같은 말인지**를 잽�
 | SenseVoiceSmall (itn 켬) | **2.40** | 6.81 | 9.68 | 13.26 / 13.77 | 21.29 |
 | SenseVoiceSmall (itn 끔) | 2.41 | 6.76 | 9.72 | 13.07 / 13.67 | 21.49 |
 
-단위 %, 총 오류 / 총 정답 글자. KsponSpeech와 전화는 철자 정답 기준. 전화는 AI-Hub 저음질 전화망 검증셋의 HR 분야(구직·교육 문의 통화) 1,936발화입니다. 모든 데이터셋에서 이기는 모델은 없고, 각 모델은 학습 데이터와 가까운 데이터셋에서 강합니다(BuzzASR은 Common Voice, TeamUNIVA는 KsponSpeech로 보임). 전화 음성에서는 whisper-large-v3가 가장 강했고, 낭독체(FLEURS, Common Voice)로 파인튜닝한 BuzzASR은 원래 모델인 whisper-large-v3를 넘지 못했습니다(원인은 확인하지 않음). 디코딩은 모두 greedy이고, BuzzASR을 모델카드 권장 설정(반복 억제)으로 다시 돌리면 다섯 데이터셋 모두 오히려 나빠집니다([자세히](benchmarks/README.md)).
+단위 %, 총 오류 / 총 정답 글자. KsponSpeech와 전화는 철자 정답 기준. 전화는 AI-Hub 저음질 전화망 검증셋의 HR 분야(구직·교육 문의 통화) 1,936발화입니다. 모든 데이터셋에서 이기는 모델은 없습니다. 각 모델의 학습 데이터는 모델카드에 자세히 적혀 있지 않아 확인하지 못했습니다. 전화 음성에서는 whisper-large-v3가 가장 강했고, BuzzASR은 원래 모델인 whisper-large-v3를 넘지 못했습니다(원인은 확인하지 않음). 디코딩은 모두 greedy이고, BuzzASR을 모델카드 권장 설정(반복 억제)으로 다시 돌리면 다섯 데이터셋 모두 오히려 나빠집니다([자세히](benchmarks/README.md)).
 
 </details>
 
