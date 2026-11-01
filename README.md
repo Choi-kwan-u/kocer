@@ -81,12 +81,15 @@ print(kocer.compare(refs, {"새 모델": new, "이전 모델": old}))   # 모델
 kocer.cer("유니스트 입학", "UNIST 입학", aliases={"UNIST": "유니스트"})   # 단어처럼 읽는 약어
 kocer.cer("(7시)/(일곱 시)에 만나", "7시에 만나")    # 0.0  AI-Hub 이중 표기는 양쪽 다 정답
 kocer.cer("b/ 그거+ 그거 *좋아", "그거 그거 좋아", aihub=True)   # 0.0  AI-Hub 원본 전사를 정제 없이
+print(kocer.breakdown(refs, hyps, style="digits"))   # 자막처럼 숫자 표기가 결과물이면: 한글로 쓴 수를 표기 위반으로 따로 셈
+print(kocer.keywords(refs, hyps, ["서초점", "3시"]))  # 키워드 오류율: 지점명·시각 같은 말을 맞혔나 ('3시' = '세 시')
 ```
 
 ```bash
 kocer ref.txt hyp.txt          # 줄 단위 쌍. raw CER, kocer CER, 오류 분해
 kocer ref.txt hyp.txt --diff   # 틀린 글자만 색으로 표시
 kocer ref.txt new.txt old.txt  # 결과 파일이 둘 이상이면 모델 비교
+kocer ref.txt hyp.txt --style digits --keywords kw.txt   # 표기 위반, 키워드 오류율
 ```
 
 <details>
@@ -113,6 +116,15 @@ c.difference("A", "B")            # (CER A − CER B, 95% 하한, 상한). 문�
 c.significant("A", "B")           # 차이가 0이 아닌가
 c.ranks["A"]                      # (순위 하한, 상한, 1위 확률)
 print(c)                          # 표로 출력. numpy가 있으면 빠르게, 없으면 순수 파이썬으로 계산
+
+r = kocer.measure("세 시", "세 시", style="digits")   # 표기 검사: 결과가 원하는 표기("digits" | "hangul")로 수를 썼나
+r.cer, r.notation, r.service_cer  # 0.0, 1, 1.0: 잘 들었지만(cer) 한글로 썼다(notation). service_cer = (오류 + 위반) / 정답 길이
+b = kocer.breakdown(refs, hyps, style="digits")
+b.notation, b.cer["service"]      # 위반 글자 수, 인식 오류 + 표기 위반 CER. 나머지 항목은 style 없을 때와 같다
+
+k = kocer.keywords(refs, hyps, ["서초 점", "3시", "KBO"])   # 키워드 목록은 사용자가 넘긴다 (도메인마다 다르니 내장 사전 없음)
+k.counts["3시"]                   # (정답에 나온 횟수, 결과에서 맞은 횟수, 결과에만 더 나온 횟수). '3시' = '세 시', 'KBO' = '케이비오'
+k.rate                            # 키워드 오류율 = 놓친 횟수 / 정답에 나온 횟수. 여러 어절 키워드도, 한 문장에 여러 번 나와도 됨
 
 kocer.cer("엘지 트윈스", "LG 트윈스")      # 0.0  대문자 연속은 철자 읽기
 kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
@@ -160,7 +172,7 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 
 ## 채점 규칙
 
-kocer는 글자가 같은지가 아니라 **읽으면 같은 말인지**를 잽니다. 띄어쓰기와 문장부호를 지우고, 숫자·영문 약어·단위는 가능한 읽기 중 CER이 가장 낮은 것을 고릅니다. 모든 단계는 끌 수 있고, 정규화 전 CER(`raw_cer`)을 항상 같이 돌려줍니다. 정규화가 실제 오류를 숨길 수 있고, 자막처럼 표기 자체가 결과물인 경우도 있으니 두 값을 같이 보고하세요.
+kocer는 글자가 같은지가 아니라 **읽으면 같은 말인지**를 잽니다. 띄어쓰기와 문장부호를 지우고, 숫자·영문 약어·단위는 가능한 읽기 중 CER이 가장 낮은 것을 고릅니다. 모든 단계는 끌 수 있고, 정규화 전 CER(`raw_cer`)을 항상 같이 돌려줍니다. 정규화가 실제 오류를 숨길 수 있고, 자막처럼 표기 자체가 결과물인 경우도 있으니 두 값을 같이 보고하세요. 표기가 결과물이면 `style="digits"`(또는 `"hangul"`)로 **표기 위반을 인식 오류와 따로** 셀 수 있습니다. 잘못 듣는 모델과, 잘 듣는데 숫자를 한글로 쓰는 버릇만 있는 모델은 다른 문제이기 때문입니다(후자는 후처리로 고칩니다).
 
 <details>
 <summary>단계별 설정, 숫자 후보 규칙, 계산식</summary>
@@ -224,6 +236,7 @@ kocer는 글자가 같은지가 아니라 **읽으면 같은 말인지**를 잽�
 - 내장 약어 사전은 16개뿐입니다. 단어처럼 읽는 약어는 `aliases`로 넘기세요.
 - 단위는 `%`, 길이·넓이·부피(`m`, `km`, `m2` …), 무게(`g`, `kg`, `t`), `L`, 전력(`W`, `kWh`), 용량(`KB`~`TB`), 주파수(`Hz`~`GHz`), `℃`·`℉`, 통화 기호 `$ ₩ € £ ¥`만 읽습니다. 분수는 `1/2` 꼴만 읽고 날짜(`2026/10/29`)는 읽지 않습니다. 조수사 사전도 완전하지 않습니다. [tests/cases.tsv](tests/cases.tsv)에 케이스를 추가하는 PR을 환영합니다.
 - WER은 띄어쓰기 차이를 오류로 셉니다. 한국어에서는 CER을 권합니다.
+- `style="digits"`의 한글 수사 찾기는 근사입니다. 조수사·단위 앞의 수사, 자리 단위(십·백·천·만)가 든 수, 스물·서른 같은 고유어 십 단위만 잡고, `이 사람`의 `이`처럼 지시어와 겹치는 한 글자 수사는 띄어 쓰면 세지 않습니다. `세대`, `만일` 같은 단어는 수로 잘못 셀 수 있습니다. `keywords()`는 공백을 뺀 부분 문자열 일치라 `점`을 키워드로 주면 `지점`도 셉니다. 키워드는 두 글자 이상으로 주세요.
 - AI-Hub 가림 태그(`@이름1`, `&이름&`)는 `aihub=True`로도 지우지 않습니다. 지우면 모델이 받아쓴 실제 이름이 전부 삽입 오류가 되기 때문입니다. 그런 문장은 빼고 재세요.
 - 긴 글은 `kocer[fast]`로 재세요(8,200자 한 덩어리 0.03초). rapidfuzz 없이 순수 파이썬으로는 정렬이 글자 수의 제곱에 비례해서, 수천 자를 한 덩어리로 넣으면 느리고 메모리를 많이 씁니다. 그때는 문장 단위로 나눠 넣으세요.
 
@@ -245,7 +258,7 @@ CER 6.88% (raw) / 2.90% (kocer 0.5.0)
   author  = {Choi, Kwan-u},
   title   = {kocer: reading-based CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.5.1},
+  version = {0.5.2},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

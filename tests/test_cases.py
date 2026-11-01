@@ -282,3 +282,64 @@ def test_numbers_beyond_the_largest_unit_do_not_crash():
     for text in ["번호 " + "9" * 25, "오후 3:" + "1" * 22, "$" + "1" * 22, "1" * 22 + "℃", "1" * 30 + ".5"]:
         kocer.measure(text, text)
     assert numbers.sino("1" * 20) == "천백십일경천백십일조천백십일억천백십일만천백십일"   # 20 digits: still read with units
+
+
+def test_style_counts_notation_without_changing_cer():
+    # #6: 표기 검사는 결과만 보고, cer에는 들어가지 않는다
+    assert kocer.measure("세 시", "세 시", style="digits").notation == 1       # 정답이 한글이어도 결과가 한글이면 위반
+    assert kocer.measure("세 시", "3시", style="digits").notation == 0
+    assert kocer.measure("3시", "3시", style="hangul").notation == 1
+    assert kocer.measure("3시", "세 시", style="hangul").notation == 0
+    for hyp in ("세 시", "3시"):
+        assert kocer.cer("세 시", hyp, style="digits") == kocer.cer("세 시", hyp) == 0
+    r = kocer.measure("세 시 삼십 분", "세 시 삼십 분", style="digits")
+    assert r.notation == 3 and r.cer == 0 and r.service_cer == pytest.approx(3 / 5)
+    assert kocer.measure("세 시", "3시 반", style="digits").notation == 0       # 숫자 + 한글이 섞여도 수사만 본다
+    assert kocer.measure("25분", "이십오 분", style="digits").notation == 3
+    assert kocer.measure("2024년", "이천이십사년", style="digits").notation == 5
+    assert kocer.measure("가", "가", style="digits").notation == 0
+
+
+def test_style_hangul_detection_is_conservative():
+    from kocer.style import violations
+    assert violations("이 사람 이 시간에", "digits") == 0      # 지시어
+    assert violations("천만에요 조만간 사이에", "digits") == 0   # 다른 말의 일부
+    assert violations("두 시간 한 번", "digits") == 2
+    assert violations("유월 첫 번째", "digits") == 2
+    with pytest.raises(ValueError):
+        kocer.measure("가", "가", style="roman")
+
+
+def test_breakdown_with_style_adds_service_rate():
+    refs, hyps = ["회의는 3시 30분에 시작합니다", "사과 3개 주세요"], ["회의는 세 시 삼십 분에 시작합니다", "사과 네 개 주세요"]
+    b = kocer.breakdown(refs, hyps, style="digits")
+    b0 = kocer.breakdown(refs, hyps)
+    assert (b.raw_errors, b.spacing, b.punctuation, b.numbers_letters, b.remaining) == (b0.raw_errors, b0.spacing, b0.punctuation, b0.numbers_letters, b0.remaining)
+    assert b.cer["kocer"] == b0.cer["kocer"] and "service" not in b0.cer
+    assert b.notation == 4 and b.cer["service"] == pytest.approx((b.remaining + 4) / 21)
+    assert "표기 위반" in str(b) and "표기 위반" not in str(b0)
+
+
+def test_keywords_match_readings_spacing_and_repeats():
+    refs = ["서초점 3시에 서초점", "케이비오 리그", "(7시)/(일곱 시)에 만나"]
+    hyps = ["서초 점 세 시에 서초점", "KBO 리그", "7시에 만나"]
+    k = kocer.keywords(refs, hyps, ["서초 점", "3시", "KBO", "일곱 시", "없는말"])
+    assert k.counts["서초 점"] == (2, 2, 0)      # 여러 어절 키워드, 한 문장에 두 번
+    assert k.counts["3시"] == (1, 1, 0) and k.counts["KBO"] == (1, 1, 0) and k.counts["일곱 시"] == (1, 1, 0)
+    assert k.counts["없는말"] == (0, 0, 0) and k.rate == 0
+    k2 = kocer.keywords(["서초점 서초점", "발레파킹"], ["서초점 사당점", "발렛 파킹 발레파킹"], ["서초점", "발레파킹"])
+    assert k2.counts["서초점"] == (2, 1, 0) and k2.counts["발레파킹"] == (1, 1, 0) and k2.rate == pytest.approx(1 / 3)
+    assert kocer.keywords(["가"], ["서초점"], ["서초점"]).counts["서초점"] == (0, 0, 1)   # 결과에만 나오면 추가
+    assert "keyword error rate" in str(k2)
+    with pytest.raises(TypeError):
+        kocer.keywords("가", "가", ["가"])
+
+
+def test_cli_style_and_keywords(tmp_path, capsys):
+    from kocer.cli import main
+    (tmp_path / "ref.txt").write_text("서초점 3시\n", encoding="utf-8")
+    (tmp_path / "hyp.txt").write_text("서초점 세 시\n", encoding="utf-8")
+    (tmp_path / "kw.txt").write_text("서초점\n3시\n", encoding="utf-8")
+    assert main([str(tmp_path / "ref.txt"), str(tmp_path / "hyp.txt"), "--style", "digits", "--keywords", str(tmp_path / "kw.txt")]) == 0
+    out = capsys.readouterr().out
+    assert "표기 위반 (digits) 1자" in out and "keyword error rate 0.00%" in out

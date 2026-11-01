@@ -5,7 +5,7 @@ import sys
 
 import os
 
-from . import __version__, breakdown, compare, measure
+from . import __version__, breakdown, compare, keywords, measure
 
 RED, GREEN, STRIKE, END = "\x1b[31m", "\x1b[32m", "\x1b[9;31m", "\x1b[0m"
 
@@ -33,10 +33,13 @@ def main(argv=None) -> int:
     p.add_argument("--aihub", action="store_true", help="AI-Hub 전사의 잡음 태그(b/ n/ ...), 간투사 슬래시, +, * 표시를 지움")
     p.add_argument("--no-dual", action="store_true", help="이중 표기 (3시)/(세 시)를 후보로 풀지 않음")
     p.add_argument("--boot", type=int, default=2000, help="비교 모드의 bootstrap 반복 수 (기본 2000)")
+    p.add_argument("--style", choices=("digits", "hangul"), help="결과가 이 표기로 수를 썼는지 따로 셈 (점수는 그대로)")
+    p.add_argument("--keywords", metavar="FILE", help="줄마다 키워드 하나. 키워드 오류율을 같이 출력")
     p.add_argument("--version", action="version", version=__version__)
     a = p.parse_args(argv)
     refs = open(a.ref, encoding="utf-8-sig").read().splitlines()
     opts = dict(numbers=not a.no_numbers, aihub=a.aihub, dual=not a.no_dual)
+    words = [w for w in open(a.keywords, encoding="utf-8-sig").read().splitlines() if w.strip()] if a.keywords else []
     if len(a.hyp) > 1:
         systems = {}
         for path in a.hyp:
@@ -46,6 +49,12 @@ def main(argv=None) -> int:
             name = os.path.splitext(os.path.basename(path))[0]
             systems[name if name not in systems else path] = lines
         print(compare(refs, systems, n_boot=a.boot, **opts))
+        for name, lines in systems.items():
+            if a.style:
+                b = breakdown(refs, lines, style=a.style, **opts)
+                print(f"{name}: 표기 위반 ({a.style}) {b.notation:,}자, 인식 오류 + 표기 위반 CER {b.cer['service']:.2%}")
+            if words:
+                print(f"{name}:"); print(keywords(refs, lines, words, **opts))
         return 0
     hyps = open(a.hyp[0], encoding="utf-8-sig").read().splitlines()
     if len(refs) != len(hyps):
@@ -55,7 +64,9 @@ def main(argv=None) -> int:
             m = measure(r, h, **opts)
             if m.errors:
                 print(f"{i}: {render(m.alignment)}  (cer {m.cer:.3f})")
-    print(breakdown(refs, hyps, **opts))
+    print(breakdown(refs, hyps, style=a.style, **opts))
+    if words:
+        print(keywords(refs, hyps, words, **opts))
     return 0
 
 

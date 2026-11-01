@@ -13,9 +13,10 @@ from .normalize import dual_variants as _dual_variants
 from .normalize import normalize as _normalize
 from .normalize import resolve_dual as _resolve_dual
 from .normalize import strip_aihub_tags as _strip_aihub
+from .style import violations as _violations
 
-__version__ = "0.5.1"
-__all__ = ["cer", "wer", "measure", "breakdown", "compare", "Result", "Breakdown", "Comparison", "ALIASES"]
+__version__ = "0.5.2"
+__all__ = ["cer", "wer", "measure", "breakdown", "compare", "keywords", "Result", "Breakdown", "Comparison", "Keywords", "ALIASES"]
 
 Text = Union[str, Sequence[str]]
 JOINT_LIMIT = 4096  # 정답 후보 × 출력 후보 조합이 이 이하이면 전수 탐색
@@ -33,6 +34,7 @@ class Result:
     alignment: List[Op] = field(repr=False)
     chosen_ref: str = ""  # 숫자 후보 중 실제로 채택된 정답
     chosen_hyp: str = ""
+    notation: int = 0     # style을 줬을 때, 결과가 그 표기에 어긋나게 쓴 수의 글자 수 (#6). cer에는 안 들어간다
 
     @property
     def ops(self):
@@ -41,6 +43,11 @@ class Result:
     @property
     def errors(self) -> int:
         return self.substitutions + self.deletions + self.insertions
+
+    @property
+    def service_cer(self) -> float:
+        """인식 오류 + 표기 위반을 모두 오류로 센 비율. 자막처럼 표기가 곧 결과물일 때."""
+        return (self.errors + self.notation) / max(self.ref_len, 1)
 
 
 def _units(text: str, unit: str) -> List[str]:
@@ -83,10 +90,15 @@ def _dual_sides(text: str):
 
 def measure(reference: str, hypothesis: str, *, unit: str = "char", normalize: bool = True,
             numbers: bool = True, punct: bool = True, fillers: bool = False, letters: bool = True,
-            aliases: Optional[Dict[str, str]] = None, dual: bool = True, aihub: bool = False) -> Result:
+            aliases: Optional[Dict[str, str]] = None, dual: bool = True, aihub: bool = False,
+            style: Optional[str] = None) -> Result:
     """aliases: 단어처럼 읽는 약어 사전 (예: {"NASA": "나사"}). 내장 ALIASES 위에 덮어쓴다.
     dual: AI-Hub 이중 표기 "(3시)/(세 시)"의 양쪽을 모두 정답 후보로 본다 (기본 켬).
-    aihub: AI-Hub 전사의 잡음 태그(b/ n/ ...), 간투사 슬래시, 반복(+)·불명확(*) 표시를 지운다 (기본 끔)."""
+    aihub: AI-Hub 전사의 잡음 태그(b/ n/ ...), 간투사 슬래시, 반복(+)·불명확(*) 표시를 지운다 (기본 끔).
+    style: "digits" | "hangul". 결과가 그 표기로 수를 썼는지 따로 센다 (Result.notation). 점수(cer)는 바뀌지 않는다."""
+    notation = 0
+    if style is not None:
+        notation = _violations(_normalize(_strip_aihub(hypothesis) if aihub else hypothesis, punct, fillers), style)
     raw_ref, raw_hyp = (reference.split(), hypothesis.split()) if unit == "word" else (list(reference.strip()), list(hypothesis.strip()))
     raw = distance(raw_ref, raw_hyp) / max(len(raw_ref), 1)
 
@@ -126,7 +138,7 @@ def measure(reference: str, hypothesis: str, *, unit: str = "char", normalize: b
             ref, hyp, ops = _normalized(ref_text, hyp_text, *args)
     counts = {k: sum(op == k for op, _, _ in ops) for k in "HSDI"}
     err = counts["S"] + counts["D"] + counts["I"]
-    return Result(err / max(ref_len, 1), raw, counts["H"], counts["S"], counts["D"], counts["I"], ref_len, ops, ref, hyp)
+    return Result(err / max(ref_len, 1), raw, counts["H"], counts["S"], counts["D"], counts["I"], ref_len, ops, ref, hyp, notation)
 
 
 def _rate(reference: Text, hypothesis: Text, unit: str, **opts) -> float:
@@ -159,7 +171,9 @@ class Breakdown:
     punctuation: int
     numbers_letters: int
     remaining: int
-    cer: Dict[str, float]  # 단계별 CER: raw, nospace, nopunct, kocer
+    cer: Dict[str, float]  # 단계별 CER: raw, nospace, nopunct, kocer (+ style을 주면 service)
+    style: Optional[str] = None
+    notation: int = 0      # style에 어긋나게 쓴 수의 글자 수. raw_errors와 별개 (#6)
 
     @property
     def shares(self) -> Dict[str, float]:
@@ -172,28 +186,35 @@ class Breakdown:
         d = max(self.raw_errors, 1)
         out = [f"raw CER {self.cer['raw']:.2%}  →  kocer CER {self.cer['kocer']:.2%}   ({self.raw_errors:,} raw errors, {self.pairs:,} pairs, kocer {__version__})"]
         out += [f"{name:<6}{n:>8,}  {n / d:4.0%}  {'█' * round(40 * n / d)}" for name, n in rows]
+        if self.style:
+            out.append(f"표기 위반 ({self.style}) {self.notation:,}자  →  인식 오류 + 표기 위반 CER {self.cer['service']:.2%}")
         return "\n".join(out)
 
 
 def breakdown(reference: Text, hypothesis: Text, **opts) -> Breakdown:
     """raw → 공백 제거 → 공백·부호 제거 → kocer 네 단계로 채점해 오류가 어디서 사라지는지 개수로 센다.
     각 단계는 정답과 결과에 똑같이 적용된다. 분모는 단계마다 그 단계의 정답 글자 수(공백·부호 제거 뒤 두 단계는 같은 분모).
-    opts는 cer()와 같다(aliases 등)."""
+    opts는 cer()와 같다(aliases 등). style="digits"|"hangul"을 주면 표기 위반을 따로 세고 cer["service"]에 합산 비율을 더한다 (#6)."""
     if isinstance(reference, str):
         reference, hypothesis = [reference], [hypothesis]
     if len(reference) != len(hypothesis):
         raise ValueError("reference and hypothesis must have the same length")
+    style = opts.pop("style", None)
     # 이중 표기 해소는 숫자·영문 칸(같은 말의 다른 표기), AI-Hub 태그 제거는 문장부호 칸으로 들어가게 단계별로 켠다
     levels = [dict(normalize=False), dict(numbers=False, punct=False, letters=False, dual=False, aihub=False),
               dict(numbers=False, letters=False, dual=False), {}]
-    E, N = [0] * 4, [0] * 4
+    E, N, V = [0] * 4, [0] * 4, 0
     for r, h in zip(reference, hypothesis):
         for i, lv in enumerate(levels):
-            m = measure(r, h, **{**opts, **lv}) if lv else measure(r, h, **opts)
+            m = measure(r, h, **{**opts, **lv}) if lv else measure(r, h, **opts, style=style)
             E[i] += m.errors
             N[i] += m.ref_len
+            V += m.notation
     cer = dict(zip(("raw", "nospace", "nopunct", "kocer"), (e / max(n, 1) for e, n in zip(E, N))))
-    return Breakdown(len(reference), E[0], E[0] - E[1], E[1] - E[2], E[2] - E[3], E[3], cer)
+    if style:
+        cer["service"] = (E[3] + V) / max(N[3], 1)
+    return Breakdown(len(reference), E[0], E[0] - E[1], E[1] - E[2], E[2] - E[3], E[3], cer, style, V)
 
 
 from .compare import Comparison, compare  # noqa: E402  (measure를 쓰므로 맨 아래에서 가져옴)
+from .keywords import Keywords, keywords  # noqa: E402
