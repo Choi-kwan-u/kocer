@@ -199,60 +199,33 @@ kocer measures whether two strings **read as the same words**, not whether they 
 
 Both arrived in 0.5.2 from practitioner requests, and neither touches the default score (`cer`).
 
-**Notation check `style`.** kocer CER measures only whether the model heard the words. When the spelling is the product (subtitles), you also need to know whether it wrote numbers in the wanted style, and that is a different problem: a model that mishears needs replacing, while a model that hears correctly but writes numbers in Hangul only needs post-processing. With `style="digits"` (or `"hangul"`), numbers written against that style are counted separately as **notation violations**. Even if the reference says `세 시`, an output of `세 시` is a `digits` violation and `3시` passes.
+**Notation check `style`.** kocer CER measures only whether the model heard the words. When the spelling is the product (subtitles), you also need "did it write numbers in the wanted style?", and that is a different problem: a model that mishears needs replacing, a model that hears correctly but writes numbers in Hangul only needs post-processing. With `style="digits"` (or `"hangul"`), numbers written against that style are counted separately as **notation violations**. Even if the reference says `세 시`, an output of `세 시` is a violation and `3시` passes.
 
 ```python
 r = kocer.measure("세 시", "세 시", style="digits")
-r.cer, r.notation, r.service_cer   # 0.0, 1, 0.5: heard correctly (cer 0) but wrote it in Hangul (1 violating character). service_cer = (errors + violations) / ref_len 2
-
-refs = ["회의는 3시 30분에 시작합니다", "사과 3개 주세요", "네, 알겠습니다."]
-hyps = ["회의는 세 시 삼십 분에 시작합니다", "사과 네 개 주세요", "네 알겠습니다"]
-b = kocer.breakdown(refs, hyps, style="digits")
-b.notation, b.cer["service"]       # 4, 0.185: violating characters (세, 삼십, 네), CER with recognition errors and violations added; everything else is unchanged
-print(b)
+r.cer, r.notation, r.service_cer   # 0.0, 1, 0.5: heard correctly, wrote it in Hangul. service_cer = (errors + violations) / ref_len
+print(kocer.breakdown(refs, hyps, style="digits"))   # adds "표기 위반 (digits) 4자 → 인식 오류 + 표기 위반 CER 18.52%" under the breakdown
 ```
 
-```
-raw CER 25.71%  →  kocer CER 3.70%   (9 raw errors, 3 pairs, kocer 0.5.3)
-띄어쓰기         3   33%  █████████████
-문장부호         2   22%  █████████
-숫자·영문        3   33%  █████████████
-진짜 오류        1   11%  ████
-표기 위반 (digits) 4자  →  인식 오류 + 표기 위반 CER 18.52%
-```
-
-Violations count only the numeral itself (`삼십 분` counts `삼십`, 2 characters). The `숫자·영문` row counts characters whose spelling differs from the reference; the `표기 위반` line counts characters whose spelling differs from the wanted style, so the two can overlap or differ (a reference of `세 시` never reaches the first but does reach the second). `style="hangul"` counts Arabic digits instead.
-
-```bash
-kocer ref.txt hyp.txt --style digits          # one violation line under the breakdown
-kocer ref.txt a.txt b.txt --style digits      # in comparison mode, one line per model
-```
-
-**Keyword error rate `keywords()`.** For phone surveys or call bots, "did it get the branch name, the time, the amount?" matters more than the overall CER. Pass a keyword list and it counts, per keyword, the occurrences in the references and how many survived in the hypotheses. The list is yours: it differs per domain, so there is no built-in one. Matching goes through kocer normalization (`3시` = `세 시`, `KBO` = `케이비오`), starts at the beginning of a word, ignores spaces inside the keyword (`서초 점` = `서초점`) and tolerates attached particles (`서초점은`). Characters inside another word (`점` in `지점`) are not counted.
+**Keyword error rate `keywords()`.** For phone surveys or call bots, "did it get the branch name, the time, the amount?" matters more than the overall CER. Pass a keyword list (yours: it differs per domain, so there is no built-in one) and it counts, per keyword, the occurrences in the references and how many survived in the hypotheses, with `3시` = `세 시` and `KBO` = `케이비오`.
 
 ```python
-refs = ["서초점 3시에 뵙겠습니다", "강남점은 10시"]
-hyps = ["서초 점 세 시에 뵙겠습니다", "강남전은 열 시"]
-k = kocer.keywords(refs, hyps, ["서초점", "강남점", "3시", "10시"])
-k.counts["강남점"]  # (1, 0, 0): (occurrences in the references, hits in the hypotheses, extra in the hypotheses)
-k.rate             # 0.25: keyword error rate = missed / occurrences
-print(k)
+k = kocer.keywords(["서초점 3시에 뵙겠습니다", "강남점은 10시"], ["서초 점 세 시에 뵙겠습니다", "강남전은 열 시"], ["서초점", "강남점", "3시", "10시"])
+k.counts["강남점"], k.rate   # (1, 0, 0), 0.25: (occurrences, hits, extra in the hypotheses), keyword error rate = missed / occurrences
 ```
-
-```
-keyword error rate 25.00%   (1 missed of 4, 2 pairs, kocer 0.5.3)
-키워드   정답  맞음  추가
-서초점      1     1     0
-강남점      1     0     0
-3시       1     1     0
-10시      1     1     0
-```
-
-`3시` is a hit even when the output says `세 시`, and `10시` when it says `열 시`. Options are the same as for `cer()` (`aliases`, `aihub`, `dual` ...).
 
 ```bash
-kocer keywords ref.txt hyp.txt --list kw.txt   # one keyword per line; several hypothesis files are reported one after another
+kocer ref.txt hyp.txt --style digits
+kocer keywords ref.txt hyp.txt --list kw.txt   # one keyword per line
 ```
+
+<details>
+<summary>Counting rules</summary>
+
+- Violations count only the numeral itself (`삼십 분` counts `삼십`, 2 characters). The `숫자·영문` row of `breakdown()` counts characters whose spelling differs from the reference, the violation line counts characters whose spelling differs from the wanted style, so a reference of `세 시` never reaches the first but does reach the second. `style="hangul"` counts Arabic digits instead.
+- Keywords are matched after kocer normalization from the start of a word: spaces inside the keyword are ignored (`서초 점` = `서초점`), attached particles are fine (`서초점은`), and characters inside another word (`점` in `지점`) are not counted. Repeats within a sentence count each time; hits per sentence = min(reference count, hypothesis count). Options are the same as for `cer()`.
+
+</details>
 
 ## Benchmark on public models
 
