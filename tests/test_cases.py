@@ -304,6 +304,8 @@ def test_style_counts_notation_without_changing_cer():
 def test_style_hangul_detection_is_conservative():
     from kocer.style import violations
     assert violations("이 사람 이 시간에", "digits") == 0      # 지시어
+    assert violations("네 알겠습니다", "digits") == 0          # '알'은 조수사지만 여기서는 낱말의 첫 글자 (0.5.2는 위반으로 셌다)
+    assert violations("세 시에 만나 두 시간이나 오 분쯤", "digits") == 3   # 조수사 뒤 조사는 허용
     assert violations("천만에요 조만간 사이에", "digits") == 0   # 다른 말의 일부
     assert violations("두 시간 한 번", "digits") == 2
     assert violations("유월 첫 번째", "digits") == 2

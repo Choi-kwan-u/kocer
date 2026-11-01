@@ -20,10 +20,12 @@ _SINO_RUN = rf"[{_SINO}]+(?:점[{_SINO}]+)?"
 _COUNTERS = sorted((NATIVE | SINO | {"분", "시", "초", "년", "개"} | {w for ws in UNITS.values() for w in ws}), key=len, reverse=True)
 _COUNTER = "|".join(map(re.escape, _COUNTERS))
 _B = r"(?<![가-힣])"  # 수사 앞에 한글이 붙어 있으면 다른 말의 일부
+# 조수사 뒤에는 조사·어미·공백·끝만 허용: '네 알겠습니다'의 '네 알'(알 = 조수사)처럼 다른 낱말의 첫 글자를 조수사로 보지 않기 위해
+_AFTER = (r"(?![가-힣])|(?=에|은|는|이|가|을|를|의|도|만|부터|까지|으로|로|나|씩|째|쯤|요|입|이다|이고|이라|밖에|이면|면|과|와|하고|랑|당|마다)")
 
 # 1) 수사 + (공백) + 조수사·단위. 2) 자리 단위가 든 한자어 수 단독. 3) 고유어 십 단위 단독(스물, 서른 ...). 4) 유월·시월, 첫 번째
 _HANGUL_NUMBER = re.compile(
-    rf"{_B}(?P<n1>{_SINO_RUN}|{_NATIVE})(?P<sp>\s?)(?={_COUNTER})"
+    rf"{_B}(?P<n1>{_SINO_RUN}|{_NATIVE})(?P<sp>\s?)(?=(?:{_COUNTER})(?:{_AFTER}))"
     rf"|{_B}(?P<n2>[{_SINO}]*[{_PLACE}][{_SINO}]*(?:점[{_SINO}]+)?)(?![가-힣])"
     rf"|{_B}(?P<n3>(?:{_NATIVE_TENS})(?:{_NATIVE_ONES})?)(?![가-힣])"
     rf"|{_B}(?P<n4>유|시)(?=월)|{_B}(?P<n5>첫)(?=\s?번째)"

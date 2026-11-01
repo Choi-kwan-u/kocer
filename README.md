@@ -128,27 +128,55 @@ kocer.cer("케이비오 리그", "KBO 리그")      # 0.0
 
 ```python
 r = kocer.measure("세 시", "세 시", style="digits")
-r.cer, r.notation, r.service_cer   # 0.0, 1, 1.0: 잘 들었지만(cer) 한글로 썼다(notation). service_cer = (오류 + 위반) / 정답 길이
+r.cer, r.notation, r.service_cer   # 0.0, 1, 0.5: 잘 들었지만(cer 0) 한글로 썼다(위반 1자). service_cer = (오류 + 위반) / 정답 길이 2
 
+refs = ["회의는 3시 30분에 시작합니다", "사과 3개 주세요", "네, 알겠습니다."]
+hyps = ["회의는 세 시 삼십 분에 시작합니다", "사과 네 개 주세요", "네 알겠습니다"]
 b = kocer.breakdown(refs, hyps, style="digits")
-b.notation, b.cer["service"]       # 위반 글자 수, 인식 오류 + 표기 위반 CER. 나머지 항목은 style 없을 때와 같다
+b.notation, b.cer["service"]       # 4, 0.185: 위반 글자 수(세·삼십·네), 인식 오류 + 표기 위반 CER. 나머지 항목은 style 없을 때와 같다
+print(b)
 ```
 
+```
+raw CER 25.71%  →  kocer CER 3.70%   (9 raw errors, 3 pairs, kocer 0.5.3)
+띄어쓰기         3   33%  █████████████
+문장부호         2   22%  █████████
+숫자·영문        3   33%  █████████████
+진짜 오류        1   11%  ████
+표기 위반 (digits) 4자  →  인식 오류 + 표기 위반 CER 18.52%
+```
+
+위반 글자 수는 수사 부분만 셉니다(`삼십 분`이면 `삼십` 2자). `숫자·영문` 칸은 정답과 표기가 다른 글자이고, `표기 위반`은 원하는 표기와 다른 글자라서 둘은 겹칠 수도 다를 수도 있습니다(정답이 `세 시`면 `숫자·영문`에는 안 잡히고 `표기 위반`에만 잡힘). `style="hangul"`은 반대로 아라비아 숫자를 위반으로 셉니다.
+
 ```bash
-kocer ref.txt hyp.txt --style digits
+kocer ref.txt hyp.txt --style digits          # 분해 표 아래에 표기 위반 줄이 붙음
+kocer ref.txt a.txt b.txt --style digits      # 비교 모드에서는 모델마다 한 줄
 ```
 
 **키워드 오류율 `keywords()`.** 전화 설문이나 콜봇에서는 전체 CER보다 "지점명, 시각, 금액을 맞혔나"가 중요합니다. 키워드 목록을 넘기면 키워드마다 정답에 나온 횟수와 결과에서 살아남은 횟수를 셉니다. 목록은 도메인마다 달라서 내장하지 않습니다. 판정은 kocer 정규화를 거쳐서 `3시` = `세 시`, `KBO` = `케이비오`이고, 키워드는 어절 첫머리에서부터 맞추되 안의 공백은 무시하고(`서초 점` = `서초점`) 조사가 붙어도 됩니다(`서초점은`). `지점`의 `점`처럼 어절 중간에 섞인 글자는 세지 않습니다.
 
 ```python
-k = kocer.keywords(refs, hyps, ["서초 점", "3시", "KBO"])
-k.counts["3시"]    # (정답에 나온 횟수, 결과에서 맞은 횟수, 결과에만 더 나온 횟수)
-k.rate             # 키워드 오류율 = 놓친 횟수 / 정답에 나온 횟수
-print(k)           # 키워드별 표
+refs = ["서초점 3시에 뵙겠습니다", "강남점은 10시"]
+hyps = ["서초 점 세 시에 뵙겠습니다", "강남전은 열 시"]
+k = kocer.keywords(refs, hyps, ["서초점", "강남점", "3시", "10시"])
+k.counts["강남점"]  # (1, 0, 0): (정답에 나온 횟수, 결과에서 맞은 횟수, 결과에만 더 나온 횟수)
+k.rate             # 0.25: 키워드 오류율 = 놓친 횟수 / 정답에 나온 횟수
+print(k)
 ```
 
+```
+keyword error rate 25.00%   (1 missed of 4, 2 pairs, kocer 0.5.3)
+키워드   정답  맞음  추가
+서초점      1     1     0
+강남점      1     0     0
+3시       1     1     0
+10시      1     1     0
+```
+
+`3시`는 결과가 `세 시`여도, `10시`는 `열 시`여도 맞음입니다. 옵션은 `cer()`와 같습니다(`aliases`, `aihub`, `dual` ...).
+
 ```bash
-kocer keywords ref.txt hyp.txt --list kw.txt   # kw.txt는 줄마다 키워드 하나
+kocer keywords ref.txt hyp.txt --list kw.txt   # kw.txt는 줄마다 키워드 하나. 결과 파일이 여럿이면 각각 출력
 ```
 
 ## 기존 도구와 비교
@@ -277,7 +305,7 @@ CER 6.88% (raw) / 2.90% (kocer 0.5.0)
   author  = {Choi, Kwan-u},
   title   = {kocer: reading-based CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.5.2},
+  version = {0.5.3},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```

@@ -132,27 +132,55 @@ Both arrived in 0.5.2 from practitioner requests, and neither touches the defaul
 
 ```python
 r = kocer.measure("세 시", "세 시", style="digits")
-r.cer, r.notation, r.service_cer   # 0.0, 1, 1.0: heard correctly (cer) but wrote it in Hangul (notation). service_cer = (errors + violations) / ref_len
+r.cer, r.notation, r.service_cer   # 0.0, 1, 0.5: heard correctly (cer 0) but wrote it in Hangul (1 violating character). service_cer = (errors + violations) / ref_len 2
 
+refs = ["회의는 3시 30분에 시작합니다", "사과 3개 주세요", "네, 알겠습니다."]
+hyps = ["회의는 세 시 삼십 분에 시작합니다", "사과 네 개 주세요", "네 알겠습니다"]
 b = kocer.breakdown(refs, hyps, style="digits")
-b.notation, b.cer["service"]       # violating characters, CER with recognition errors and violations added; everything else is unchanged
+b.notation, b.cer["service"]       # 4, 0.185: violating characters (세, 삼십, 네), CER with recognition errors and violations added; everything else is unchanged
+print(b)
 ```
 
+```
+raw CER 25.71%  →  kocer CER 3.70%   (9 raw errors, 3 pairs, kocer 0.5.3)
+띄어쓰기         3   33%  █████████████
+문장부호         2   22%  █████████
+숫자·영문        3   33%  █████████████
+진짜 오류        1   11%  ████
+표기 위반 (digits) 4자  →  인식 오류 + 표기 위반 CER 18.52%
+```
+
+Violations count only the numeral itself (`삼십 분` counts `삼십`, 2 characters). The `숫자·영문` row counts characters whose spelling differs from the reference; the `표기 위반` line counts characters whose spelling differs from the wanted style, so the two can overlap or differ (a reference of `세 시` never reaches the first but does reach the second). `style="hangul"` counts Arabic digits instead.
+
 ```bash
-kocer ref.txt hyp.txt --style digits
+kocer ref.txt hyp.txt --style digits          # one violation line under the breakdown
+kocer ref.txt a.txt b.txt --style digits      # in comparison mode, one line per model
 ```
 
 **Keyword error rate `keywords()`.** For phone surveys or call bots, "did it get the branch name, the time, the amount?" matters more than the overall CER. Pass a keyword list and it counts, per keyword, the occurrences in the references and how many survived in the hypotheses. The list is yours: it differs per domain, so there is no built-in one. Matching goes through kocer normalization (`3시` = `세 시`, `KBO` = `케이비오`), starts at the beginning of a word, ignores spaces inside the keyword (`서초 점` = `서초점`) and tolerates attached particles (`서초점은`). Characters inside another word (`점` in `지점`) are not counted.
 
 ```python
-k = kocer.keywords(refs, hyps, ["서초 점", "3시", "KBO"])
-k.counts["3시"]    # (occurrences in the references, hits in the hypotheses, extra in the hypotheses)
-k.rate             # keyword error rate = missed / occurrences
-print(k)           # table per keyword
+refs = ["서초점 3시에 뵙겠습니다", "강남점은 10시"]
+hyps = ["서초 점 세 시에 뵙겠습니다", "강남전은 열 시"]
+k = kocer.keywords(refs, hyps, ["서초점", "강남점", "3시", "10시"])
+k.counts["강남점"]  # (1, 0, 0): (occurrences in the references, hits in the hypotheses, extra in the hypotheses)
+k.rate             # 0.25: keyword error rate = missed / occurrences
+print(k)
 ```
 
+```
+keyword error rate 25.00%   (1 missed of 4, 2 pairs, kocer 0.5.3)
+키워드   정답  맞음  추가
+서초점      1     1     0
+강남점      1     0     0
+3시       1     1     0
+10시      1     1     0
+```
+
+`3시` is a hit even when the output says `세 시`, and `10시` when it says `열 시`. Options are the same as for `cer()` (`aliases`, `aihub`, `dual` ...).
+
 ```bash
-kocer keywords ref.txt hyp.txt --list kw.txt   # one keyword per line
+kocer keywords ref.txt hyp.txt --list kw.txt   # one keyword per line; several hypothesis files are reported one after another
 ```
 
 ## Compared with existing tools
@@ -281,7 +309,7 @@ Use "Cite this repository" on the right side of the repo page to copy a citation
   author  = {Choi, Kwan-u},
   title   = {kocer: reading-based CER/WER for Korean speech recognition},
   year    = {2026},
-  version = {0.5.2},
+  version = {0.5.3},
   url     = {https://github.com/Choi-kwan-u/kocer}
 }
 ```
