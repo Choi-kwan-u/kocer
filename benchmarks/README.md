@@ -137,6 +137,7 @@ With the pronunciation reference and nospace+punct scoring the Qwen3-ASR base ra
 | runaway utterances (greedy → card) | 19 → 17 | 0 → 0 | 0 → 0 | 0 → 0 | 0 → 0 |
 
    BuzzASR stays 4th on KsponSpeech and 1st on Common Voice either way. Details: `results/decoding_check.md` (`scripts/decoding_check.py`); public-set outputs with the card settings are in `results/_buzzasr-korean-cardgen/`. The telephone column is from the section below.
+   Beam search (`num_beams=5`) goes the other way: lower kocer CER than greedy on all six sets and it also stops both loops, at 1.22× the decoding time. Three-way comparison with intervals, the two loops and the cost: [`results/buzzasr_decoding.md`](results/buzzasr_decoding.md).
 6. Pooled with the three public sets (7,418 utterances, KsponSpeech dominating), every pair is separated and the order is TeamUNIVA ko, TeamUNIVA ko beta, Qwen3-ASR base, BuzzASR, whisper, SenseVoice. This order reflects the KsponSpeech share of the pool; read the per-set tables first.
 
 **Raw AI-Hub transcripts, no cleaning (since kocer 0.2.0).** kocer reads the dual notation `(3시)/(세 시)` and accepts either side span by span, and `aihub=True` strips the noise tags (`b/`, `n/`, ...), filler slashes, `+` and `*`. Feeding the original `.trn` text straight in:
