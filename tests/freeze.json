@@ -1,6 +1,9 @@
 {
  "version": "0.5.1",
  "digests": {
+  "_buzzasr-korean-beam5/zeroth": "cfeb559b5b272195161d8b43bd5e3f20a7472754d365ab5f140b6cb0becdb1fc",
+  "_buzzasr-korean-beam5/fleurs": "e9b61e766ad70d844013ecbc8ccb499bfc0e67d95d60f9fe1d31cf7850d3b94f",
+  "_buzzasr-korean-beam5/commonvoice": "7b566aab46b40bc7e17f35fa09f649f8f4805f6f91e2e55bb329386705a467cc",
   "_buzzasr-korean-cardgen/zeroth": "0a365f1ee47d5f6e7f5b6bb2fc18c8baa9431c3ecaaaa0d4df9822d710b5adb3",
   "_buzzasr-korean-cardgen/fleurs": "c195b45d20d32185a9095ed919ee6031df45de1f46361fe9274c67454d60ccf0",
   "_buzzasr-korean-cardgen/commonvoice": "165619b5b81349fda9fcb94827a216e64696c793ea477bc9bff74722c002b54a",

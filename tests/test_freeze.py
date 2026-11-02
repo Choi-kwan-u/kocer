@@ -38,8 +38,10 @@ def digests():
 def test_default_scores_match_frozen_version():
     expected = json.loads(EXPECTED.read_text(encoding="utf-8"))
     got = digests()
-    assert got.keys() == expected["digests"].keys()
-    changed = [k for k in got if got[k] != expected["digests"][k]]
+    missing = [k for k in expected["digests"] if k not in got]
+    assert not missing, f"result files missing: {missing}"
+    # 새 결과 폴더가 추가되는 건 괜찮다 (freeze.json을 다시 만들 때 포함된다)
+    changed = [k for k in expected["digests"] if got[k] != expected["digests"][k]]
     assert not changed, f"scores differ from kocer {expected['version']} on: {changed}"
 
 
