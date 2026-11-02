@@ -250,6 +250,11 @@ kocer keywords ref.txt hyp.txt --list kw.txt   # kw.txt는 줄마다 키워드 �
 
 </details>
 
+## 사용 사례
+
+- [BuzzASR/korean](https://huggingface.co/BuzzASR/korean): 모델 카드의 권장 디코딩 설정을 kocer 0.5.0 평가 결과를 근거로 `num_beams=5`로 변경했습니다 ([비교 결과](benchmarks/results/buzzasr_decoding.md)).
+- [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko): 모델 카드에 kocer(0.1.5)로 재채점한 결과를 추가했습니다.
+
 ## 한계
 
 - 숫자와 영문 약어가 아닌 표기 차이(구어 축약, 발음대로 적은 표기)는 오류로 셉니다.

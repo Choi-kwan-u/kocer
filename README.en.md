@@ -254,6 +254,11 @@ In %, pooled errors / pooled reference characters. KsponSpeech and telephone use
 
 </details>
 
+## Used in
+
+- [BuzzASR/korean](https://huggingface.co/BuzzASR/korean): the model card's recommended decoding settings were changed to `num_beams=5` based on an evaluation with kocer 0.5.0 ([comparison](benchmarks/results/buzzasr_decoding.md)).
+- [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko): the model card reports results re-scored with kocer (0.1.5).
+
 ## Limitations
 
 - Notation differences other than numbers and acronyms (colloquial contractions, spelling as pronounced) are counted as errors.
