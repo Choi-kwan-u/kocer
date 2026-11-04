@@ -258,7 +258,7 @@ In %, pooled errors / pooled reference characters. KsponSpeech and telephone use
 
 - [BuzzASR/korean](https://huggingface.co/BuzzASR/korean): the model card's recommended decoding settings were changed to `num_beams=5` based on an evaluation with kocer 0.5.0 ([comparison](benchmarks/results/buzzasr_decoding.md)).
 - [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko): the model card reports results re-scored with kocer (0.1.5).
-- [ThakiCloud/Thaki-ASR-KO-1.7B](https://huggingface.co/ThakiCloud/Thaki-ASR-KO-1.7B): an independent re-score ([Discussion #1](link)) prompted a release audit on the model card, which now reports a supplementary kocer 0.5.3 re-score of its sealed evaluation sets and narrows the card's performance claims.
+- [ThakiCloud/Thaki-ASR-KO-1.7B](https://huggingface.co/ThakiCloud/Thaki-ASR-KO-1.7B): an independent re-score prompted a release audit on the model card, which now reports a supplementary kocer 0.5.3 re-score of its sealed evaluation sets and narrows the card's performance claims.
 
 ## Limitations
 
