@@ -254,7 +254,7 @@ kocer keywords ref.txt hyp.txt --list kw.txt   # kw.txt는 줄마다 키워드 �
 
 - [BuzzASR/korean](https://huggingface.co/BuzzASR/korean): 모델 카드의 권장 디코딩 설정을 kocer 0.5.0 평가 결과를 근거로 `num_beams=5`로 변경했습니다 ([비교 결과](benchmarks/results/buzzasr_decoding.md)).
 - [TeamUNIVA/qwen3_asr_1.7b_ko](https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko): 모델 카드에 kocer(0.1.5)로 재채점한 결과를 추가했습니다.
-- [ThakiCloud/Thaki-ASR-KO-1.7B](https://huggingface.co/ThakiCloud/Thaki-ASR-KO-1.7B): 독립 재채점([Discussion #1](링크))을 계기로 모델 카드에 릴리스 감사가 추가되었고, 비공개 평가셋의 kocer 0.5.3 보충 결과와 함께 성능 주장의 범위가 조정되었습니다.
+- [ThakiCloud/Thaki-ASR-KO-1.7B](https://huggingface.co/ThakiCloud/Thaki-ASR-KO-1.7B): 독립 재채점을 계기로 모델 카드에 평가 재검토 내용이 추가되었고, 비공개 평가셋의 kocer 0.5.3 보충 결과와 함께 성능 주장의 범위가 조정되었습니다.
 
 ## 한계
 
